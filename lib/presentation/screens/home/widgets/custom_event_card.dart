@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lenore/presentation/screens/product_listng_screen/product_listing_screen.dart';
 
-Widget buildEventCard(
-    String imagePath, String title, Size querySize, BuildContext context) {
+Widget buildEventCard(String imagePath, String title, Size querySize,
+    BuildContext context, int eventId) {
   return GestureDetector(
     onTap: () {
       Navigator.push(
@@ -10,6 +10,7 @@ Widget buildEventCard(
           MaterialPageRoute(
             builder: (context) => ProductListingScreen(
               productListingScreenName: title,
+              eventId: eventId,
             ),
           ));
     },
@@ -31,7 +32,7 @@ Widget buildEventCard(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset(imagePath, height: querySize.height * 0.037),
+            Image.network(imagePath, height: querySize.height * 0.037),
             const SizedBox(height: 5.0),
             Text(
               title,

@@ -212,10 +212,14 @@ class GiftByVoucherDetailScreen extends StatelessWidget {
               ),
               child: Align(
                 alignment: Alignment.topRight,
-                child: Image.asset(
-                  'assets/images/home/favourite.png',
-                  width: querySize.width * 0.075,
-                  height: querySize.height * 0.035,
+                child: CircleAvatar(
+                  radius: querySize.width * 0.033,
+                  backgroundColor: Colors.white,
+                  child: Image.asset(
+                    'assets/images/home/favourite.png',
+                    width: querySize.width * 0.075,
+                    height: querySize.height * 0.035,
+                  ),
                 ),
               ),
             ),

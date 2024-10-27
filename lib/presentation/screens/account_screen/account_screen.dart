@@ -14,6 +14,7 @@ import 'package:lenore/presentation/widgets/custom_profile_top_bar.dart';
 import 'package:lenore/presentation/widgets/cutom_bottom_bar_top_bar.dart';
 import 'package:lenore/presentation/widgets/logout_pop_up.dart';
 import 'package:lenore/presentation/widgets/top_bar_title.dart';
+import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 
 class AccountScreen extends StatelessWidget {
   const AccountScreen({super.key});
@@ -53,11 +54,13 @@ class AccountScreen extends StatelessWidget {
                 children: [
                   ElevatedButton(
                     onPressed: () {
-                      // Navigator.push(
-                      //     context,
-                      //     MaterialPageRoute(
-                      //       builder: (context) => MobileNumberInputScreen(),
-                      //     ));
+                      PersistentNavBarNavigator.pushNewScreen(
+                        context,
+                        screen: MobileNumberInputScreen(),
+                        withNavBar: false,
+                        pageTransitionAnimation:
+                            PageTransitionAnimation.cupertino,
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,

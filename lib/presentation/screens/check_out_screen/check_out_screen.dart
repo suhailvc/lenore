@@ -388,21 +388,30 @@ class CheckOutScreen extends StatelessWidget {
               ],
             ),
             const Spacer(),
-            Container(
-              width: querySize.width * 0.4,
-              height: querySize.height * 0.055,
-              decoration: BoxDecoration(
-                color: appColor,
-                borderRadius: BorderRadius.circular(querySize.width * 0.08),
-              ),
-              child: Center(
-                child: Text(
-                  'Pay Now',
-                  style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                      fontFamily: 'Segoe',
-                      fontSize: querySize.height * 0.017),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PaymentScreen(),
+                    ));
+              },
+              child: Container(
+                width: querySize.width * 0.4,
+                height: querySize.height * 0.055,
+                decoration: BoxDecoration(
+                  color: appColor,
+                  borderRadius: BorderRadius.circular(querySize.width * 0.08),
+                ),
+                child: Center(
+                  child: Text(
+                    'Pay Now',
+                    style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                        fontFamily: 'Segoe',
+                        fontSize: querySize.height * 0.017),
+                  ),
                 ),
               ),
             )

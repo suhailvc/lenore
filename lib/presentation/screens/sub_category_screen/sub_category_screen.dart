@@ -1,12 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:lenore/application/provider/home_provider/gift_by_voucher_provider/gift_by_voucher_provider.dart';
+import 'package:lenore/application/provider/sub_category_provider/sub_category_provider.dart';
 import 'package:lenore/core/constant.dart';
+import 'package:lenore/domain/sub_category_model/sub_category_model.dart';
+import 'package:lenore/presentation/screens/sub_category_product_listing_screen/sub_category_product_listing_screen.dart';
 
 import 'package:lenore/presentation/screens/sub_category_screen/widget/sub_category_product_card.dart';
 import 'package:lenore/presentation/widgets/custom_top_bar.dart';
+import 'package:provider/provider.dart';
 
-class SubCategoryScreen extends StatelessWidget {
+class SubCategoryScreen extends StatefulWidget {
   final String screenName;
-  const SubCategoryScreen({required this.screenName, super.key});
+  final String categoryName;
+  final int id;
+  const SubCategoryScreen(
+      {required this.categoryName,
+      required this.id,
+      required this.screenName,
+      super.key});
+
+  @override
+  State<SubCategoryScreen> createState() => _SubCategoryScreenState();
+}
+
+class _SubCategoryScreenState extends State<SubCategoryScreen> {
+  @override
+  void initState() {
+    Provider.of<SubCategoryProvider>(context, listen: false)
+        .fetchSubCategoriesItems(
+            categoryName: widget.categoryName, id: widget.id.toString());
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +48,7 @@ class SubCategoryScreen extends StatelessWidget {
               customTopBar(querySize, context),
               customHeightThree(querySize),
               Text(
-                screenName,
+                widget.screenName,
                 style: TextStyle(
                     color: const Color(0xFF008186),
                     fontSize: querySize.width * 0.05,
@@ -32,70 +56,129 @@ class SubCategoryScreen extends StatelessWidget {
                     fontFamily: 'ElMessiri'),
               ),
               customSizedBox(querySize),
-              GridView.count(
-                physics: const NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                crossAxisCount: 4,
-                crossAxisSpacing: 10.0,
-                mainAxisSpacing: 16.0,
-                childAspectRatio: 1.1,
-                children: [
-                  subCategoryCard("assets/images/sub_category_product/ring.png",
-                      "Rings", querySize, context),
-                  subCategoryCard(
-                      "assets/images/sub_category_product/earing.png",
-                      "Earings",
-                      querySize,
-                      context),
-                  subCategoryCard(
-                      "assets/images/sub_category_product/pendants.png",
-                      "Pendants",
-                      querySize,
-                      context),
-                  subCategoryCard(
-                      "assets/images/sub_category_product/necklase.png",
-                      "Necklaces",
-                      querySize,
-                      context),
-                  subCategoryCard(
-                      "assets/images/sub_category_product/bangles.png",
-                      "Bangles",
-                      querySize,
-                      context),
-                  subCategoryCard(
-                      "assets/images/sub_category_product/bracelet.png",
-                      "Bracelet",
-                      querySize,
-                      context),
-                  subCategoryCard("assets/images/sub_category_product/ring.png",
-                      "Rings", querySize, context),
-                  subCategoryCard(
-                      "assets/images/sub_category_product/earing.png",
-                      "Earings",
-                      querySize,
-                      context),
-                  subCategoryCard(
-                      "assets/images/sub_category_product/pendants.png",
-                      "Pendants",
-                      querySize,
-                      context),
-                  subCategoryCard(
-                      "assets/images/sub_category_product/necklase.png",
-                      "Necklaces",
-                      querySize,
-                      context),
-                  subCategoryCard(
-                      "assets/images/sub_category_product/bangles.png",
-                      "Bangles",
-                      querySize,
-                      context),
-                  subCategoryCard(
-                      "assets/images/sub_category_product/bracelet.png",
-                      "Bracelet",
-                      querySize,
-                      context),
-                ],
-              ),
+              Consumer<SubCategoryProvider>(
+                builder: (context, subCategoryvalue, child) {
+                  if (subCategoryvalue.isLoading) {
+                    return CircularProgressIndicator();
+                  } else if (subCategoryvalue.error ==
+                      "No data available for this category") {
+                    return Container(
+                      child: Center(
+                        child: Text('"No data available for this category"'),
+                      ),
+                    );
+                  } else if (subCategoryvalue.subCategoryItems == null) {
+                    return Container(
+                      child: Center(
+                        child: Text('"No data available for this category"'),
+                      ),
+                    );
+                  }
+                  return GridView.builder(
+                    physics: const NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 4,
+                      crossAxisSpacing: 10.0,
+                      mainAxisSpacing: 16.0,
+                      childAspectRatio: 1.1,
+                    ),
+                    itemCount: subCategoryvalue.subCategoryItems!.data!.length,
+                    itemBuilder: (context, index) {
+                      // return GestureDetector(
+                      //   onTap: () {
+                      //     Navigator.push(
+                      //         context,
+                      //         MaterialPageRoute(
+                      //           builder: (context) =>
+                      //               SubCategoryProductListingScreen(
+                      //                   eventId: subCategoryvalue
+                      //                       .subCategoryItems!.data![index].id!,
+                      //                   eventName: 'sub-category',
+                      //                   productListingScreenName:
+                      //                       subCategoryvalue.subCategoryItems!
+                      //                           .data![index].name!),
+                      //         ));
+                      //   },
+                      //child:
+                      return subCategoryCard(
+                          subCategoryvalue
+                              .subCategoryItems!.data![index].image!,
+                          subCategoryvalue.subCategoryItems!.data![index].name!,
+                          querySize,
+                          context,
+                          subCategoryvalue.subCategoryItems!.data![index].id!,
+                          'sub-category');
+                      //  );
+                    },
+                  );
+                },
+              )
+              // GridView.count(
+              //   physics: const NeverScrollableScrollPhysics(),
+              //   shrinkWrap: true,
+              //   crossAxisCount: 4,
+              //   crossAxisSpacing: 10.0,
+              //   mainAxisSpacing: 16.0,
+              //   childAspectRatio: 1.1,
+              //   children: [
+              //     subCategoryCard("assets/images/sub_category_product/ring.png",
+              //         "Rings", querySize, context),
+              //     subCategoryCard(
+              //         "assets/images/sub_category_product/earing.png",
+              //         "Earings",
+              //         querySize,
+              //         context),
+              //     subCategoryCard(
+              //         "assets/images/sub_category_product/pendants.png",
+              //         "Pendants",
+              //         querySize,
+              //         context),
+              //     subCategoryCard(
+              //         "assets/images/sub_category_product/necklase.png",
+              //         "Necklaces",
+              //         querySize,
+              //         context),
+              //     subCategoryCard(
+              //         "assets/images/sub_category_product/bangles.png",
+              //         "Bangles",
+              //         querySize,
+              //         context),
+              //     subCategoryCard(
+              //         "assets/images/sub_category_product/bracelet.png",
+              //         "Bracelet",
+              //         querySize,
+              //         context),
+              //     subCategoryCard("assets/images/sub_category_product/ring.png",
+              //         "Rings", querySize, context),
+              //     subCategoryCard(
+              //         "assets/images/sub_category_product/earing.png",
+              //         "Earings",
+              //         querySize,
+              //         context),
+              //     subCategoryCard(
+              //         "assets/images/sub_category_product/pendants.png",
+              //         "Pendants",
+              //         querySize,
+              //         context),
+              //     subCategoryCard(
+              //         "assets/images/sub_category_product/necklase.png",
+              //         "Necklaces",
+              //         querySize,
+              //         context),
+              //     subCategoryCard(
+              //         "assets/images/sub_category_product/bangles.png",
+              //         "Bangles",
+              //         querySize,
+              //         context),
+              //     subCategoryCard(
+              //         "assets/images/sub_category_product/bracelet.png",
+              //         "Bracelet",
+              //         querySize,
+              //         context),
+              //   ],
+              // ),
             ],
           ),
         ),

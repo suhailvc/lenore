@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:lenore/application/provider/otp_provider/otp_provider.dart';
+import 'package:lenore/application/provider/user_registration_provider/user_registration_provider.dart';
 import 'package:lenore/core/constant.dart';
 import 'package:lenore/presentation/screens/bottom_nav_bar/custom_bottom_nav_bar.dart';
 import 'package:lenore/presentation/screens/home/home_screen.dart';
@@ -6,9 +8,11 @@ import 'package:lenore/presentation/screens/home/home_screen.dart';
 import 'package:lenore/presentation/screens/login_screen/personal_details_screen/widgets/user_input_field.dart';
 import 'package:lenore/presentation/screens/login_screen/widget/login_custom_button.dart';
 import 'package:lenore/presentation/screens/persistant_bottom_nav_bar/persistant_bottom_nav_bar.dart';
+import 'package:provider/provider.dart';
 
 class PersonalDetailsScreen extends StatefulWidget {
-  const PersonalDetailsScreen({super.key});
+  final String mobileNumber;
+  const PersonalDetailsScreen({required this.mobileNumber, super.key});
 
   @override
   State<PersonalDetailsScreen> createState() => _PersonalDetailsScreenState();
@@ -187,8 +191,21 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                 SizedBox(
                   height: querySize.height * 0.05,
                 ),
-                loginCustomButton(context, querySize, "CONTINUE",
-                    const PersistantBottomNavBarScreen()),
+                Consumer<UserRegistrationProvider>(
+                    builder: (context, otpProvider, child) {
+                  return otpProvider.isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : loginCustomButton(context, querySize, "CONTINUE", () {
+                          otpProvider.userRegistration(
+                              fName: 'muhammad',
+                              sName: 'suhail',
+                              email: 'muhammad@gmail.com',
+                              qId: '12345678',
+                              gender: 'male',
+                              term: true,
+                              mobileNumber: widget.mobileNumber);
+                        });
+                }),
                 SizedBox(
                   height: querySize.height * 0.08,
                 )

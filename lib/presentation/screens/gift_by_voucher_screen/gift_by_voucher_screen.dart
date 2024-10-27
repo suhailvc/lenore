@@ -1,12 +1,14 @@
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
+import 'package:lenore/application/provider/home_provider/gift_by_voucher_provider/gift_by_voucher_provider.dart';
 import 'package:lenore/core/constant.dart';
 import 'package:lenore/presentation/screens/gift_by_voucher_detail_screen.dart/gift_by_voucher_detail_screen.dart';
 
 import 'package:lenore/presentation/widgets/custom_top_bar.dart';
 
 class GiftByVoucherScreen extends StatelessWidget {
-  const GiftByVoucherScreen({super.key});
+  final GiftByVoucherProvider giftByVoucherProvider;
+  const GiftByVoucherScreen({required this.giftByVoucherProvider, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +48,8 @@ class GiftByVoucherScreen extends StatelessWidget {
                       ),
                       customSizedBox(querySize),
                       GridView.builder(
-                        itemCount: 10,
+                        itemCount: giftByVoucherProvider
+                            .giftByVoucherItems!.data!.length,
                         physics: const NeverScrollableScrollPhysics(),
                         shrinkWrap: true,
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -113,7 +116,7 @@ class GiftByVoucherScreen extends StatelessWidget {
                                         height: querySize.height * 0.02,
                                       ),
                                       Text(
-                                        '1000 QR',
+                                        '${giftByVoucherProvider.giftByVoucherItems!.data![index].amount} QR',
                                         style: TextStyle(
                                             fontSize: querySize.height * 0.025,
                                             fontWeight: FontWeight.w600,
@@ -121,7 +124,10 @@ class GiftByVoucherScreen extends StatelessWidget {
                                             color: const Color(0xFF00ACB3)),
                                       ),
                                       Text(
-                                        'Gift Voucher',
+                                        giftByVoucherProvider
+                                            .giftByVoucherItems!
+                                            .data![index]
+                                            .name!,
                                         style: TextStyle(
                                             fontSize: querySize.height * 0.013,
                                             fontWeight: FontWeight.w700,

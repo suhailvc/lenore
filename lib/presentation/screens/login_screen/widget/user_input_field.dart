@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-Container userInputField() {
+Container userInputField({required TextEditingController inputController}) {
   return Container(
     height: 55,
     width: 333,
@@ -21,8 +21,9 @@ Container userInputField() {
             style: TextStyle(fontSize: 16),
           ),
         ),
-        const Expanded(
+        Expanded(
           child: TextField(
+            controller: inputController,
             keyboardType: TextInputType.phone,
             decoration: InputDecoration(
               hintStyle: TextStyle(color: Color(0xFFD0D0D0)),

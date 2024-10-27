@@ -7,16 +7,11 @@ ElevatedButton loginCustomButton(
   BuildContext context,
   Size querySize,
   String buttonText,
-  screenName,
+  Function onPressed,
 ) {
   return ElevatedButton(
     onPressed: () {
-      //  GoRouter.of(context).pushReplacement(NamedRoutes().home.path);
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => screenName,
-          ));
+      onPressed();
     },
     style: ElevatedButton.styleFrom(
       minimumSize: Size(querySize.width * 0.85, querySize.height * 0.06),
@@ -39,3 +34,43 @@ ElevatedButton loginCustomButton(
     ),
   );
 }
+
+
+// loginCustomButton(
+//                     context,
+//                     querySize,
+//                     apiService.isLoading ? "Loading..." : "GET OTP",
+//                     null, // Disable default navigation
+//                     onPressed: () async {
+//                       String phoneNumber = _phoneController.text.trim();
+//                       if (phoneNumber.isNotEmpty) {
+//                         // Send mobile number using the API service
+//                         await apiService.sendMobileNumber(phoneNumber);
+
+//                         // Navigate to OTP screen if the API call is successful
+//                         if (apiService.resultMessage != null &&
+//                             apiService.resultMessage == 'Success') {
+//                           Navigator.push(
+//                             context,
+//                             MaterialPageRoute(
+//                               builder: (context) => const OtpScreen(),
+//                             ),
+//                           );
+//                         } else {
+//                           // Show error message
+//                           ScaffoldMessenger.of(context).showSnackBar(
+//                             SnackBar(
+//                               content:
+//                                   Text(apiService.resultMessage ?? 'Error'),
+//                             ),
+//                           );
+//                         }
+//                       } else {
+//                         ScaffoldMessenger.of(context).showSnackBar(
+//                           const SnackBar(
+//                             content: Text("Please enter a phone number"),
+//                           ),
+//                         );
+//                       }
+//                     },
+//                   );

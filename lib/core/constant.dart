@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+var baseUrl = "https://project.artisans.qa/lenore-latest";
 Color appColor = const Color(0xFF00ACB3);
 Color textColor = const Color(0xFF008186);
 SizedBox customSizedBox(Size querySize) {

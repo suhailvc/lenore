@@ -1,159 +1,311 @@
 // import 'package:flutter/material.dart';
-// import 'package:lenore/core/constant.dart';
-// import 'package:lenore/presentation/screens/home/widgets/custom_best_seller.dart';
-// import 'package:lenore/presentation/screens/home/widgets/custom_category_card.dart';
-// import 'package:lenore/presentation/screens/home/widgets/custom_event_card.dart';
-// import 'package:lenore/presentation/screens/home/widgets/custom_event_message_field.dart';
-// import 'package:lenore/presentation/screens/home/widgets/custom_gift_voucher_card.dart';
-// import 'package:lenore/presentation/screens/home/widgets/custom_home_top_bar.dart';
+// import 'package:lenore/application/provider/product_listing_provider/product_listing_provider.dart';
+// import 'package:provider/provider.dart';
 
-// class HomeScreen1 extends StatelessWidget {
+// class HomeScreen1 extends StatefulWidget {
 //   const HomeScreen1({super.key});
 
 //   @override
+//   State<HomeScreen1> createState() => _HomeScreen1State();
+// }
+
+// class _HomeScreen1State extends State<HomeScreen1> {
+//   @override
+//   void initState() {
+//     Provider.of<ProductListingProvider>(context, listen: false)
+//         .productListProviderMethod(pageNo: '1', eventName: 'new-arrivals');
+//     Provider.of<ProductListingProvider>(context, listen: false)
+//         .productListProviderMethod(pageNo: '1', eventName: 'best-sellers');
+//     super.initState();
+//   }
+
+//   @override
 //   Widget build(BuildContext context) {
-//     var querySize = MediaQuery.of(context).size;
 //     return Scaffold(
-//       backgroundColor: Colors.white,
 //       body: SafeArea(
-//         child: Scrollbar(
-//           interactive: true,
-//           thickness: 3,
-//           child: SingleChildScrollView(
-//             child: Column(
-//               children: [
-//                 Padding(
-//                   padding: EdgeInsets.all(querySize.height * 0.02),
-//                   child: customHomeTopBar(querySize),
-//                 ),
-//                 SizedBox(
-//                   height: querySize.height * 0.01,
-//                 ),
-//                 customEventMessageField(querySize),
-//                 customSizedBox(querySize),
-//                 Padding(
-//                   padding:
-//                       EdgeInsets.symmetric(horizontal: querySize.height * 0.05),
-//                   child: Column(
-//                     crossAxisAlignment: CrossAxisAlignment.start,
+//           child: Column(
+//         children: [
+//           Consumer<ProductListingProvider>(
+//             builder: (context, newArrival, child) {
+//               if (newArrival.isLoading) {
+//                 return Center(child: CircularProgressIndicator());
+//               } else {
+//                 return customHomeNewArrivalSection(
+//                     querySize, "New Arrival", "All New Arrivals", context,
+//                     newArrivalProvider: newArrival);
+//               }
+//             },
+//           ),
+//           Consumer<ProductListingProvider>(
+//             builder: (context, bestSeller, child) {
+//               if (bestSeller.isLoading) {
+//                 // Show loading spinner while fetching data
+//                 return Center(child: CircularProgressIndicator());
+//               } else {
+//                 return bestSellerSection(
+//                     querySize, "Best Seller", "All Best Sellers", context,
+//                     bestSellerProvider: bestSeller);
+//               }
+//             },
+//           ),
+//         ],
+//       )),
+//     );
+//   }
+// }
+
+// customHomeNewArrivalSection(
+//     Size querySize, sectionTitle, String buttonName, BuildContext context,
+//     {ProductListingProvider? newArrivalProvider}) {
+//   return Column(
+//     crossAxisAlignment: CrossAxisAlignment.start,
+//     children: [
+//       homeSectionTitle(
+//           querySize,
+//           sectionTitle,
+//           context,
+//           BestSellerNewArrivalListingScreen(
+//             eventName: 'new-arrivals',
+//             productListingScreenName: 'New Arrivals',
+//           )),
+//       customSizedBox(querySize),
+//       GridView.builder(
+//         physics: const NeverScrollableScrollPhysics(),
+//         shrinkWrap: true,
+//         itemCount: newArrivalProvider!.productListItems.data!.length > 4
+//             ? 4
+//             : newArrivalProvider.productListItems.data!.length,
+//         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+//           crossAxisCount: 2,
+//           crossAxisSpacing: querySize.height * 0.017,
+//           //mainAxisSpacing: querySize.height * 001,
+//           childAspectRatio: 0.78,
+//         ),
+//         itemBuilder: (context, index) {
+//           return Column(
+//             crossAxisAlignment: CrossAxisAlignment.start,
+//             children: [
+//               GestureDetector(
+//                   onTap: () {
+//                     Navigator.push(
+//                         context,
+//                         MaterialPageRoute(
+//                           builder: (context) => const ProductDetailScreen(),
+//                         ));
+//                   },
+//                   child: Stack(
 //                     children: [
-//                       Text(
-//                         "Gift By Event",
-//                         style: TextStyle(
-//                           fontSize: querySize.height * 0.025,
-//                           fontWeight: FontWeight.bold,
-//                           fontFamily: 'Sitka',
+//                       Container(
+//                         height: querySize.height * 0.2,
+//                         decoration: BoxDecoration(
+//                           borderRadius:
+//                               BorderRadius.circular(querySize.width * 0.04),
+//                           boxShadow: [
+//                             BoxShadow(
+//                               color: Colors.black.withOpacity(0.3),
+//                               offset: const Offset(0, 7),
+//                               blurRadius: querySize.width * 0.008,
+//                               spreadRadius: -2,
+//                             ),
+//                           ],
 //                         ),
-//                       ),
-//                       customSizedBox(querySize),
-//                       GridView.count(
-//                         physics: const NeverScrollableScrollPhysics(),
-//                         shrinkWrap: true,
-//                         crossAxisCount: 4,
-//                         crossAxisSpacing: 16.0,
-//                         mainAxisSpacing: 16.0,
-//                         childAspectRatio: 1.1,
-//                         children: [
-//                           buildEventCard("assets/images/home/Birth Day.png",
-//                               "Birthday", querySize),
-//                           buildEventCard("assets/images/home/Graduation.png",
-//                               "Graduation", querySize),
-//                           buildEventCard(
-//                               "assets/images/home/Love.png", "Love", querySize),
-//                           buildEventCard("assets/images/home/New Born.png",
-//                               "New Born", querySize),
-//                           buildEventCard("assets/images/home/aniversary.png",
-//                               "Anniversarys", querySize),
-//                           buildEventCard("assets/images/home/wedding.png",
-//                               "Wedding", querySize),
-//                           buildEventCard(
-//                               "assets/images/home/omra.png", "Omra", querySize),
-//                           buildEventCard("assets/images/home/ramdan.png",
-//                               "Ramadan", querySize),
-//                         ],
-//                       ),
-//                       SizedBox(height: querySize.height * 0.01),
-//                       Align(
-//                         alignment: Alignment.centerRight,
-//                         child: Text(
-//                           "See more ...",
-//                           style: TextStyle(
-//                             fontFamily: 'Raleway',
-//                             fontSize: querySize.height * 0.011,
-//                             color: Colors.black,
+//                         child: ClipRRect(
+//                           borderRadius:
+//                               BorderRadius.circular(querySize.width * 0.04),
+//                           child: Image.network(
+//                             newArrivalProvider
+//                                 .productListItems.data![index].thumbImage!,
+//                             fit: BoxFit.cover,
+//                             width: double.infinity,
+//                             height: double.infinity,
 //                           ),
 //                         ),
 //                       ),
-//                       SizedBox(
-//                         height: querySize.height * 0.02,
+
+//                       // Favorite icon positioned in the top right corner
+//                       Positioned(
+//                         top: querySize.height * 0.008,
+//                         right: querySize.height * 0.012,
+//                         child: GestureDetector(
+//                           onTap: () {},
+//                           child: CircleAvatar(
+//                             radius: querySize.width * 0.033,
+//                             backgroundColor: Colors.white,
+//                             child: Image.asset(
+//                               'assets/images/home/favourite.png',
+//                               width: querySize.width * 0.075,
+//                               height: querySize.height * 0.035,
+//                             ),
+//                           ),
+//                         ),
 //                       ),
-//                       const Divider(),
 //                     ],
+//                   )),
+//               SizedBox(height: querySize.height * 0.01),
+//               Row(
+//                 children: [
+//                   Text(
+//                     "QAR",
+//                     style: TextStyle(
+//                       fontFamily: 'ElMessiri',
+//                       color: Colors.black,
+//                       fontWeight: FontWeight.w600,
+//                       fontSize: querySize.width * 0.029,
+//                     ),
 //                   ),
+//                   Text(
+//                     ' 99',
+//                     style: TextStyle(
+//                       color: const Color(0xFF000000),
+//                       fontSize: querySize.width * 0.035,
+//                       fontWeight: FontWeight.bold,
+//                     ),
+//                   ),
+//                 ],
+//               ),
+//               Text(
+//                 newArrivalProvider.productListItems.data![index].name!,
+//                 style: TextStyle(
+//                   overflow: TextOverflow.ellipsis,
+//                   fontWeight: FontWeight.w600,
+//                   fontFamily: 'Segoe',
+//                   fontSize: querySize.width * 0.027,
+//                   color: const Color(0xFF525252),
 //                 ),
-//                 customSizedBox(querySize),
-//                 customCategoriesCard(
-//                     const Color(0xFFFCEDE2),
-//                     querySize,
-//                     "Product Categories",
-//                     "Diamond",
-//                     "assets/images/home/diamond.png",
-//                     "Pearl",
-//                     "assets/images/home/pearl.png",
-//                     "Gold",
-//                     "assets/images/home/gold.png",
-//                     "Sets",
-//                     "assets/images/home/sets.png"),
-//                 customSizedBox(querySize),
-//                 customDivider(querySize),
-//                 customSizedBox(querySize),
-//                 giftVoucherCard(querySize, context),
-//                 customHeightThree(querySize),
-//                 customDivider(querySize),
-//                 customHeightThree(querySize),
-//                 Padding(
-//                   padding:
-//                       EdgeInsets.symmetric(horizontal: querySize.height * 0.05),
-//                   child: customBestSeller(querySize),
-//                 ),
-//                 customSizedBox(querySize),
-//                 customDivider(querySize),
-//                 customSizedBox(querySize),
-//                 customCategoriesCard(
-//                     const Color(0xFFDFEFD6),
-//                     querySize,
-//                     "Brands",
-//                     "Warda",
-//                     "assets/images/home/warda image.png",
-//                     "Zri",
-//                     "assets/images/home/zri image.png",
-//                     "Laura",
-//                     "assets/images/home/laura image.png",
-//                     "Maraya",
-//                     "assets/images/home/maraya image.png"),
-//                 customSizedBox(querySize),
-//                 customDivider(querySize),
-//                 customSizedBox(querySize),
-//                 customCategoriesCard(
-//                     const Color(0xFFECEAE6),
-//                     querySize,
-//                     "New Arrival",
-//                     "Warda",
-//                     "assets/images/home/warda image.png",
-//                     "Zri",
-//                     "assets/images/home/zri image.png",
-//                     "Laura",
-//                     "assets/images/home/laura image.png",
-//                     "Maraya",
-//                     "assets/images/home/maraya image.png"),
-//                 SizedBox(
-//                   height: querySize.height * 0.06,
-//                 )
-//               ],
-//             ),
-//           ),
-//         ),
+//               ),
+//             ],
+//           );
+//         },
 //       ),
-//     );
-//   }
+//     ],
+//   );
+// }
+
+// bestSellerSection(
+//     Size querySize, sectionTitle, String buttonName, BuildContext context,
+//     {ProductListingProvider? bestSellerProvider}) {
+//   return Column(
+//     crossAxisAlignment: CrossAxisAlignment.start,
+//     children: [
+//       homeSectionTitle(
+//           querySize,
+//           sectionTitle,
+//           context,
+//           BestSellerNewArrivalListingScreen(
+//             eventName: 'best-sellers',
+//             productListingScreenName: 'Best Sellers',
+//           )),
+//       customSizedBox(querySize),
+//       GridView.builder(
+//         physics: const NeverScrollableScrollPhysics(),
+//         shrinkWrap: true,
+//         itemCount: bestSellerProvider!.productListItems.data!.length > 4
+//             ? 4
+//             : bestSellerProvider.productListItems.data!.length,
+//         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+//           crossAxisCount: 2,
+//           crossAxisSpacing: querySize.height * 0.017,
+//           //mainAxisSpacing: querySize.height * 001,
+//           childAspectRatio: 0.78,
+//         ),
+//         itemBuilder: (context, index) {
+//           return Column(
+//             crossAxisAlignment: CrossAxisAlignment.start,
+//             children: [
+//               GestureDetector(
+//                   onTap: () {
+//                     Navigator.push(
+//                         context,
+//                         MaterialPageRoute(
+//                           builder: (context) => const ProductDetailScreen(),
+//                         ));
+//                   },
+//                   child: Stack(
+//                     children: [
+//                       Container(
+//                         height: querySize.height * 0.2,
+//                         decoration: BoxDecoration(
+//                           borderRadius:
+//                               BorderRadius.circular(querySize.width * 0.04),
+//                           boxShadow: [
+//                             BoxShadow(
+//                               color: Colors.black.withOpacity(0.3),
+//                               offset: const Offset(0, 7),
+//                               blurRadius: querySize.width * 0.008,
+//                               spreadRadius: -2,
+//                             ),
+//                           ],
+//                         ),
+//                         child: ClipRRect(
+//                           borderRadius:
+//                               BorderRadius.circular(querySize.width * 0.04),
+//                           child: Image.network(
+//                             bestSellerProvider
+//                                 .productListItems.data![index].thumbImage!,
+
+//                             fit: BoxFit
+//                                 .cover, // Ensure the image covers the entire container
+//                             width: double.infinity,
+//                             height: double.infinity,
+//                           ),
+//                         ),
+//                       ),
+
+//                       // Favorite icon positioned in the top right corner
+//                       Positioned(
+//                         top: querySize.height * 0.008,
+//                         right: querySize.height * 0.012,
+//                         child: GestureDetector(
+//                           onTap: () {},
+//                           child: CircleAvatar(
+//                             radius: querySize.width * 0.033,
+//                             backgroundColor: Colors.white,
+//                             child: Image.asset(
+//                               'assets/images/home/favourite.png',
+//                               width: querySize.width * 0.075,
+//                               height: querySize.height * 0.035,
+//                             ),
+//                           ),
+//                         ),
+//                       ),
+//                     ],
+//                   )),
+//               SizedBox(height: querySize.height * 0.01),
+//               Row(
+//                 children: [
+//                   Text(
+//                     "QAR",
+//                     style: TextStyle(
+//                       fontFamily: 'ElMessiri',
+//                       color: Colors.black,
+//                       fontWeight: FontWeight.w600,
+//                       fontSize: querySize.width * 0.029,
+//                     ),
+//                   ),
+//                   Text(
+//                     '99',
+//                     style: TextStyle(
+//                       color: const Color(0xFF000000),
+//                       fontSize: querySize.width * 0.035,
+//                       fontWeight: FontWeight.bold,
+//                     ),
+//                   ),
+//                 ],
+//               ),
+//               Text(
+//                 bestSellerProvider.productListItems.data![index].name!,
+//                 style: TextStyle(
+//                   overflow: TextOverflow.ellipsis,
+//                   fontWeight: FontWeight.w600,
+//                   fontFamily: 'Segoe',
+//                   fontSize: querySize.width * 0.027,
+//                   color: const Color(0xFF525252),
+//                 ),
+//               ),
+//             ],
+//           );
+//         },
+//       ),
+//     ],
+//   );
 // }

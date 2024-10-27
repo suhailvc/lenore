@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:lenore/application/provider/home_provider/gift_by_event_provider/gift_by_event_provider.dart';
 import 'package:lenore/core/constant.dart';
 import 'package:lenore/presentation/screens/home/widgets/custom_event_card.dart';
 
 import 'package:lenore/presentation/widgets/custom_top_bar.dart';
 
 class GiftByEventScreen extends StatelessWidget {
-  const GiftByEventScreen({super.key});
+  final GiftByEventProvider eventProvider;
+  const GiftByEventScreen({required this.eventProvider, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -31,47 +33,25 @@ class GiftByEventScreen extends StatelessWidget {
                     fontFamily: 'ElMessiri'),
               ),
               customSizedBox(querySize),
-              GridView.count(
+              GridView.builder(
+                itemCount: eventProvider.cachedResponse!.data!.length,
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
-                crossAxisCount: 4,
-                crossAxisSpacing: 10.0,
-                mainAxisSpacing: 16.0,
-                childAspectRatio: 1.1,
-                children: [
-                  buildEventCard("assets/images/home/Birth Day.png", "Birthday",
-                      querySize, context),
-                  buildEventCard("assets/images/home/ramdan.png", "Ramadan",
-                      querySize, context),
-                  buildEventCard("assets/images/home/New Born.png", "New Born",
-                      querySize, context),
-                  buildEventCard("assets/images/home/Graduation.png",
-                      "Graduation", querySize, context),
-                  buildEventCard(
-                      "assets/images/home/eid.png", "Eid", querySize, context),
-                  buildEventCard("assets/images/home/wedding.png", "Wedding",
-                      querySize, context),
-                  buildEventCard("assets/images/home/omra.png", "Omra",
-                      querySize, context),
-                  buildEventCard("assets/images/home/thankyou.png", "Thank you",
-                      querySize, context),
-                  buildEventCard("assets/images/home/Birth Day.png", "Birthday",
-                      querySize, context),
-                  buildEventCard("assets/images/home/ramdan.png", "Ramadan",
-                      querySize, context),
-                  buildEventCard("assets/images/home/New Born.png", "New Born",
-                      querySize, context),
-                  buildEventCard("assets/images/home/Graduation.png",
-                      "Graduation", querySize, context),
-                  buildEventCard(
-                      "assets/images/home/eid.png", "Eid", querySize, context),
-                  buildEventCard("assets/images/home/wedding.png", "Wedding",
-                      querySize, context),
-                  buildEventCard("assets/images/home/omra.png", "Omra",
-                      querySize, context),
-                  buildEventCard("assets/images/home/thankyou.png", "Thank you",
-                      querySize, context),
-                ],
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 4, // Number of columns
+                  crossAxisSpacing: 10.0,
+                  mainAxisSpacing: 16.0,
+                  childAspectRatio: 1.1,
+                ),
+                itemBuilder: (context, index) {
+                  final event = eventProvider.cachedResponse!.data![index];
+                  return buildEventCard(
+                      event.image ?? '',
+                      event.eventCategory ?? 'No Name',
+                      querySize,
+                      context,
+                      event.id!);
+                },
               ),
             ],
           ),

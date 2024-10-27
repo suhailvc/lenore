@@ -1,12 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:lenore/application/provider/home_provider/collection_provider/collection_provider.dart';
+import 'package:lenore/application/provider/product_listing_provider/product_listing_provder.dart';
 import 'package:lenore/core/constant.dart';
 
 import 'package:lenore/presentation/screens/product_listng_screen/product_listing_screen.dart';
+import 'package:lenore/presentation/screens/sub_category_product_listing_screen/sub_category_product_listing_screen.dart';
 import 'package:lenore/presentation/widgets/custom_top_bar.dart';
 
-class CollectionScreen extends StatelessWidget {
-  const CollectionScreen({super.key});
+class CollectionScreen extends StatefulWidget {
+  final CollectionProvider collections;
+  const CollectionScreen({required this.collections, super.key});
 
+  @override
+  State<CollectionScreen> createState() => _CollectionScreenState();
+}
+
+class _CollectionScreenState extends State<CollectionScreen> {
   @override
   Widget build(BuildContext context) {
     var querySize = MediaQuery.of(context).size;
@@ -48,7 +57,7 @@ class CollectionScreen extends StatelessWidget {
                     right: querySize.width * 0.03,
                   ),
                   child: GridView.builder(
-                    itemCount: 6,
+                    itemCount: widget.collections.collectionItems.data!.length,
                     physics: const NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -60,60 +69,22 @@ class CollectionScreen extends StatelessWidget {
                     itemBuilder: (context, index) {
                       return GestureDetector(
                           onTap: () {
-                            if (index == 0) {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
                                     builder: (context) =>
-                                        const ProductListingScreen(
-                                            productListingScreenName: 'Laura'),
-                                  ));
-                            }
-                            if (index == 1) {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const ProductListingScreen(
-                                              productListingScreenName:
-                                                  "ZRI")));
-                            }
-                            if (index == 2) {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const ProductListingScreen(
-                                            productListingScreenName: "WARDA"),
-                                  ));
-                            }
-                            if (index == 3) {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const ProductListingScreen(
-                                            productListingScreenName: "ZRI"),
-                                  ));
-                            }
-                            if (index == 4) {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const ProductListingScreen(
-                                            productListingScreenName: "WARDA"),
-                                  ));
-                            }
-                            if (index == 5) {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const ProductListingScreen(
-                                            productListingScreenName: "LAURA"),
-                                  ));
-                            }
+                                        SubCategoryProductListingScreen(
+                                            eventId: widget
+                                                .collections
+                                                .collectionItems
+                                                .data![index]
+                                                .id!,
+                                            eventName: 'collections',
+                                            productListingScreenName: widget
+                                                .collections
+                                                .collectionItems
+                                                .data![index]
+                                                .name!)));
                           },
                           child: Column(
                             children: [
@@ -126,14 +97,15 @@ class CollectionScreen extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(
                                       querySize.width * 0.03),
                                   image: DecorationImage(
-                                    image:
-                                        AssetImage(collectionListPhotos[index]),
+                                    image: NetworkImage(widget.collections
+                                        .collectionItems.data![index].logo!),
                                     fit: BoxFit.cover,
                                   ),
                                 ),
                               ),
                               Text(
-                                collectionListName[index],
+                                widget.collections.collectionItems.data![index]
+                                    .name!,
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                     fontSize: 12.69 / 375.0 * querySize.width,

@@ -1,16 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:lenore/presentation/screens/product_listng_screen/product_listing_screen.dart';
+import 'package:lenore/presentation/screens/sub_category_product_listing_screen/sub_category_product_listing_screen.dart';
 
 Widget subCategoryCard(
-    String imagePath, String title, Size querySize, BuildContext context) {
+  String imagePath,
+  String title,
+  Size querySize,
+  BuildContext context,
+  int id,
+  String eventName,
+) {
   return GestureDetector(
     onTap: () {
       Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ProductListingScreen(
-              productListingScreenName: title,
-            ),
+            builder: (context) => SubCategoryProductListingScreen(
+                eventId: id,
+                eventName: eventName,
+                productListingScreenName: title),
           ));
     },
     child: Container(
@@ -31,7 +38,7 @@ Widget subCategoryCard(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset(imagePath,
+            Image.network(imagePath,
                 height: querySize.height * 0.037,
                 filterQuality: FilterQuality.high),
             const SizedBox(height: 5.0),
