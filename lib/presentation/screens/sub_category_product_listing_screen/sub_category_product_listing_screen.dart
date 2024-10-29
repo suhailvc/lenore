@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:lenore/application/provider/product_listing_provider/product_listing_provder.dart';
 import 'package:lenore/core/constant.dart';
 import 'package:lenore/presentation/screens/filter_screen/filter_screen.dart';
@@ -70,7 +71,7 @@ class _SubCategoryProductListingScreenState
                     child: Consumer<ProductListProvider>(
                       builder: (context, productListvalue, child) {
                         if (productListvalue.isLoading && pageNo == 1) {
-                          return CircularProgressIndicator();
+                          return lenoreGif(querySize);
                         } else if (productListvalue.productListItems.data ==
                                 null ||
                             productListvalue.productListItems.data!.isEmpty) {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lenore/presentation/screens/product_listng_screen/product_listing_screen.dart';
+import 'package:lenore/presentation/screens/sub_category_product_listing_screen/sub_category_product_listing_screen.dart';
 
 Widget buildEventCard(String imagePath, String title, Size querySize,
     BuildContext context, int eventId) {
@@ -8,7 +9,8 @@ Widget buildEventCard(String imagePath, String title, Size querySize,
       Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ProductListingScreen(
+            builder: (context) => SubCategoryProductListingScreen(
+              eventName: 'gift-by-event',
               productListingScreenName: title,
               eventId: eventId,
             ),

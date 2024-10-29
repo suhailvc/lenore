@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 var baseUrl = "https://project.artisans.qa/lenore-latest";
 Color appColor = const Color(0xFF00ACB3);
@@ -68,3 +70,17 @@ var homeBanner = [
   "assets/images/home/home_banner_2.png",
   "assets/images/home/home_banner_3.png"
 ];
+Container lenoreGif(Size querySize) {
+  return Container(
+    color: Colors.white,
+    height: querySize.height * 0.7,
+    width: querySize.width * 1,
+    child: Center(
+      child: Image.asset(
+        'assets/images/Lenore.gif',
+        height: querySize.height * 0.3,
+        width: querySize.width * 0.4,
+      ).animate(),
+    ),
+  );
+}

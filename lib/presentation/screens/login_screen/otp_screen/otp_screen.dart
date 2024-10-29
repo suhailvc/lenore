@@ -19,53 +19,48 @@ class OtpScreen extends StatefulWidget {
 }
 
 class _OtpScreenState extends State<OtpScreen> {
-  final TextEditingController otpController = TextEditingController();
+  final TextEditingController otpController1 = TextEditingController();
+  final TextEditingController otpController2 = TextEditingController();
+  final TextEditingController otpController3 = TextEditingController();
+  final TextEditingController otpController4 = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    // Start the OTP timer countdown
     Provider.of<TimerProvider>(context, listen: false).startTimer();
   }
 
   Future<void> _handleOtpSubmission(BuildContext context) async {
     final otpProvider = Provider.of<OtpProvider>(context, listen: false);
-    String otp = otpController.text;
+    String otp = otpController1.text +
+        otpController2.text +
+        otpController3.text +
+        otpController4.text;
 
-    // if (otp.isEmpty) {
-    //   ScaffoldMessenger.of(context).showSnackBar(
-    //     const SnackBar(content: Text('Please enter the OTP')),
-    //   );
-    //   return;
-    // }
+    if (otp.isEmpty || otp.length < 4) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter a valid OTP')),
+      );
+      return;
+    }
 
     var response = await otpProvider.verifyOtp(widget.mobileNumber, otp);
 
     if (response is ExistingUserOtpModel) {
-      print('response');
-      // Navigate to Home Screen if the user exists
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
             builder: (context) => const PersistantBottomNavBarScreen()),
       );
     } else if (response is NewUserOtpModel) {
-      print(response);
-      // Navigate to Registration Screen for new users
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-            builder: (context) => PersonalDetailsScreen(
-                  mobileNumber: widget.mobileNumber,
-                )),
+            builder: (context) =>
+                PersonalDetailsScreen(mobileNumber: widget.mobileNumber)),
       );
     } else if (response is Map<String, dynamic> &&
         response.containsKey('error')) {
-      print(response);
-      print('ui error-------------------------------------------');
-      print(response);
-      // Show error message for incorrect OTP
-
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(response['error'])),
       );
@@ -104,15 +99,13 @@ class _OtpScreenState extends State<OtpScreen> {
                     color: Colors.black,
                   ),
                   children: <TextSpan>[
-                    const TextSpan(
-                      text: 'Code has been sent to ',
-                    ),
+                    const TextSpan(text: 'Code has been sent to '),
                     TextSpan(
                       text: widget.mobileNumber,
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w400,
-                        color: Color(0xFF00ACB3), // Custom color
+                        color: Color(0xFF00ACB3),
                       ),
                     ),
                   ],
@@ -123,13 +116,13 @@ class _OtpScreenState extends State<OtpScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _otpTextField(context, otpController,
+                    _otpTextField(context, otpController1,
                         first: true, last: false),
-                    _otpTextField(context, otpController,
+                    _otpTextField(context, otpController2,
                         first: false, last: false),
-                    _otpTextField(context, otpController,
+                    _otpTextField(context, otpController3,
                         first: false, last: false),
-                    _otpTextField(context, otpController,
+                    _otpTextField(context, otpController4,
                         first: false, last: true),
                   ],
                 ),
@@ -187,7 +180,7 @@ class _OtpScreenState extends State<OtpScreen> {
   }
 }
 
-Widget _otpTextField(BuildContext context, TextEditingController otpController,
+Widget _otpTextField(BuildContext context, TextEditingController controller,
     {required bool first, required bool last}) {
   return Container(
     width: 77,
@@ -197,13 +190,15 @@ Widget _otpTextField(BuildContext context, TextEditingController otpController,
       borderRadius: BorderRadius.circular(28),
     ),
     child: TextFormField(
-      controller: otpController,
+      maxLength: 1,
+      controller: controller,
       autofocus: true,
       obscureText: true,
       keyboardType: TextInputType.number,
       textAlign: TextAlign.center,
       style: const TextStyle(fontSize: 24),
       decoration: const InputDecoration(
+        counterText: "", // Hides the character counter
         border: InputBorder.none,
         contentPadding: EdgeInsets.all(10),
       ),
@@ -224,6 +219,213 @@ Widget _otpTextField(BuildContext context, TextEditingController otpController,
     ),
   );
 }
+
+// class _OtpScreenState extends State<OtpScreen> {
+//   final TextEditingController otpController = TextEditingController();
+
+//   @override
+//   void initState() {
+//     super.initState();
+//     // Start the OTP timer countdown
+//     Provider.of<TimerProvider>(context, listen: false).startTimer();
+//   }
+
+//   Future<void> _handleOtpSubmission(BuildContext context) async {
+//     final otpProvider = Provider.of<OtpProvider>(context, listen: false);
+//     String otp = otpController.text;
+
+//     // if (otp.isEmpty) {
+//     //   ScaffoldMessenger.of(context).showSnackBar(
+//     //     const SnackBar(content: Text('Please enter the OTP')),
+//     //   );
+//     //   return;
+//     // }
+
+//     var response = await otpProvider.verifyOtp(widget.mobileNumber, otp);
+
+//     if (response is ExistingUserOtpModel) {
+//       print('response');
+//       // Navigate to Home Screen if the user exists
+//       Navigator.pushReplacement(
+//         context,
+//         MaterialPageRoute(
+//             builder: (context) => const PersistantBottomNavBarScreen()),
+//       );
+//     } else if (response is NewUserOtpModel) {
+//       print(response);
+//       // Navigate to Registration Screen for new users
+//       Navigator.pushReplacement(
+//         context,
+//         MaterialPageRoute(
+//             builder: (context) => PersonalDetailsScreen(
+//                   mobileNumber: widget.mobileNumber,
+//                 )),
+//       );
+//     } else if (response is Map<String, dynamic> &&
+//         response.containsKey('error')) {
+//       print(response);
+//       print('ui error-------------------------------------------');
+//       print(response);
+//       // Show error message for incorrect OTP
+
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(content: Text(response['error'])),
+//       );
+//     }
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     var querySize = MediaQuery.of(context).size;
+
+//     return Scaffold(
+//       backgroundColor: Colors.white,
+//       resizeToAvoidBottomInset: false,
+//       body: SafeArea(
+//         child: Padding(
+//           padding: const EdgeInsets.symmetric(horizontal: 24.0),
+//           child: Column(
+//             crossAxisAlignment: CrossAxisAlignment.start,
+//             children: [
+//               const SizedBox(height: 60),
+//               const Text(
+//                 'Enter Your OTP to Continue',
+//                 style: TextStyle(
+//                   fontSize: 36,
+//                   fontWeight: FontWeight.w500,
+//                   fontFamily: 'Lora',
+//                 ),
+//               ),
+//               const SizedBox(height: 20),
+//               RichText(
+//                 text: TextSpan(
+//                   style: const TextStyle(
+//                     fontSize: 14,
+//                     fontWeight: FontWeight.w400,
+//                     fontFamily: 'serif',
+//                     color: Colors.black,
+//                   ),
+//                   children: <TextSpan>[
+//                     const TextSpan(
+//                       text: 'Code has been sent to ',
+//                     ),
+//                     TextSpan(
+//                       text: widget.mobileNumber,
+//                       style: const TextStyle(
+//                         fontSize: 14,
+//                         fontWeight: FontWeight.w400,
+//                         color: Color(0xFF00ACB3), // Custom color
+//                       ),
+//                     ),
+//                   ],
+//                 ),
+//               ),
+//               const SizedBox(height: 20),
+//               Form(
+//                 child: Row(
+//                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                   children: [
+//                     _otpTextField(context, otpController,
+//                         first: true, last: false),
+//                     _otpTextField(context, otpController,
+//                         first: false, last: false),
+//                     _otpTextField(context, otpController,
+//                         first: false, last: false),
+//                     _otpTextField(context, otpController,
+//                         first: false, last: true),
+//                   ],
+//                 ),
+//               ),
+//               const SizedBox(height: 20),
+//               Row(
+//                 children: [
+//                   Text(
+//                     'Resend OTP?',
+//                     style: TextStyle(
+//                       fontFamily: 'Jost',
+//                       fontSize: 16,
+//                       fontWeight: FontWeight.w500,
+//                       color: appColor,
+//                     ),
+//                   ),
+//                   const Spacer(),
+//                   Consumer<TimerProvider>(
+//                     builder: (context, timerProvider, child) {
+//                       return Text(
+//                         '${timerProvider.start} seconds',
+//                         style: TextStyle(
+//                           fontFamily: 'Segoe',
+//                           fontSize: querySize.height * 0.018,
+//                           fontWeight: FontWeight.w500,
+//                           color: Color(0x80292D32),
+//                         ),
+//                       );
+//                     },
+//                   ),
+//                 ],
+//               ),
+//               SizedBox(
+//                 height: querySize.height * 0.43,
+//               ),
+//               Consumer<OtpProvider>(
+//                 builder: (context, otpProvider, child) {
+//                   return otpProvider.isLoading
+//                       ? const Center(child: CircularProgressIndicator())
+//                       : loginCustomButton(
+//                           context,
+//                           querySize,
+//                           "CONTINUE",
+//                           () {
+//                             _handleOtpSubmission(context);
+//                           },
+//                         );
+//                 },
+//               ),
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
+
+// Widget _otpTextField(BuildContext context, TextEditingController otpController,
+//     {required bool first, required bool last}) {
+//   return Container(
+//     width: 77,
+//     height: 55,
+//     decoration: BoxDecoration(
+//       border: Border.all(color: const Color(0xFF00ACB3), width: 1.5),
+//       borderRadius: BorderRadius.circular(28),
+//     ),
+//     child: TextFormField(
+//       controller: otpController,
+//       autofocus: true,
+//       obscureText: true,
+//       keyboardType: TextInputType.number,
+//       textAlign: TextAlign.center,
+//       style: const TextStyle(fontSize: 24),
+//       decoration: const InputDecoration(
+//         border: InputBorder.none,
+//         contentPadding: EdgeInsets.all(10),
+//       ),
+//       onChanged: (value) {
+//         if (value.length == 1 && !last) {
+//           FocusScope.of(context).nextFocus();
+//         }
+//         if (value.isEmpty && !first) {
+//           FocusScope.of(context).previousFocus();
+//         }
+//       },
+//       validator: (value) {
+//         if (value == null || value.isEmpty) {
+//           return 'Please enter a digit';
+//         }
+//         return null;
+//       },
+//     ),
+//   );
+// }
 
 
 

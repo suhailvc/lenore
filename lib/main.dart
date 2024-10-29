@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lenore/application/provider/bestseller_new_aarival_product_list_provider/bestseller_new_aarival_product_list_provider.dart';
+import 'package:lenore/application/provider/customization_provider/customization_provider.dart';
+import 'package:lenore/application/provider/edit_profile_model/edit_profile_model.dart';
 import 'package:lenore/application/provider/home_provider/best_seller_provider/best_seller_provider.dart';
 import 'package:lenore/application/provider/check_out_provider/check_box_provider.dart';
 
@@ -13,15 +15,19 @@ import 'package:lenore/application/provider/home_provider/home_banner_provider/h
 import 'package:lenore/application/provider/login_provider/login_provider.dart';
 import 'package:lenore/application/provider/mobile_number_provider/mobile_number_provider.dart';
 import 'package:lenore/application/provider/new_aarival_provider/new_arrival_provider.dart';
+import 'package:lenore/application/provider/notification_provider/notification_provider.dart';
 import 'package:lenore/application/provider/otp_provider/otp_provider.dart';
 import 'package:lenore/application/provider/gift_product_listing_provider/gift_product_listing_provider.dart';
 import 'package:lenore/application/provider/product_detail_provider/product_detail_provider.dart';
 import 'package:lenore/application/provider/product_listing_provider/product_listing_provder.dart';
+import 'package:lenore/application/provider/profile_provider/profile_provider.dart';
 import 'package:lenore/application/provider/sub_category_provider/sub_category_provider.dart';
 
 import 'package:lenore/application/provider/user_registration_provider/user_registration_provider.dart';
+import 'package:lenore/presentation/screens/landing_screen/landing_screen.dart';
 
 import 'package:lenore/presentation/screens/persistant_bottom_nav_bar/persistant_bottom_nav_bar.dart';
+import 'package:lenore/presentation/screens/splash/splash_screen.dart';
 
 import 'package:provider/provider.dart';
 
@@ -88,6 +94,18 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (context) => ProductDetailProvider(),
         ),
+        ChangeNotifierProvider(
+          create: (context) => CustomizationProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => EditProfileProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => ProfileProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => NotificationProvider(),
+        ),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -100,15 +118,15 @@ class MyApp extends StatelessWidget {
 
         // routerDelegate: Routes.router.routerDelegate,
         //routeInformationParser: Routes.router.routeInformationParser,
-        home: const PersistantBottomNavBarScreen(),
-        // home: OrderDetailScreen(),
+        //  home: const PersistantBottomNavBarScreen(),
+        //  home: LandingScreen(),
         //home: AccountScreen(),
         // home: const SplashScreen(),
         //home: const BottomNaveBar(),
         //home: const CollectionScreen(),
         //home: const HomeScreen(),
         //home: GiftByEventScreen(),
-        // home: const SplashScreen(),
+        home: const SplashScreen(),
         //home: const ProductDetailScreen(),
         // home: EditProfileScreen(),
       ),

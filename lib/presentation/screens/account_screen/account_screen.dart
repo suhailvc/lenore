@@ -11,7 +11,7 @@ import 'package:lenore/presentation/screens/profile_screen.dart/profile_screen.d
 import 'package:lenore/presentation/screens/repair_screen/repair_screen.dart';
 import 'package:lenore/presentation/screens/wish_list_screen/wish_list_screen.dart';
 import 'package:lenore/presentation/widgets/custom_profile_top_bar.dart';
-import 'package:lenore/presentation/widgets/cutom_bottom_bar_top_bar.dart';
+
 import 'package:lenore/presentation/widgets/logout_pop_up.dart';
 import 'package:lenore/presentation/widgets/top_bar_title.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';

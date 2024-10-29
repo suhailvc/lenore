@@ -971,7 +971,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Row(
                   children: [
                     Text(
-                      "QAR",
+                      "QAR  ",
                       style: TextStyle(
                         fontFamily: 'ElMessiri',
                         color: Colors.black,
@@ -980,7 +980,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     Text(
-                      '99',
+                      bestSellerProvider.productListItems.data![index].price
+                              .toString() ??
+                          'N?A',
                       style: TextStyle(
                         color: const Color(0xFF000000),
                         fontSize: querySize.width * 0.035,

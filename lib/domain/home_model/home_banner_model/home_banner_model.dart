@@ -34,7 +34,7 @@ class Data {
   String? titleTwo;
   String? titleTwoar;
   String? image;
-  String? link;
+  int? link;
 
   Data(
       {this.id,

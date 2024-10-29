@@ -2,7 +2,9 @@ import 'dart:convert';
 
 import 'package:lenore/core/constant.dart';
 import 'package:http/http.dart' as http;
+import 'package:lenore/domain/user_registration_model/user_registration_data_taken.dart';
 import 'package:lenore/domain/user_registration_model/user_registration_success_model.dart';
+import 'package:lenore/presentation/widgets/shared_pref_method.dart';
 
 Future<dynamic> userRegistrationService(
     {required String fName,
@@ -13,9 +15,8 @@ Future<dynamic> userRegistrationService(
     required bool term,
     required String mobileNumber}) async {
   final String url =
-      '$baseUrl/api/register?f_name=&&l_name=m&email=jaseela1s7775@gmail.coms&q_id=1212321223&gender=male&terms=true&phone=71899353';
-  // final String url =
-  //'$baseUrl/api/register?f_name=$fName&l_name=$sName&email=$email&q_id=$qId&gender=$gender&terms=$term&phone=$mobileNumber';
+      '$baseUrl/api/register?f_name=$fName&l_name=$sName&email=$email&q_id=$qId&gender=$gender&terms=$term&phone=$mobileNumber';
+
   try {
     print(
         'api called-------------------------------------------------------------');
@@ -29,22 +30,12 @@ Future<dynamic> userRegistrationService(
         print('user registered-----------------------------------');
         final UserRegistrationSuccessModel userRegistration =
             UserRegistrationSuccessModel.fromJson(responseData);
+        saveToken(userRegistration.token.toString());
         return userRegistration;
-      } //else if (responseData['response_code'] == '2') {
-      // print('exiting user-----------------------------------');
-      // Existing User: response_code == 2, Return ExistingUserOtpModel
-      // final ExistingUserOtpModel existingUser =
-      //     ExistingUserOtpModel.fromJson(responseData);
-
-      // SharedPreferences _tokenPref = await SharedPreferences.getInstance();
-      // _tokenPref.setString('token', existingUser.token.toString());
-
-      // return existingUser;
-      //}
-      else if (responseData['response_code'] == '0') {
+      } else if (responseData['response_code'] == '0') {
         print('fieled alredy present-----------------------------------');
-        final UserRegistrationSuccessModel userRegistration =
-            UserRegistrationSuccessModel.fromJson(responseData);
+        final UserRegistrationDataTakenModel userRegistration =
+            UserRegistrationDataTakenModel.fromJson(responseData);
         return userRegistration;
       } else {
         print('errrrorrrrrrr-----------------------------------');

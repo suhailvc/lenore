@@ -298,7 +298,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                         ),
                       ),
                       SizedBox(
-                        height: querySize.height * 0.36,
+                        height: productDetailProvidervalue
+                                    .productDetails!.data!.category!.name ==
+                                'Diamond'
+                            ? querySize.height * 0.32
+                            : querySize.height * 0.28,
                         child: TabBarView(
                           controller: _tabController,
                           children: [
@@ -544,46 +548,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                                           )
                                         ],
                                       ),
-                                    ],
-                                  ),
-                                  customSizedBox(querySize),
-                                  Text(
-                                    'Price Breakup',
-                                    style: TextStyle(
-                                      decoration: TextDecoration.underline,
-                                      fontSize: querySize.width * 0.0344,
-                                      color: const Color(0xFF000000),
-                                      fontWeight: FontWeight.w600,
-                                      fontFamily: 'Segoe',
-                                    ),
-                                  ),
-                                  customSizedBox(querySize),
-                                  Row(
-                                    //   mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            "Weight",
-                                            style: TextStyle(
-                                                fontSize:
-                                                    querySize.width * 0.0344,
-                                                color: const Color(0xFF5E5E5E),
-                                                fontFamily: 'Segoe'),
-                                          ),
-                                          Text(
-                                            "${productDetailProvidervalue.productDetails!.data!.goldWeight ?? "N/A"} gm",
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.w600,
-                                                fontSize:
-                                                    querySize.width * 0.0344,
-                                                color: const Color(0xFF000000),
-                                                fontFamily: 'Segoe'),
-                                          )
-                                        ],
-                                      ),
                                       SizedBox(
                                         height: querySize.height * 0.049,
                                         child: VerticalDivider(
@@ -597,7 +561,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            "Making Charge",
+                                            productDetailProvidervalue
+                                                        .productDetails!
+                                                        .data!
+                                                        .category!
+                                                        .name ==
+                                                    'Gold'
+                                                ? "Weight"
+                                                : "Gold Purity",
                                             style: TextStyle(
                                                 fontSize:
                                                     querySize.width * 0.0344,
@@ -605,7 +576,17 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                                                 fontFamily: 'Segoe'),
                                           ),
                                           Text(
-                                            "${productDetailProvidervalue.productDetails!.data!.makingPrice ?? "N/A"} Qr",
+                                            productDetailProvidervalue
+                                                        .productDetails!
+                                                        .data!
+                                                        .category!
+                                                        .name ==
+                                                    'Gold'
+                                                ? "${productDetailProvidervalue.productDetails!.data!.goldWeight ?? "N/A"} gm"
+                                                : productDetailProvidervalue
+                                                    .productDetails!
+                                                    .data!
+                                                    .goldPurity!,
                                             style: TextStyle(
                                                 fontWeight: FontWeight.w600,
                                                 fontSize:
@@ -615,8 +596,176 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                                           )
                                         ],
                                       ),
+                                      productDetailProvidervalue.productDetails!
+                                                  .data!.category!.name ==
+                                              'Gold'
+                                          ? SizedBox(
+                                              height: querySize.height * 0.049,
+                                              child: VerticalDivider(
+                                                color: Colors.grey,
+                                                thickness:
+                                                    querySize.width * 0.002,
+                                                width: querySize.width * 0.08,
+                                              ),
+                                            )
+                                          : SizedBox(),
+                                      productDetailProvidervalue.productDetails!
+                                                  .data!.category!.name ==
+                                              'Gold'
+                                          ? Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  "Making Charge",
+                                                  style: TextStyle(
+                                                      fontSize:
+                                                          querySize.width *
+                                                              0.0344,
+                                                      color: const Color(
+                                                          0xFF5E5E5E),
+                                                      fontFamily: 'Segoe'),
+                                                ),
+                                                Text(
+                                                  "${productDetailProvidervalue.productDetails!.data!.makingPrice ?? "N/A"} Qr",
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      fontSize:
+                                                          querySize.width *
+                                                              0.0344,
+                                                      color: const Color(
+                                                          0xFF000000),
+                                                      fontFamily: 'Segoe'),
+                                                )
+                                              ],
+                                            )
+                                          : SizedBox(),
                                     ],
                                   ),
+                                  customSizedBox(querySize),
+                                  // Text(
+                                  //   'Price Breakup',
+                                  //   style: TextStyle(
+                                  //     decoration: TextDecoration.underline,
+                                  //     fontSize: querySize.width * 0.0344,
+                                  //     color: const Color(0xFF000000),
+                                  //     fontWeight: FontWeight.w600,
+                                  //     fontFamily: 'Segoe',
+                                  //   ),
+                                  // ),
+                                  customSizedBox(querySize),
+                                  productDetailProvidervalue.productDetails!
+                                              .data!.category!.name ==
+                                          'Diamond'
+                                      ? Row(
+                                          //   mainAxisAlignment: MainAxisAlignment.start,
+                                          children: [
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  "Dimaond Weight",
+                                                  style: TextStyle(
+                                                      fontSize:
+                                                          querySize.width *
+                                                              0.03,
+                                                      color: const Color(
+                                                          0xFF5E5E5E),
+                                                      fontFamily: 'Segoe'),
+                                                ),
+                                                Text(
+                                                  "${productDetailProvidervalue.productDetails!.data!.diamondWeight ?? "N/A"} gm",
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      fontSize:
+                                                          querySize.width *
+                                                              0.0344,
+                                                      color: const Color(
+                                                          0xFF000000),
+                                                      fontFamily: 'Segoe'),
+                                                )
+                                              ],
+                                            ),
+                                            SizedBox(
+                                              height: querySize.height * 0.049,
+                                              child: VerticalDivider(
+                                                color: Colors.grey,
+                                                thickness:
+                                                    querySize.width * 0.002,
+                                                width: querySize.width * 0.08,
+                                              ),
+                                            ),
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  "Diamond Colour",
+                                                  style: TextStyle(
+                                                      fontSize:
+                                                          querySize.width *
+                                                              0.03,
+                                                      color: const Color(
+                                                          0xFF5E5E5E),
+                                                      fontFamily: 'Segoe'),
+                                                ),
+                                                Text(
+                                                  "${productDetailProvidervalue.productDetails!.data!.diamondColour ?? "N/A"}",
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      fontSize:
+                                                          querySize.width *
+                                                              0.0344,
+                                                      color: const Color(
+                                                          0xFF000000),
+                                                      fontFamily: 'Segoe'),
+                                                )
+                                              ],
+                                            ),
+                                            SizedBox(
+                                              height: querySize.height * 0.049,
+                                              child: VerticalDivider(
+                                                color: Colors.grey,
+                                                thickness:
+                                                    querySize.width * 0.002,
+                                                width: querySize.width * 0.08,
+                                              ),
+                                            ),
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  "Diamond Clarity",
+                                                  style: TextStyle(
+                                                      fontSize:
+                                                          querySize.width *
+                                                              0.03,
+                                                      color: const Color(
+                                                          0xFF5E5E5E),
+                                                      fontFamily: 'Segoe'),
+                                                ),
+                                                Text(
+                                                  "${productDetailProvidervalue.productDetails!.data!.diamondClarity ?? "N/A"}",
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      fontSize:
+                                                          querySize.width *
+                                                              0.0344,
+                                                      color: const Color(
+                                                          0xFF000000),
+                                                      fontFamily: 'Segoe'),
+                                                )
+                                              ],
+                                            ),
+                                          ],
+                                        )
+                                      : SizedBox(),
                                 ],
                               ),
                             ),
@@ -667,57 +816,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                                 itemCount: giftByCateogryListName.length,
                                 itemBuilder: (context, index) {
                                   return GestureDetector(
-                                      onTap: () {
-                                        // if (index == 0) {
-                                        //   Navigator.push(
-                                        //       context,
-                                        //       MaterialPageRoute(
-                                        //         builder: (context) =>
-                                        //             const ProductListingScreen(
-                                        //                 productListingScreenName:
-                                        //                     'Laura'),
-                                        //       ));
-                                        // }
-                                        // if (index == 1) {
-                                        //   Navigator.push(
-                                        //       context,
-                                        //       MaterialPageRoute(
-                                        //           builder: (context) =>
-                                        //               const ProductListingScreen(
-                                        //                   productListingScreenName:
-                                        //                       "ZRI")));
-                                        // }
-                                        // if (index == 2) {
-                                        //   Navigator.push(
-                                        //       context,
-                                        //       MaterialPageRoute(
-                                        //         builder: (context) =>
-                                        //             const ProductListingScreen(
-                                        //                 productListingScreenName:
-                                        //                     "WARDA"),
-                                        //       ));
-                                        // }
-                                        // if (index == 3) {
-                                        //   Navigator.push(
-                                        //       context,
-                                        //       MaterialPageRoute(
-                                        //         builder: (context) =>
-                                        //             const ProductListingScreen(
-                                        //                 productListingScreenName:
-                                        //                     "ZRI"),
-                                        //       ));
-                                        // }
-                                        // if (index == 4) {
-                                        //   Navigator.push(
-                                        //       context,
-                                        //       MaterialPageRoute(
-                                        //         builder: (context) =>
-                                        //             const ProductListingScreen(
-                                        //                 productListingScreenName:
-                                        //                     "WARDA"),
-                                        //       ));
-                                        // }
-                                      },
+                                      onTap: () {},
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
@@ -888,254 +987,3 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
     );
   }
 }
-///////////////////import 'package:flutter/material.dart';
-// import 'package:lenore/core/constant.dart';
-// import 'package:lenore/presentation/screens/home/widgets/custom_home_top_bar.dart';
-
-// class ProductDetailScreen extends StatefulWidget {
-//   const ProductDetailScreen({super.key});
-
-//   @override
-//   State<ProductDetailScreen> createState() => _ProductDetailScreenState();
-// }
-
-// class _ProductDetailScreenState extends State<ProductDetailScreen>
-//     with SingleTickerProviderStateMixin {
-//   late TabController _tabController;
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     // Initialize TabController in initState and use vsync: this
-//     _tabController = TabController(length: 2, vsync: this);
-//   }
-
-//   @override
-//   void dispose() {
-//     // Dispose of the TabController when the widget is disposed
-//     _tabController.dispose();
-//     super.dispose();
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     var querySize = MediaQuery.of(context).size;
-//     return Scaffold(
-//       body: Stack(
-//         children: [
-//           SafeArea(
-//             child: SingleChildScrollView(
-//               child: Column(
-//                 crossAxisAlignment: CrossAxisAlignment.start,
-//                 children: [
-//                   Padding(
-//                     padding: EdgeInsets.all(querySize.width * 0.03),
-//                     child: Column(
-//                       children: [
-//                         customHomeTopBar(querySize),
-//                         customSizedBox(querySize),
-//                         Container(
-//                           width: querySize.width * 0.94,
-//                           height: querySize.width * 0.9,
-//                           decoration: const BoxDecoration(
-//                               color: Colors.amber // Add your image here
-//                               ),
-//                         ),
-//                       ],
-//                     ),
-//                   ),
-//                   Padding(
-//                     padding: EdgeInsets.symmetric(
-//                         horizontal: querySize.width * 0.06),
-//                     child: Column(
-//                       crossAxisAlignment: CrossAxisAlignment.start,
-//                       children: [
-//                         Row(
-//                           children: [
-//                             Text(
-//                               'QAR 756',
-//                               style: TextStyle(
-//                                   fontFamily: 'ElMessirisemibold',
-//                                   fontSize: querySize.height * 0.025,
-//                                   fontWeight: FontWeight.w800),
-//                             ),
-//                             const Spacer(),
-//                             Container(
-//                               width: querySize.width * 0.2,
-//                               height: querySize.height * 0.03,
-//                               decoration: BoxDecoration(
-//                                 color: Color(0x4500ACB3),
-//                                 borderRadius: BorderRadius.circular(
-//                                     querySize.width * 0.013),
-//                               ),
-//                               child: const Center(
-//                                   child: Text(
-//                                 'In Stock',
-//                                 style: TextStyle(
-//                                     fontFamily: 'Segoe',
-//                                     color: Color(0xFF5E5E5E)),
-//                               )),
-//                             )
-//                           ],
-//                         ),
-//                         SizedBox(
-//                           height: querySize.height * 0.01,
-//                         ),
-//                         Text(
-//                           'Product | Name and prices Laura',
-//                           style: TextStyle(
-//                               color: const Color(0xFF008186),
-//                               fontFamily: 'Segoebold',
-//                               fontSize: querySize.width * 0.05),
-//                         ),
-//                         TabBar(
-//                           controller:
-//                               _tabController, // Attach TabController here
-//                           tabs: const [
-//                             Tab(text: 'Details'),
-//                             Tab(text: 'Description'),
-//                           ],
-//                         ),
-//                       ],
-//                     ),
-//                   ),
-//                   SizedBox(
-//                     height: querySize.height * 0.36,
-//                     child: TabBarView(
-//                       controller: _tabController,
-//                       children: [
-//                         const Text(
-//                             "Lorem Ipsum is simply dummy text of the printing and typesetting industry."),
-//                         Padding(
-//                           padding: EdgeInsets.symmetric(
-//                               horizontal: querySize.width * 0.06),
-//                           child: Column(
-//                             crossAxisAlignment: CrossAxisAlignment.start,
-//                             children: [
-//                               customSizedBox(querySize),
-//                               Row(
-//                                 children: [
-//                                   Container(
-//                                     width: querySize.width * 0.27,
-//                                     height: querySize.height * 0.03,
-//                                     decoration: const BoxDecoration(
-//                                         color: Color(0x7AF3C200)),
-//                                     child: Center(
-//                                         child: Text(
-//                                       '18k   318.50 QR',
-//                                       style: TextStyle(
-//                                           fontSize: querySize.width * 0.03,
-//                                           fontFamily: 'Segoe',
-//                                           color: Colors.black,
-//                                           fontWeight: FontWeight.w600),
-//                                     )),
-//                                   ),
-//                                   SizedBox(
-//                                     width: querySize.width * 0.03,
-//                                   ),
-//                                   Container(
-//                                     width: querySize.width * 0.27,
-//                                     height: querySize.height * 0.03,
-//                                     decoration: const BoxDecoration(
-//                                         color: Color(0x7AF3C200)),
-//                                     child: Center(
-//                                         child: Text(
-//                                       '18k   318.50 QR',
-//                                       style: TextStyle(
-//                                           fontSize: querySize.width * 0.03,
-//                                           fontFamily: 'Segoe',
-//                                           color: Colors.black,
-//                                           fontWeight: FontWeight.w600),
-//                                     )),
-//                                   ),
-//                                 ],
-//                               ),
-//                               customSizedBox(querySize),
-//                               Row(
-//                                 children: [
-//                                   Text(
-//                                     "Category",
-//                                     style: TextStyle(
-//                                         fontSize: querySize.width * 0.0344,
-//                                         color: const Color(0xFF5E5E5E),
-//                                         fontFamily: 'Segoe'),
-//                                   ),
-//                                   SizedBox(
-//                                     width: querySize.width * 0.132,
-//                                   ),
-//                                   Text(
-//                                     'Gold',
-//                                     style: TextStyle(
-//                                         fontSize: querySize.width * 0.0344,
-//                                         color: const Color(0xFF000000),
-//                                         fontFamily: 'Segoe'),
-//                                   )
-//                                 ],
-//                               ),
-//                               customSizedBox(querySize),
-//                               Text(
-//                                 'Product Details',
-//                                 style: TextStyle(
-//                                   decoration: TextDecoration.underline,
-//                                   fontSize: querySize.width * 0.0344,
-//                                   color: const Color(0xFF000000),
-//                                   fontFamily: 'Segoe',
-//                                 ),
-//                               ),
-//                               customSizedBox(querySize),
-//                             ],
-//                           ),
-//                         )
-//                       ],
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//             ),
-//           ),
-//           // Buttons that remain fixed at the bottom
-//           Positioned(
-//             bottom: 0,
-//             left: 0,
-//             right: 0,
-//             child: Container(
-//               padding: EdgeInsets.all(querySize.width * 0.04),
-//               color: Colors.white, // Background color for the button section
-//               child: Row(
-//                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                 children: [
-//                   ElevatedButton(
-//                     onPressed: () {
-//                       // Add to cart action
-//                     },
-//                     style: ElevatedButton.styleFrom(
-//                       backgroundColor: Colors.blue, // Button color
-//                       padding: EdgeInsets.symmetric(
-//                         vertical: querySize.height * 0.02,
-//                         horizontal: querySize.width * 0.18,
-//                       ),
-//                     ),
-//                     child: const Text('Add to cart'),
-//                   ),
-//                   ElevatedButton(
-//                     onPressed: () {
-//                       // Buy now action
-//                     },
-//                     style: ElevatedButton.styleFrom(
-//                       backgroundColor: Colors.green, // Button color
-//                       padding: EdgeInsets.symmetric(
-//                         vertical: querySize.height * 0.02,
-//                         horizontal: querySize.width * 0.18,
-//                       ),
-//                     ),
-//                     child: const Text('Buy Now'),
-//                   ),
-//                 ],
-//               ),
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }

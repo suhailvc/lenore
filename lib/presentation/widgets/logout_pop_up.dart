@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lenore/core/constant.dart';
 import 'package:lenore/presentation/screens/login_screen/mobile_number_screen/mobile_number_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 logOutPopUp(BuildContext context, Size querySize) {
   showDialog(
@@ -35,21 +36,34 @@ logOutPopUp(BuildContext context, Size querySize) {
                       fontFamily: 'Segoe'),
                 ),
                 customSizedBox(querySize),
-                Container(
-                  width: querySize.width * 0.5,
-                  height: querySize.height * 0.048,
-                  decoration: BoxDecoration(
-                    color: appColor,
-                    borderRadius: BorderRadius.circular(querySize.width * 0.08),
-                  ),
-                  child: Center(
-                    child: Text(
-                      'Log Out',
-                      style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                          fontFamily: 'Segoe',
-                          fontSize: querySize.height * 0.017),
+                GestureDetector(
+                  onTap: () async {
+                    SharedPreferences prefs =
+                        await SharedPreferences.getInstance();
+                    await prefs.remove('bearerToken');
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => MobileNumberInputScreen()),
+                    );
+                  },
+                  child: Container(
+                    width: querySize.width * 0.5,
+                    height: querySize.height * 0.048,
+                    decoration: BoxDecoration(
+                      color: appColor,
+                      borderRadius:
+                          BorderRadius.circular(querySize.width * 0.08),
+                    ),
+                    child: Center(
+                      child: Text(
+                        'Log Out',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                            fontFamily: 'Segoe',
+                            fontSize: querySize.height * 0.017),
+                      ),
                     ),
                   ),
                 ),

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:lenore/application/provider/edit_profile_model/edit_profile_model.dart';
 import 'package:lenore/core/constant.dart';
 
 import 'package:lenore/presentation/widgets/custom_profile_top_bar.dart';
 import 'package:lenore/presentation/screens/profile_screen.dart/widget/edit_profile_field.dart';
+import 'package:provider/provider.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -194,7 +196,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       Size querySize, String buttonText, Color buttonColor, Color textColor) {
     return ElevatedButton(
       onPressed: () {
-        Navigator.pop(context);
+        if (buttonText == 'Save') {
+          Provider.of<EditProfileProvider>(context, listen: false)
+              .editProfileRequest(
+                  fName: 'zzzz', email: 'zzzz@gmail.com', gender: '1');
+        }
       },
       style: ElevatedButton.styleFrom(
         backgroundColor: buttonColor,

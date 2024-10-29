@@ -4,12 +4,13 @@ import 'package:lenore/core/constant.dart';
 
 import 'package:lenore/domain/otp_model/existing_user_otp_model.dart';
 import 'package:lenore/domain/otp_model/new_user_otp_model.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:lenore/presentation/widgets/shared_pref_method.dart';
 
 class OtpApiService {
   // Function to verify OTP
   Future<dynamic> verifyOtp(String mobileNumber, String otp) async {
-    final String url = '$baseUrl/api/confirm-otp?phone=71899353&otp=1234';
+    final String url =
+        '$baseUrl/api/confirm-otp?phone=${mobileNumber}&otp=$otp';
     // final String url = '$baseUrl/api/confirm-otp?phone=$mobileNumber&otp=1234';
     try {
       print(
@@ -34,9 +35,7 @@ class OtpApiService {
           final ExistingUserOtpModel existingUser =
               ExistingUserOtpModel.fromJson(responseData);
           print('shared preffffffff-----------------------------------');
-          SharedPreferences _tokenPref = await SharedPreferences.getInstance();
-          _tokenPref.setString('token', existingUser.token.toString());
-
+          saveToken(existingUser.token.toString());
           return existingUser;
         } else if (responseData['response_code'] == '0') {
           print('incorrect-----------------------------------');

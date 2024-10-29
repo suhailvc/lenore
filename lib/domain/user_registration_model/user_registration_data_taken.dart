@@ -1,50 +1,60 @@
 class UserRegistrationDataTakenModel {
-  String? responseCode;
-  bool? status;
-  String? message;
-  Errors? errors;
+  final String responseCode;
+  final bool status;
+  final String message;
+  final ErrorDetails? errors;
 
-  UserRegistrationDataTakenModel(
-      {this.responseCode, this.status, this.message, this.errors});
+  UserRegistrationDataTakenModel({
+    required this.responseCode,
+    required this.status,
+    required this.message,
+    this.errors,
+  });
 
-  UserRegistrationDataTakenModel.fromJson(Map<String, dynamic> json) {
-    responseCode = json['response_code'];
-    status = json['status'];
-    message = json['message'];
-    errors =
-        json['errors'] != null ? new Errors.fromJson(json['errors']) : null;
+  factory UserRegistrationDataTakenModel.fromJson(Map<String, dynamic> json) {
+    return UserRegistrationDataTakenModel(
+      responseCode: json['response_code'],
+      status: json['status'],
+      message: json['message'],
+      errors:
+          json['errors'] != null ? ErrorDetails.fromJson(json['errors']) : null,
+    );
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['response_code'] = this.responseCode;
-    data['status'] = this.status;
-    data['message'] = this.message;
-    if (this.errors != null) {
-      data['errors'] = this.errors!.toJson();
-    }
-    return data;
+    return {
+      'response_code': responseCode,
+      'status': status,
+      'message': message,
+      'errors': errors?.toJson(),
+    };
   }
 }
 
-class Errors {
-  List<String>? email;
-  List<String>? qId;
-  List<String>? phone;
+class ErrorDetails {
+  final List<String>? email;
+  final List<String>? qId;
+  final List<String>? phone;
 
-  Errors({this.email, this.qId, this.phone});
+  ErrorDetails({
+    this.email,
+    this.qId,
+    this.phone,
+  });
 
-  Errors.fromJson(Map<String, dynamic> json) {
-    email = json['email'].cast<String>();
-    qId = json['q_id'].cast<String>();
-    phone = json['phone'].cast<String>();
+  factory ErrorDetails.fromJson(Map<String, dynamic> json) {
+    return ErrorDetails(
+      email: json['email'] != null ? List<String>.from(json['email']) : null,
+      qId: json['q_id'] != null ? List<String>.from(json['q_id']) : null,
+      phone: json['phone'] != null ? List<String>.from(json['phone']) : null,
+    );
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['email'] = this.email;
-    data['q_id'] = this.qId;
-    data['phone'] = this.phone;
-    return data;
+    return {
+      'email': email,
+      'q_id': qId,
+      'phone': phone,
+    };
   }
 }

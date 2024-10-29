@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lenore/core/constant.dart';
 
-Column userInputField(
-    BuildContext context, String assetName, String fieldText, String name) {
+Column userInputField(BuildContext context, String assetName, String fieldText,
+    String name, TextEditingController controller) {
   var sizeQuery = MediaQuery.of(context).size;
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
@@ -36,6 +36,7 @@ Column userInputField(
             ),
             Expanded(
               child: TextField(
+                controller: controller,
                 decoration: InputDecoration(
                   hintStyle: const TextStyle(color: Color(0xFFD0D0D0)),
                   border: InputBorder.none,

@@ -2,7 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:lenore/core/constant.dart';
 
 Column customCustomiseField(
-    BuildContext context, String assetName, String fieldText, String name) {
+    {required BuildContext context,
+    required String assetName,
+    required String fieldText,
+    required String name,
+    required TextEditingController controller,
+    required String? errorText}) {
   var sizeQuery = MediaQuery.of(context).size;
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
@@ -36,7 +41,9 @@ Column customCustomiseField(
             ),
             Expanded(
               child: TextField(
+                controller: controller,
                 decoration: InputDecoration(
+                  // errorText: errorText,
                   hintStyle: const TextStyle(color: Color(0xFFD0D0D0)),
                   border: InputBorder.none,
                   hintText: fieldText,

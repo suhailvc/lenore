@@ -192,7 +192,7 @@ customHomeNewArrivalSection(
               Row(
                 children: [
                   Text(
-                    "QAR",
+                    "QAR  ",
                     style: TextStyle(
                       fontFamily: 'ElMessiri',
                       color: Colors.black,
@@ -201,7 +201,8 @@ customHomeNewArrivalSection(
                     ),
                   ),
                   Text(
-                    ' 99',
+                    newArrivalProvider.productListItems.data![index].price
+                        .toString(),
                     style: TextStyle(
                       color: const Color(0xFF000000),
                       fontSize: querySize.width * 0.035,
