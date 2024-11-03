@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lenore/application/provider/customization_provider/customization_provider.dart';
+import 'package:lenore/application/provider/repair_provider/repair_provider.dart';
 import 'package:lenore/core/constant.dart';
 import 'package:lenore/presentation/screens/customise/widget/custom_customise_check_box.dart';
 import 'package:lenore/presentation/screens/customise/widget/custom_customise_filed.dart';
@@ -38,7 +39,7 @@ class _RepairScreenState extends State<RepairScreen> {
   String? productTypeError;
   String? messageError;
 
-  void validateAndSubmit() {
+  void validateAndSubmit() async {
     print('submitted');
     setState(() {
       // Reset errors
@@ -70,8 +71,8 @@ class _RepairScreenState extends State<RepairScreen> {
         productTypeError == null &&
         messageError == null) {
       // Submit the form if no errors
-      Provider.of<CustomizationProvider>(context, listen: false)
-          .sendCustomizationRequest(
+      await Provider.of<RepairProvider>(context, listen: false)
+          .sendRepairRequest(
         filterType: 'repair',
         name: nameController.text,
         phone: numberController.text,
@@ -87,6 +88,31 @@ class _RepairScreenState extends State<RepairScreen> {
         productType: selectedProductType ?? "",
         message: messageController.text,
       );
+      final result = Provider.of<RepairProvider>(context, listen: false);
+      if (result.responseMessage == "repair request submitted") {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Result form is submitted"),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 2),
+          ),
+        );
+
+        // Clear fields and reset UI state after successful submission
+        setState(() {
+          nameController.clear();
+          numberController.clear();
+          weightController.clear();
+          purityController.clear();
+          messageController.clear();
+          isSilverSelected = false;
+          isGoldSelected = false;
+          isDiamondSelected = false;
+          selectedProductType = null;
+          result.clearImages(); // Clears selected images
+        });
+      }
     }
   }
 
@@ -241,8 +267,16 @@ class _RepairScreenState extends State<RepairScreen> {
                                   width: querySize.width * 0.038,
                                   height: querySize.height * 0.038,
                                 ),
-                                items: ['Diamond', 'Gold', 'Platinum']
-                                    .map((String value) {
+                                items: [
+                                  'Ring',
+                                  'Nicklase',
+                                  'Earring',
+                                  'Bracelet',
+                                  'Chain',
+                                  'Bangle',
+                                  'Pendant',
+                                  'Anklet'
+                                ].map((String value) {
                                   return DropdownMenuItem<String>(
                                     value: value,
                                     child: Text(value),

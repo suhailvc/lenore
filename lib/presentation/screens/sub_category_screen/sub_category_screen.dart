@@ -59,7 +59,7 @@ class _SubCategoryScreenState extends State<SubCategoryScreen> {
               Consumer<SubCategoryProvider>(
                 builder: (context, subCategoryvalue, child) {
                   if (subCategoryvalue.isLoading) {
-                    return CircularProgressIndicator();
+                    return lenoreGif(querySize);
                   } else if (subCategoryvalue.error ==
                       "No data available for this category") {
                     return Container(

@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:lenore/application/provider/auth_provider/auth_provider.dart';
+import 'package:lenore/application/provider/cart_provider/cart_provider.dart';
 import 'package:lenore/core/constant.dart';
+import 'package:lenore/infrastructure/log_out_api/log_out_api.dart';
 import 'package:lenore/presentation/screens/login_screen/mobile_number_screen/mobile_number_screen.dart';
+import 'package:lenore/presentation/widgets/custom_snack_bar.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 logOutPopUp(BuildContext context, Size querySize) {
@@ -31,21 +36,35 @@ logOutPopUp(BuildContext context, Size querySize) {
                   textAlign: TextAlign.center, // Ensure text is centered
                   style: TextStyle(
                       color: Colors.black,
-                      fontSize: querySize.width * 0.04,
+                      fontSize: querySize.width * 0.038,
                       fontWeight: FontWeight.w600,
                       fontFamily: 'Segoe'),
                 ),
                 customSizedBox(querySize),
                 GestureDetector(
                   onTap: () async {
-                    SharedPreferences prefs =
-                        await SharedPreferences.getInstance();
-                    await prefs.remove('bearerToken');
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => MobileNumberInputScreen()),
-                    );
+                    String token = (await AuthProvider().getToken())!;
+                    String response = await logOutService(token);
+                    if (response == 'success') {
+                      SharedPreferences prefs =
+                          await SharedPreferences.getInstance();
+                      await prefs.remove('bearerToken');
+                      Provider.of<CartProvider>(context, listen: false)
+                          .clearCart();
+                      // Navigator.pushReplacement(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //       builder: (context) => MobileNumberInputScreen()),
+                      // );
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => MobileNumberInputScreen()),
+                        (Route<dynamic> route) => false,
+                      );
+                    } else {
+                      customSnackBar(context, 'failed to log out');
+                    }
                   },
                   child: Container(
                     width: querySize.width * 0.5,

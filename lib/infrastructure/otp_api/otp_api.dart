@@ -1,14 +1,18 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:lenore/application/provider/auth_provider/auth_provider.dart';
 import 'package:lenore/core/constant.dart';
 
 import 'package:lenore/domain/otp_model/existing_user_otp_model.dart';
 import 'package:lenore/domain/otp_model/new_user_otp_model.dart';
-import 'package:lenore/presentation/widgets/shared_pref_method.dart';
+
+import 'package:provider/provider.dart';
 
 class OtpApiService {
   // Function to verify OTP
-  Future<dynamic> verifyOtp(String mobileNumber, String otp) async {
+  Future<dynamic> verifyOtp(
+      String mobileNumber, String otp, BuildContext context) async {
     final String url =
         '$baseUrl/api/confirm-otp?phone=${mobileNumber}&otp=$otp';
     // final String url = '$baseUrl/api/confirm-otp?phone=$mobileNumber&otp=1234';
@@ -35,7 +39,9 @@ class OtpApiService {
           final ExistingUserOtpModel existingUser =
               ExistingUserOtpModel.fromJson(responseData);
           print('shared preffffffff-----------------------------------');
-          saveToken(existingUser.token.toString());
+          await Provider.of<AuthProvider>(context, listen: false)
+              .setToken(existingUser.token.toString());
+
           return existingUser;
         } else if (responseData['response_code'] == '0') {
           print('incorrect-----------------------------------');

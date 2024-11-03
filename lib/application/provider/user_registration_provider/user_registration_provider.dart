@@ -10,6 +10,7 @@ class UserRegistrationProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
 
   Future<dynamic> userRegistration({
+    required context,
     required String fName,
     required String sName,
     required String email,
@@ -35,6 +36,7 @@ class UserRegistrationProvider extends ChangeNotifier {
     }
 
     var response = await userRegistrationService(
+      context: context,
       email: email,
       fName: fName,
       gender: gender,

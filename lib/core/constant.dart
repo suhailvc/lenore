@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:lenore/application/provider/auth_provider/auth_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-var baseUrl = "https://project.artisans.qa/lenore-latest";
+var baseUrl =
+    "https://lenore.qa"; // "https://project.artisans.qa/lenore-latest";
 Color appColor = const Color(0xFF00ACB3);
 Color textColor = const Color(0xFF008186);
 SizedBox customSizedBox(Size querySize) {
@@ -83,4 +86,9 @@ Container lenoreGif(Size querySize) {
       ).animate(),
     ),
   );
+}
+
+Future<bool> hasBearerToken() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  return prefs.containsKey('bearerToken');
 }

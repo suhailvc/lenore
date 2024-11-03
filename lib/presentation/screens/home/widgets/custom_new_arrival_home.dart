@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:lenore/application/provider/auth_provider/auth_provider.dart';
 
 import 'package:lenore/application/provider/new_aarival_provider/new_arrival_provider.dart';
+import 'package:lenore/application/provider/wishlist_provider/whishlist_provider.dart';
 import 'package:lenore/core/constant.dart';
 import 'package:lenore/presentation/screens/best_seller_new_arrival_listing_screen/best_seller_new_arrival_listing_screen.dart';
 import 'package:lenore/presentation/screens/home/widgets/custom_home_section_title.dart';
 import 'package:lenore/presentation/screens/product_detail_screen/product_detail_screen.dart';
+import 'package:lenore/presentation/widgets/custom_snack_bar.dart';
+import 'package:provider/provider.dart';
 
 customHomeNewArrivalSection(
     Size querySize, sectionTitle, String buttonName, BuildContext context,
@@ -85,18 +89,60 @@ customHomeNewArrivalSection(
                       Positioned(
                         top: querySize.height * 0.008,
                         right: querySize.height * 0.012,
-                        child: GestureDetector(
-                          onTap: () {},
-                          child: CircleAvatar(
-                            radius: querySize.width * 0.033,
-                            backgroundColor: Colors.white,
-                            child: Image.asset(
-                              'assets/images/home/favourite.png',
-                              width: querySize.width * 0.075,
-                              height: querySize.height * 0.035,
-                            ),
-                          ),
+                        child: Consumer<WishlistProvider>(
+                          builder: (context, wishlistProvider, child) {
+                            final isInWishlist = wishlistProvider
+                                .isProductInWishlist(newArrivalProvider
+                                    .productListItems.data![index].id!);
+
+                            return GestureDetector(
+                              onTap: () async {
+                                final authProvider = Provider.of<AuthProvider>(
+                                    context,
+                                    listen: false);
+                                final token = await authProvider.getToken();
+
+                                if (token == null) {
+                                  customSnackBar(context, 'Please SignIn');
+                                  return;
+                                }
+
+                                // Toggle wishlist status for this specific product
+                                await wishlistProvider.toggleWishlist(
+                                    token,
+                                    newArrivalProvider
+                                        .productListItems.data![index].id!);
+                              },
+                              child: CircleAvatar(
+                                radius: querySize.width * 0.033,
+                                backgroundColor: Colors.white,
+                                child: isInWishlist
+                                    ? Image.asset(
+                                        'assets/images/love (1).png',
+                                        width: querySize.width * 0.048,
+                                        height: querySize.height * 0.018,
+                                      )
+                                    : Image.asset(
+                                        'assets/images/home/favourite.png',
+                                        width: querySize.width * 0.075,
+                                        height: querySize.height * 0.037,
+                                      ),
+                              ),
+                            );
+                          },
                         ),
+                        // child: GestureDetector(
+                        //   onTap: () {},
+                        //   child: CircleAvatar(
+                        //     radius: querySize.width * 0.033,
+                        //     backgroundColor: Colors.white,
+                        //     child: Image.asset(
+                        //       'assets/images/home/favourite.png',
+                        //       width: querySize.width * 0.075,
+                        //       height: querySize.height * 0.035,
+                        //     ),
+                        //   ),
+                        // ),
                         // child: Image.asset(
                         //   'assets/images/home/favourite.png',
                         //   width: querySize.width * 0.075,

@@ -44,7 +44,8 @@ class _OtpScreenState extends State<OtpScreen> {
       return;
     }
 
-    var response = await otpProvider.verifyOtp(widget.mobileNumber, otp);
+    var response =
+        await otpProvider.verifyOtp(widget.mobileNumber, otp, context);
 
     if (response is ExistingUserOtpModel) {
       Navigator.pushReplacement(

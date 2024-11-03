@@ -1,6 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
+import 'package:lenore/application/provider/auth_provider/auth_provider.dart';
 
 import 'package:lenore/application/provider/home_provider/collection_provider/collection_provider.dart';
 import 'package:lenore/application/provider/home_provider/gift_by_category/gift_by_category_provider.dart';
@@ -10,6 +11,7 @@ import 'package:lenore/application/provider/home_provider/gift_by_voucher_provid
 import 'package:lenore/application/provider/home_provider/home_banner_provider/home_banner_provider.dart';
 import 'package:lenore/application/provider/home_provider/best_seller_provider/best_seller_provider.dart';
 import 'package:lenore/application/provider/new_aarival_provider/new_arrival_provider.dart';
+import 'package:lenore/application/provider/wishlist_provider/whishlist_provider.dart';
 import 'package:lenore/core/constant.dart';
 
 import 'package:lenore/presentation/screens/best_seller_new_arrival_listing_screen/best_seller_new_arrival_listing_screen.dart';
@@ -23,10 +25,12 @@ import 'package:lenore/presentation/screens/home/widgets/custom_home_section_tit
 import 'package:lenore/presentation/screens/home/widgets/custom_home_top_bar.dart';
 import 'package:lenore/presentation/screens/home/widgets/custom_new_arrival_home.dart';
 import 'package:lenore/presentation/screens/product_detail_screen/product_detail_screen.dart';
-import 'package:lenore/presentation/screens/product_listng_screen/product_listing_screen.dart';
+
 import 'package:lenore/presentation/screens/sub_category_product_listing_screen/sub_category_product_listing_screen.dart';
 import 'package:lenore/presentation/screens/sub_category_screen/sub_category_screen.dart';
+import 'package:lenore/presentation/widgets/custom_snack_bar.dart';
 import 'package:lenore/presentation/widgets/cutom_bottom_bar_top_bar.dart';
+import 'package:lenore/presentation/widgets/shimmer_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
@@ -70,6 +74,19 @@ class _HomeScreenState extends State<HomeScreen> {
     });
     Provider.of<HomeBannerProvider>(context, listen: false)
         .fetchHomeBannerItems();
+    _fetchWishlist();
+  }
+
+  Future<void> _fetchWishlist() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final token = await authProvider.getToken();
+    if (token != null) {
+      Provider.of<WishlistProvider>(context, listen: false)
+          .fetchWishlist(token);
+    } else {
+      // Handle case where token is null, e.g., show an error or prompt login
+      print("Token not available");
+    }
   }
 
   @override
@@ -113,7 +130,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     builder: (context, homeBannerProvidervalue, child) {
                       if (homeBannerProvidervalue.isLoading) {
                         // Show loading spinner while fetching data
-                        return Center(child: CircularProgressIndicator());
+                        return ShimmerLoading(
+                            containerHeight: querySize.height * 0.04);
                       } else if (homeBannerProvidervalue
                                   .giftByVoucherItems.data ==
                               null ||
@@ -197,7 +215,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     builder: (context, eventProvider, child) {
                       if (eventProvider.isLoading) {
                         // Show loading spinner while fetching data
-                        return Center(child: CircularProgressIndicator());
+                        return ShimmerLoading(
+                            containerHeight: querySize.height * 0.04);
                       } else if (eventProvider.cachedResponse == null) {
                         // Handle case where data fetching failed
                         return Center(
@@ -217,7 +236,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     builder: (context, bestSeller, child) {
                       if (bestSeller.isLoading) {
                         // Show loading spinner while fetching data
-                        return Center(child: CircularProgressIndicator());
+                        return ShimmerLoading(
+                            containerHeight: querySize.height * 0.04);
                       }
                       //else if (bestSeller.cachedResponse == null) {
                       // Handle case where data fetching failed
@@ -237,7 +257,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     builder: (context, giftByVoucherProviderValue, child) {
                       if (giftByVoucherProviderValue.isLoading) {
                         // Show loading spinner while fetching data
-                        return Center(child: CircularProgressIndicator());
+                        return ShimmerLoading(
+                            containerHeight: querySize.height * 0.04);
                       } else if (giftByVoucherProviderValue
                               .giftByVoucherItems ==
                           null) {
@@ -254,7 +275,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   Consumer<NewArrivalProvider>(
                     builder: (context, newArrival, child) {
                       if (newArrival.isLoading) {
-                        return Center(child: CircularProgressIndicator());
+                        return ShimmerLoading(
+                            containerHeight: querySize.height * 0.04);
                       } else {
                         return customHomeNewArrivalSection(querySize,
                             "New Arrival", "All New Arrivals", context,
@@ -270,7 +292,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       print(
                           'cccccccccccccccccooooooooooooooooooooollllllllllllllll');
                       if (collectionValue.isLoading) {
-                        return CircularProgressIndicator();
+                        return ShimmerLoading(
+                            containerHeight: querySize.height * 0.04);
                       }
                       if (collectionValue.collectionItems.data == null ||
                           collectionValue.collectionItems.data!.isEmpty) {
@@ -566,7 +589,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const GiftByVoucherDetailScreen(),
+                        builder: (context) => GiftByVoucherDetailScreen(
+                          id: giftByVoucherProvider
+                              .giftByVoucherItems!.data![index].id!,
+                        ),
                       ));
                 },
                 child: Container(
@@ -576,7 +602,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Stack(
                     children: [
                       Positioned(
-                        left: querySize.height * 0.03,
+                        left: querySize.height * 0.0286,
                         top: querySize.height * 0.00,
                         child: Container(
                           width: querySize.width * 0.65,
@@ -793,13 +819,14 @@ class _HomeScreenState extends State<HomeScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         homeSectionTitle(
-            querySize,
-            sectionTitle,
-            context,
-            BestSellerNewArrivalListingScreen(
-              eventName: 'best-sellers',
-              productListingScreenName: 'Best Sellers',
-            )),
+          querySize,
+          sectionTitle,
+          context,
+          BestSellerNewArrivalListingScreen(
+            eventName: 'best-sellers',
+            productListingScreenName: 'Best Sellers',
+          ),
+        ),
         customSizedBox(querySize),
         GridView.builder(
           physics: const NeverScrollableScrollPhysics(),
@@ -810,163 +837,101 @@ class _HomeScreenState extends State<HomeScreen> {
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
             crossAxisSpacing: querySize.height * 0.017,
-            //mainAxisSpacing: querySize.height * 001,
             childAspectRatio: 0.78,
           ),
           itemBuilder: (context, index) {
+            final product = bestSellerProvider.productListItems.data![index];
+            final isInWishlist =
+                Provider.of<WishlistProvider>(context, listen: false)
+                    .isProductInWishlist(product.id!);
+
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ProductDetailScreen(
-                                productId: bestSellerProvider
-                                    .productListItems.data![index].id!),
-                          ));
-                    },
-                    child: Stack(
-                      children: [
-                        Container(
-                          height: querySize.height * 0.2,
-                          decoration: BoxDecoration(
-                            borderRadius:
-                                BorderRadius.circular(querySize.width * 0.04),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.3),
-                                offset: const Offset(0, 7),
-                                blurRadius: querySize.width * 0.008,
-                                spreadRadius: -2,
-                              ),
-                            ],
-                          ),
-                          child: ClipRRect(
-                            borderRadius:
-                                BorderRadius.circular(querySize.width * 0.04),
-                            child: Image.network(
-                              bestSellerProvider
-                                  .productListItems.data![index].thumbImage!,
-                              //.cachedResponse!.data![index] index % 2 == 0
-                              //     ? "assets/images/wishlist_one.png"
-                              //     : "assets/images/wishlist_two.png",
-                              fit: BoxFit
-                                  .cover, // Ensure the image covers the entire container
-                              width: double.infinity,
-                              height: double.infinity,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ProductDetailScreen(
+                          productId: product.id!,
+                        ),
+                      ),
+                    );
+                  },
+                  child: Stack(
+                    children: [
+                      Container(
+                        height: querySize.height * 0.2,
+                        decoration: BoxDecoration(
+                          borderRadius:
+                              BorderRadius.circular(querySize.width * 0.04),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.3),
+                              offset: const Offset(0, 7),
+                              blurRadius: querySize.width * 0.008,
+                              spreadRadius: -2,
                             ),
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius:
+                              BorderRadius.circular(querySize.width * 0.04),
+                          child: Image.network(
+                            product.thumbImage!,
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                            height: double.infinity,
                           ),
                         ),
+                      ),
+                      Positioned(
+                        top: querySize.height * 0.008,
+                        right: querySize.height * 0.012,
+                        child: Consumer<WishlistProvider>(
+                          builder: (context, wishlistProvider, child) {
+                            final isInWishlist = wishlistProvider
+                                .isProductInWishlist(product.id!);
 
-                        // Favorite icon positioned in the top right corner
-                        Positioned(
-                          top: querySize.height * 0.008,
-                          right: querySize.height * 0.012,
-                          child: GestureDetector(
-                            onTap: () {},
-                            child: CircleAvatar(
-                              radius: querySize.width * 0.033,
-                              backgroundColor: Colors.white,
-                              child: Image.asset(
-                                'assets/images/home/favourite.png',
-                                width: querySize.width * 0.075,
-                                height: querySize.height * 0.035,
+                            return GestureDetector(
+                              onTap: () async {
+                                final authProvider = Provider.of<AuthProvider>(
+                                    context,
+                                    listen: false);
+                                final token = await authProvider.getToken();
+
+                                if (token == null) {
+                                  customSnackBar(context, 'Please SignIn');
+                                  return;
+                                }
+
+                                // Toggle wishlist status for this specific product
+                                await wishlistProvider.toggleWishlist(
+                                    token, product.id!);
+                              },
+                              child: CircleAvatar(
+                                radius: querySize.width * 0.033,
+                                backgroundColor: Colors.white,
+                                child: isInWishlist
+                                    ? Image.asset(
+                                        'assets/images/love (1).png',
+                                        width: querySize.width * 0.048,
+                                        height: querySize.height * 0.018,
+                                      )
+                                    : Image.asset(
+                                        'assets/images/home/favourite.png',
+                                        width: querySize.width * 0.075,
+                                        height: querySize.height * 0.037,
+                                      ),
                               ),
-                            ),
-                          ),
-                          // child: Image.asset(
-                          //   'assets/images/home/favourite.png',
-                          //   width: querySize.width * 0.075,
-                          //   height: querySize.height * 0.035,
-                          // ),
+                            );
+                          },
                         ),
-                      ],
-                    )
-
-                    // child: ClipRRect(
-                    //   borderRadius: BorderRadius.circular(querySize.width * 0.04),
-                    //   child: Container(
-                    //     height: querySize.height * 0.2,
-                    //     decoration: BoxDecoration(
-                    //       boxShadow: [
-                    //         BoxShadow(
-                    //           color: Colors.black.withOpacity(0.3),
-                    //           offset: const Offset(3, 4),
-                    //           blurRadius: querySize.width * 2,
-                    //           spreadRadius: querySize.width * 0.01,
-                    //         ),
-                    //       ],
-                    //       color: Colors.white,
-                    //       image: DecorationImage(
-                    //         image: index % 2 == 0
-                    //             ? const AssetImage(
-                    //                 "assets/images/home/best seller one.png")
-                    //             : const AssetImage(
-                    //                 "assets/images/home/best seller two.png"),
-                    //         fit: BoxFit.cover,
-                    //       ),
-                    //     ),
-                    //     child: Row(
-                    //       mainAxisAlignment: MainAxisAlignment.end,
-                    //       crossAxisAlignment: CrossAxisAlignment.start,
-                    //       children: [
-                    //         Padding(
-                    //           padding: EdgeInsets.only(
-                    //               top: querySize.height * 0.008,
-                    //               right: querySize.height * 0.012),
-                    //           child: Image.asset(
-                    //             'assets/images/home/favourite.png',
-                    //             width: querySize.width * 0.075,
-                    //             height: querySize.height * 0.035,
-                    //           ),
-                    //         ),
-                    //       ],
-                    //     ),
-                    //   ),
-                    // ),
-                    // child: Container(
-                    //   height: querySize.height * 0.2,
-                    //   decoration: BoxDecoration(
-                    //     boxShadow: [
-                    //       BoxShadow(
-                    //         color: Colors.black.withOpacity(0.3),
-                    //         offset: const Offset(0, 4),
-                    //         blurRadius: querySize.width * 0.008,
-                    //         spreadRadius: 0,
-                    //       ),
-                    //     ],
-                    //     color: Colors.white,
-                    //     borderRadius:
-                    //         BorderRadius.circular(querySize.width * 0.04),
-                    //     image: DecorationImage(
-                    //       image: index % 2 == 0
-                    //           ? const AssetImage(
-                    //               "assets/images/home/best seller one.png")
-                    //           : const AssetImage(
-                    //               "assets/images/home/best seller two.png"),
-                    //       fit: BoxFit.cover,
-                    //     ),
-                    //   ),
-                    //   child: Row(
-                    //     mainAxisAlignment: MainAxisAlignment.end,
-                    //     crossAxisAlignment: CrossAxisAlignment.start,
-                    //     children: [
-                    //       Padding(
-                    //         padding: EdgeInsets.only(
-                    //             top: querySize.height * 0.008,
-                    //             right: querySize.height * 0.012),
-                    //         child: Image.asset(
-                    //           'assets/images/home/favourite.png',
-                    //           width: querySize.width * 0.075,
-                    //           height: querySize.height * 0.035,
-                    //         ),
-                    //       ),
-                    //     ],
-                    //   ),
-                    // ),
-                    ),
+                      ),
+                    ],
+                  ),
+                ),
                 SizedBox(height: querySize.height * 0.01),
                 Row(
                   children: [
@@ -980,9 +945,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     Text(
-                      bestSellerProvider.productListItems.data![index].price
-                              .toString() ??
-                          'N?A',
+                      product.price.toString(),
                       style: TextStyle(
                         color: const Color(0xFF000000),
                         fontSize: querySize.width * 0.035,
@@ -992,7 +955,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
                 Text(
-                  bestSellerProvider.productListItems.data![index].name!,
+                  product.name!,
                   style: TextStyle(
                     overflow: TextOverflow.ellipsis,
                     fontWeight: FontWeight.w600,
@@ -1005,46 +968,316 @@ class _HomeScreenState extends State<HomeScreen> {
             );
           },
         ),
-        // Align(
-        //     alignment: Alignment.center,
-        //     child: ElevatedButton(
-        //       onPressed: () {
-        //         Navigator.push(
-        //             context,
-        //             MaterialPageRoute(
-        //               builder: (context) => ProductListingScreen(
-        //                   productListingScreenName: sectionTitle),
-        //             ));
-        //       },
-        //       style: ElevatedButton.styleFrom(
-        //         minimumSize:
-        //             Size(querySize.width * 0.8, querySize.height * 0.06),
-        //         backgroundColor: Colors.white,
-        //         padding: EdgeInsets.symmetric(
-        //           horizontal: querySize.width * 0.15,
-        //           vertical: querySize.height * 0.02,
-        //         ),
-        //         shape: RoundedRectangleBorder(
-        //           borderRadius: BorderRadius.circular(
-        //             querySize.width * 0.08,
-        //           ),
-        //           side: BorderSide(
-        //             color: const Color(0xFF00ACB3),
-        //             width: querySize.height * 0.0018,
-        //           ),
-        //         ),
-        //       ),
-        //       child: Text(
-        //         buttonName,
-        //         style: TextStyle(
-        //             fontWeight: FontWeight.w600,
-        //             color: const Color(0xFF00ACB3),
-        //             fontSize: querySize.height * 0.017,
-        //             fontFamily: 'Segoe'),
-        //       ),
-        //     )),
       ],
     );
+
+    // return Column(
+    //   crossAxisAlignment: CrossAxisAlignment.start,
+    //   children: [
+    //     homeSectionTitle(
+    //         querySize,
+    //         sectionTitle,
+    //         context,
+    //         BestSellerNewArrivalListingScreen(
+    //           eventName: 'best-sellers',
+    //           productListingScreenName: 'Best Sellers',
+    //         )),
+    //     customSizedBox(querySize),
+    //     GridView.builder(
+    //       physics: const NeverScrollableScrollPhysics(),
+    //       shrinkWrap: true,
+    //       itemCount: bestSellerProvider!.productListItems.data!.length > 4
+    //           ? 4
+    //           : bestSellerProvider.productListItems.data!.length,
+    //       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+    //         crossAxisCount: 2,
+    //         crossAxisSpacing: querySize.height * 0.017,
+    //         //mainAxisSpacing: querySize.height * 001,
+    //         childAspectRatio: 0.78,
+    //       ),
+    //       itemBuilder: (context, index) {
+    //         return Column(
+    //           crossAxisAlignment: CrossAxisAlignment.start,
+    //           children: [
+    //             GestureDetector(
+    //                 onTap: () {
+    //                   Navigator.push(
+    //                       context,
+    //                       MaterialPageRoute(
+    //                         builder: (context) => ProductDetailScreen(
+    //                             productId: bestSellerProvider
+    //                                 .productListItems.data![index].id!),
+    //                       ));
+    //                 },
+    //                 child: Stack(
+    //                   children: [
+    //                     Container(
+    //                       height: querySize.height * 0.2,
+    //                       decoration: BoxDecoration(
+    //                         borderRadius:
+    //                             BorderRadius.circular(querySize.width * 0.04),
+    //                         boxShadow: [
+    //                           BoxShadow(
+    //                             color: Colors.black.withOpacity(0.3),
+    //                             offset: const Offset(0, 7),
+    //                             blurRadius: querySize.width * 0.008,
+    //                             spreadRadius: -2,
+    //                           ),
+    //                         ],
+    //                       ),
+    //                       child: ClipRRect(
+    //                         borderRadius:
+    //                             BorderRadius.circular(querySize.width * 0.04),
+    //                         child: Image.network(
+    //                           bestSellerProvider
+    //                               .productListItems.data![index].thumbImage!,
+    //                           //.cachedResponse!.data![index] index % 2 == 0
+    //                           //     ? "assets/images/wishlist_one.png"
+    //                           //     : "assets/images/wishlist_two.png",
+    //                           fit: BoxFit
+    //                               .cover, // Ensure the image covers the entire container
+    //                           width: double.infinity,
+    //                           height: double.infinity,
+    //                         ),
+    //                       ),
+    //                     ),
+
+    //                     // Favorite icon positioned in the top right corner
+    //                     Positioned(
+    //                       top: querySize.height * 0.008,
+    //                       right: querySize.height * 0.012,
+    //                       child: Consumer<WishlistProvider>(
+    //                         builder: (context, wishlistProvider, child) {
+    //                           // if (wishlistProvider
+    //                           //     .isLoading) {
+    //                           //   return SizedBox();
+    //                           // }
+    //                           if (wishlistProvider.errorMessage != null) {
+    //                             return Text(
+    //                                 'Error: ${wishlistProvider.errorMessage}');
+    //                           }
+
+    //                           final isInWishlist =
+    //                               wishlistProvider.isInWishlist;
+
+    //                           return GestureDetector(
+    //                             onTap: () async {
+    //                               final authProvider =
+    //                                   Provider.of<AuthProvider>(context,
+    //                                       listen: false);
+    //                               final token = await authProvider.getToken();
+
+    //                               if (token == null) {
+    //                                 customSnackBar(context, 'Please SignIn');
+    //                                 return;
+    //                               }
+
+    //                               // Toggle wishlist status
+    //                               await wishlistProvider.toggleWishlist(
+    //                                   token,
+    //                                   bestSellerProvider
+    //                                       .productListItems.data![index].id!,
+    //                                   !isInWishlist);
+    //                             },
+    //                             child: CircleAvatar(
+    //                               radius: querySize.width * 0.033,
+    //                               backgroundColor: Colors.white,
+    //                               child: isInWishlist
+    //                                   ? Image.asset(
+    //                                       'assets/images/love (1).png',
+    //                                       width: querySize.width * 0.048,
+    //                                       height: querySize.height * 0.018,
+    //                                     )
+    //                                   : Image.asset(
+    //                                       'assets/images/home/favourite.png',
+    //                                       width: querySize.width * 0.075,
+    //                                       height: querySize.height * 0.037,
+    //                                     ),
+    //                             ),
+    //                           );
+    //                         },
+    //                       ),
+    //                       // child: GestureDetector(
+    //                       //   onTap: () {},
+    //                       //   child: CircleAvatar(
+    //                       //     radius: querySize.width * 0.033,
+    //                       //     backgroundColor: Colors.white,
+    //                       //     child: Image.asset(
+    //                       //       'assets/images/home/favourite.png',
+    //                       //       width: querySize.width * 0.075,
+    //                       //       height: querySize.height * 0.035,
+    //                       //     ),
+    //                       //   ),
+    //                       // ),
+    //                       // child: Image.asset(
+    //                       //   'assets/images/home/favourite.png',
+    //                       //   width: querySize.width * 0.075,
+    //                       //   height: querySize.height * 0.035,
+    //                       // ),
+    //                     ),
+    //                   ],
+    //                 )
+
+    //                 // child: ClipRRect(
+    //                 //   borderRadius: BorderRadius.circular(querySize.width * 0.04),
+    //                 //   child: Container(
+    //                 //     height: querySize.height * 0.2,
+    //                 //     decoration: BoxDecoration(
+    //                 //       boxShadow: [
+    //                 //         BoxShadow(
+    //                 //           color: Colors.black.withOpacity(0.3),
+    //                 //           offset: const Offset(3, 4),
+    //                 //           blurRadius: querySize.width * 2,
+    //                 //           spreadRadius: querySize.width * 0.01,
+    //                 //         ),
+    //                 //       ],
+    //                 //       color: Colors.white,
+    //                 //       image: DecorationImage(
+    //                 //         image: index % 2 == 0
+    //                 //             ? const AssetImage(
+    //                 //                 "assets/images/home/best seller one.png")
+    //                 //             : const AssetImage(
+    //                 //                 "assets/images/home/best seller two.png"),
+    //                 //         fit: BoxFit.cover,
+    //                 //       ),
+    //                 //     ),
+    //                 //     child: Row(
+    //                 //       mainAxisAlignment: MainAxisAlignment.end,
+    //                 //       crossAxisAlignment: CrossAxisAlignment.start,
+    //                 //       children: [
+    //                 //         Padding(
+    //                 //           padding: EdgeInsets.only(
+    //                 //               top: querySize.height * 0.008,
+    //                 //               right: querySize.height * 0.012),
+    //                 //           child: Image.asset(
+    //                 //             'assets/images/home/favourite.png',
+    //                 //             width: querySize.width * 0.075,
+    //                 //             height: querySize.height * 0.035,
+    //                 //           ),
+    //                 //         ),
+    //                 //       ],
+    //                 //     ),
+    //                 //   ),
+    //                 // ),
+    //                 // child: Container(
+    //                 //   height: querySize.height * 0.2,
+    //                 //   decoration: BoxDecoration(
+    //                 //     boxShadow: [
+    //                 //       BoxShadow(
+    //                 //         color: Colors.black.withOpacity(0.3),
+    //                 //         offset: const Offset(0, 4),
+    //                 //         blurRadius: querySize.width * 0.008,
+    //                 //         spreadRadius: 0,
+    //                 //       ),
+    //                 //     ],
+    //                 //     color: Colors.white,
+    //                 //     borderRadius:
+    //                 //         BorderRadius.circular(querySize.width * 0.04),
+    //                 //     image: DecorationImage(
+    //                 //       image: index % 2 == 0
+    //                 //           ? const AssetImage(
+    //                 //               "assets/images/home/best seller one.png")
+    //                 //           : const AssetImage(
+    //                 //               "assets/images/home/best seller two.png"),
+    //                 //       fit: BoxFit.cover,
+    //                 //     ),
+    //                 //   ),
+    //                 //   child: Row(
+    //                 //     mainAxisAlignment: MainAxisAlignment.end,
+    //                 //     crossAxisAlignment: CrossAxisAlignment.start,
+    //                 //     children: [
+    //                 //       Padding(
+    //                 //         padding: EdgeInsets.only(
+    //                 //             top: querySize.height * 0.008,
+    //                 //             right: querySize.height * 0.012),
+    //                 //         child: Image.asset(
+    //                 //           'assets/images/home/favourite.png',
+    //                 //           width: querySize.width * 0.075,
+    //                 //           height: querySize.height * 0.035,
+    //                 //         ),
+    //                 //       ),
+    //                 //     ],
+    //                 //   ),
+    //                 // ),
+    //                 ),
+    //             SizedBox(height: querySize.height * 0.01),
+    //             Row(
+    //               children: [
+    //                 Text(
+    //                   "QAR  ",
+    //                   style: TextStyle(
+    //                     fontFamily: 'ElMessiri',
+    //                     color: Colors.black,
+    //                     fontWeight: FontWeight.w600,
+    //                     fontSize: querySize.width * 0.029,
+    //                   ),
+    //                 ),
+    //                 Text(
+    //                   bestSellerProvider.productListItems.data![index].price
+    //                           .toString() ??
+    //                       'N?A',
+    //                   style: TextStyle(
+    //                     color: const Color(0xFF000000),
+    //                     fontSize: querySize.width * 0.035,
+    //                     fontWeight: FontWeight.bold,
+    //                   ),
+    //                 ),
+    //               ],
+    //             ),
+    //             Text(
+    //               bestSellerProvider.productListItems.data![index].name!,
+    //               style: TextStyle(
+    //                 overflow: TextOverflow.ellipsis,
+    //                 fontWeight: FontWeight.w600,
+    //                 fontFamily: 'Segoe',
+    //                 fontSize: querySize.width * 0.027,
+    //                 color: const Color(0xFF525252),
+    //               ),
+    //             ),
+    //           ],
+    //         );
+    //       },
+    //     ),
+    //     // Align(
+    //     //     alignment: Alignment.center,
+    //     //     child: ElevatedButton(
+    //     //       onPressed: () {
+    //     //         Navigator.push(
+    //     //             context,
+    //     //             MaterialPageRoute(
+    //     //               builder: (context) => ProductListingScreen(
+    //     //                   productListingScreenName: sectionTitle),
+    //     //             ));
+    //     //       },
+    //     //       style: ElevatedButton.styleFrom(
+    //     //         minimumSize:
+    //     //             Size(querySize.width * 0.8, querySize.height * 0.06),
+    //     //         backgroundColor: Colors.white,
+    //     //         padding: EdgeInsets.symmetric(
+    //     //           horizontal: querySize.width * 0.15,
+    //     //           vertical: querySize.height * 0.02,
+    //     //         ),
+    //     //         shape: RoundedRectangleBorder(
+    //     //           borderRadius: BorderRadius.circular(
+    //     //             querySize.width * 0.08,
+    //     //           ),
+    //     //           side: BorderSide(
+    //     //             color: const Color(0xFF00ACB3),
+    //     //             width: querySize.height * 0.0018,
+    //     //           ),
+    //     //         ),
+    //     //       ),
+    //     //       child: Text(
+    //     //         buttonName,
+    //     //         style: TextStyle(
+    //     //             fontWeight: FontWeight.w600,
+    //     //             color: const Color(0xFF00ACB3),
+    //     //             fontSize: querySize.height * 0.017,
+    //     //             fontFamily: 'Segoe'),
+    //     //       ),
+    //     //     )),
+    //   ],
+    // );
   }
 
   giftByCategorySection(Size querySize, BuildContext context) {
@@ -1053,7 +1286,7 @@ class _HomeScreenState extends State<HomeScreen> {
       children: [
         if (giftProvider.isLoading)
           // Show loading indicator while fetching
-          Center(child: CircularProgressIndicator())
+          ShimmerLoading(containerHeight: querySize.height * 0.36)
         else if (giftProvider.cachedResponse == null)
           // Handle case where data is null (failed to fetch)
           Center(child: Text('Failed to load categories'))

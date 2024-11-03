@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 Container userInputField({required TextEditingController inputController}) {
   return Container(
@@ -23,6 +24,11 @@ Container userInputField({required TextEditingController inputController}) {
         ),
         Expanded(
           child: TextField(
+            inputFormatters: [
+              LengthLimitingTextInputFormatter(
+                  8), // Limits input to 8 characters
+              FilteringTextInputFormatter.digitsOnly, // Allows only digits
+            ],
             controller: inputController,
             keyboardType: TextInputType.phone,
             decoration: InputDecoration(

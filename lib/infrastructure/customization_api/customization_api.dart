@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:lenore/core/constant.dart';
 import 'package:lenore/domain/customization_model/error_response_model.dart';
 import 'dart:io';
 
@@ -16,8 +17,7 @@ Future<dynamic> submitCustomizationRequest({
   required String filterType,
   List<File>? images,
 }) async {
-  final url = Uri.parse(
-      "https://project.artisans.qa/lenore-latest/api/submit-customisation-request");
+  final url = Uri.parse("${baseUrl}/api/submit-customisation-request");
 
   try {
     var request = http.MultipartRequest("POST", url);
@@ -53,8 +53,10 @@ Future<dynamic> submitCustomizationRequest({
 
     if (response.statusCode == 200) {
       if (decodedResponse['status'] == true) {
+        print('true');
         return CustomizationSuccessResponse.fromJson(decodedResponse);
       } else {
+        print('false');
         return CustomizationErrorResponse.fromJson(decodedResponse);
       }
     } else {

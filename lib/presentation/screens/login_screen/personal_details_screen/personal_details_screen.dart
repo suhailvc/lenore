@@ -238,6 +238,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                               return; // Stop submission if terms not accepted
                             }
                             var response = await provider.userRegistration(
+                              context: context,
                               fName: fNameController.text.trim(),
                               sName: lNameController.text.trim(),
                               email: emailController.text.trim(),

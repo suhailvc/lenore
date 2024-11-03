@@ -265,8 +265,16 @@ class _CustomisationScreenState extends State<CustomisationScreen> {
                                   width: querySize.width * 0.038,
                                   height: querySize.height * 0.038,
                                 ),
-                                items: ['Diamond', 'Gold', 'Platinum']
-                                    .map((String value) {
+                                items: [
+                                  'Ring',
+                                  'Nicklase',
+                                  'Earring',
+                                  'Bracelet',
+                                  'Chain',
+                                  'Bangle',
+                                  'Pendant',
+                                  'Anklet'
+                                ].map((String value) {
                                   return DropdownMenuItem<String>(
                                     value: value,
                                     child: Text(value),

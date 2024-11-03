@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:lenore/application/provider/home_provider/gift_by_category/gift_by_category_provider.dart';
 import 'package:lenore/core/constant.dart';
-import 'package:lenore/presentation/screens/gift_by%20category_screen/widget/constants.dart';
 
 import 'package:lenore/presentation/screens/sub_category_screen/sub_category_screen.dart';
-import 'package:lenore/presentation/widgets/custom_top_bar.dart';
-import 'package:lenore/presentation/widgets/cutom_bottom_bar_top_bar.dart';
+
 import 'package:provider/provider.dart';
 
 class GiftByCategoryScreen extends StatefulWidget {
@@ -66,7 +64,7 @@ class _GiftByCategoryScreenState extends State<GiftByCategoryScreen> {
                     child: Consumer<GiftByCategoryProvider>(
                       builder: (context, giftByCategoryValue, child) {
                         if (giftByCategoryValue.isLoading) {
-                          return CircularProgressIndicator();
+                          return lenoreGif(querySize);
                         } else if (giftByCategoryValue.cachedResponse!.data ==
                                 null ||
                             giftByCategoryValue.cachedResponse!.data!.isEmpty) {

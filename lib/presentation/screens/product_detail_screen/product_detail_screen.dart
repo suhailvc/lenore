@@ -1,12 +1,21 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+
+import 'package:lenore/application/provider/auth_provider/auth_provider.dart';
+import 'package:lenore/application/provider/cart_provider/cart_provider.dart';
+
 import 'package:lenore/application/provider/product_detail_provider/product_detail_provider.dart';
+import 'package:lenore/application/provider/wishlist_provider/whishlist_provider.dart';
 import 'package:lenore/core/constant.dart';
-import 'package:lenore/presentation/screens/product_detail_screen/widgets/contant.dart';
+
+import 'package:lenore/domain/hive_model/hive_cart_model/hive_cart_model.dart';
+import 'package:lenore/domain/product_detail_model/product_detail_model.dart';
+import 'package:lenore/presentation/screens/buy_now_check_out_screen/buy_now_check_out_screen.dart';
 
 import 'package:lenore/presentation/widgets/custom_top_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:flutter_html/flutter_html.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final int productId;
@@ -27,8 +36,19 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
     _tabController = TabController(length: 2, vsync: this);
     Provider.of<ProductDetailProvider>(context, listen: false)
         .fetchProductDetails(id: widget.productId);
-
+    _fetchWishlistStatus();
     super.initState();
+  }
+
+  Future<void> _fetchWishlistStatus() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final token = await authProvider.getToken();
+
+    if (token != null) {
+      final wishlistProvider =
+          Provider.of<WishlistProvider>(context, listen: false);
+      await wishlistProvider.fetchWishlist(token);
+    }
   }
 
   @override
@@ -47,7 +67,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
       body: Consumer<ProductDetailProvider>(
         builder: (context, productDetailProvidervalue, child) {
           if (productDetailProvidervalue.isLoading) {
-            return CircularProgressIndicator();
+            return lenoreGif(querySize);
           }
           if (productDetailProvidervalue.productDetails == null) {
             return Container(
@@ -116,17 +136,235 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                                               SizedBox(
                                                   width:
                                                       querySize.width * 0.02),
-                                              CircleAvatar(
-                                                radius: querySize.width * 0.033,
-                                                backgroundColor: Colors.white,
-                                                child: Image.asset(
-                                                  'assets/images/home/favourite.png',
-                                                  width:
-                                                      querySize.width * 0.075,
-                                                  height:
-                                                      querySize.height * 0.037,
-                                                ),
-                                              ),
+                                              // Consumer2<GetWishListProvider,
+                                              //     AddToWishlistProvider>(
+                                              //   builder: (context,
+                                              //       getWishListProvider,
+                                              //       addToWishlistProvider,
+                                              //       child) {
+                                              //     final productId =
+                                              //         productDetailProvidervalue
+                                              //             .productDetails!
+                                              //             .data!
+                                              //             .id!;
+                                              //     final isInWishlist =
+                                              //         addToWishlistProvider
+                                              //             .isProductInWishlist(
+                                              //                 productId);
+
+                                              //     return GestureDetector(
+                                              //       onTap: () async {
+                                              //         String token =
+                                              //             await Provider.of<
+                                              //                             AuthProvider>(
+                                              //                         context,
+                                              //                         listen:
+                                              //                             false)
+                                              //                     .getToken() ??
+                                              //                 '';
+                                              //         if (token.isEmpty) {
+                                              //           customSnackBar(context,
+                                              //               "Please Sign In");
+                                              //         } else {
+                                              //           // Add or remove from wishlist based on current state
+                                              //           if (isInWishlist) {
+                                              //             await addToWishlistProvider
+                                              //                 .addToWishListProvider(
+                                              //                     productId,
+                                              //                     '0',
+                                              //                     token);
+                                              //           } else {
+                                              //             await addToWishlistProvider
+                                              //                 .addToWishListProvider(
+                                              //                     productId,
+                                              //                     '1',
+                                              //                     token);
+                                              //           }
+                                              //         }
+                                              //       },
+                                              //       child: CircleAvatar(
+                                              //         radius: querySize.width *
+                                              //             0.033,
+                                              //         backgroundColor:
+                                              //             isInWishlist
+                                              //                 ? Colors.red
+                                              //                 : Colors.white,
+                                              //         child: Image.asset(
+                                              //           isInWishlist
+                                              //               ? 'assets/images/app icon.png'
+                                              //               : 'assets/images/home/favourite.png',
+                                              //           width: querySize.width *
+                                              //               0.075,
+                                              //           height:
+                                              //               querySize.height *
+                                              //                   0.037,
+                                              //         ),
+                                              //       ),
+                                              //     );
+                                              //   },
+                                              // )
+
+                                              // Consumer<GetWishListProvider>(...............................................
+                                              //     builder: (context,
+                                              //         getWishListvalue, child) {
+                                              //   return Consumer<
+                                              //           AddToWishlistProvider>(
+                                              //       builder: (context,
+                                              //           wishlistValue, child) {
+                                              //     return GestureDetector(
+                                              //       onTap: () async {
+                                              //         String token =
+                                              //             await Provider.of<
+                                              //                             AuthProvider>(
+                                              //                         context,
+                                              //                         listen:
+                                              //                             false)
+                                              //                     .getToken() ??
+                                              //                 '';
+                                              //         if (token == '') {
+                                              //           return customSnackBar(
+                                              //               context,
+                                              //               "Please SignIn");
+                                              //         } else if (getWishListvalue
+                                              //                 .isProductInWishlist(
+                                              //                     productDetailProvidervalue
+                                              //                         .productDetails!
+                                              //                         .data!
+                                              //                         .id!) ==
+                                              //             false)
+                                              //           wishlistValue
+                                              //               .addToWishListProvider(
+                                              //                   productDetailProvidervalue
+                                              //                       .productDetails!
+                                              //                       .data!
+                                              //                       .id!,
+                                              //                   '1',
+                                              //                   token);
+                                              //         else if (getWishListvalue
+                                              //                 .isProductInWishlist(
+                                              //                     productDetailProvidervalue
+                                              //                         .productDetails!
+                                              //                         .data!
+                                              //                         .id!) ==
+                                              //             true)
+                                              //           wishlistValue
+                                              //               .addToWishListProvider(
+                                              //                   productDetailProvidervalue
+                                              //                       .productDetails!
+                                              //                       .data!
+                                              //                       .id!,
+                                              //                   '0',
+                                              //                   token);
+                                              //         print('touched');
+                                              //       },
+                                              //       child: CircleAvatar(
+                                              //         radius: querySize.width *
+                                              //             0.033,
+                                              //         backgroundColor:
+                                              //             Colors.white,
+                                              //         child: getWishListvalue
+                                              //                     .isProductInWishlist(
+                                              //                         productDetailProvidervalue
+                                              //                             .productDetails!
+                                              //                             .data!
+                                              //                             .id!) ==
+                                              //                 false
+                                              //             ? Image.asset(
+                                              //                 'assets/images/home/favourite.png',
+                                              //                 width: querySize
+                                              //                         .width *
+                                              //                     0.075,
+                                              //                 height: querySize
+                                              //                         .height *
+                                              //                     0.037,
+                                              //               )
+                                              //             : Image.asset(
+                                              //                 'assets/images/app icon.png',
+                                              //                 width: querySize
+                                              //                         .width *
+                                              //                     0.075,
+                                              //                 height: querySize
+                                              //                         .height *
+                                              //                     0.037,
+                                              //               ),
+                                              //       ),
+                                              //     );
+                                              //   });
+                                              // }),
+                                              Consumer<WishlistProvider>(
+                                                builder: (context,
+                                                    wishlistProvider, child) {
+                                                  // if (wishlistProvider
+                                                  //     .isLoading) {
+                                                  //   return CircularProgressIndicator();
+                                                  // }
+                                                  if (wishlistProvider
+                                                          .errorMessage !=
+                                                      null) {
+                                                    return Text(
+                                                        'Error: ${wishlistProvider.errorMessage}');
+                                                  }
+
+                                                  final isInWishlist =
+                                                      wishlistProvider
+                                                          .isProductInWishlist(
+                                                              widget.productId);
+
+                                                  return GestureDetector(
+                                                    onTap: () async {
+                                                      final authProvider =
+                                                          Provider.of<
+                                                                  AuthProvider>(
+                                                              context,
+                                                              listen: false);
+                                                      final token =
+                                                          await authProvider
+                                                              .getToken();
+
+                                                      if (token == null) {
+                                                        ScaffoldMessenger.of(
+                                                                context)
+                                                            .showSnackBar(
+                                                          SnackBar(
+                                                              content: Text(
+                                                                  "Please SignIn")),
+                                                        );
+                                                        return;
+                                                      }
+
+                                                      // Toggle wishlist status
+                                                      await wishlistProvider
+                                                          .toggleWishlist(token,
+                                                              widget.productId);
+                                                    },
+                                                    child: CircleAvatar(
+                                                      radius: querySize.width *
+                                                          0.033,
+                                                      backgroundColor:
+                                                          Colors.white,
+                                                      child: isInWishlist
+                                                          ? Image.asset(
+                                                              'assets/images/love (1).png',
+                                                              width: querySize
+                                                                      .width *
+                                                                  0.048,
+                                                              height: querySize
+                                                                      .height *
+                                                                  0.018,
+                                                            )
+                                                          : Image.asset(
+                                                              'assets/images/home/favourite.png',
+                                                              width: querySize
+                                                                      .width *
+                                                                  0.075,
+                                                              height: querySize
+                                                                      .height *
+                                                                  0.037,
+                                                            ),
+                                                    ),
+                                                  );
+                                                },
+                                              )
                                             ],
                                           ),
                                         ),
@@ -314,8 +552,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                                 children: [
                                   customSizedBox(querySize),
                                   productDetailProvidervalue.productDetails!
-                                              .data!.category!.name ==
-                                          'Gold'
+                                              .data!.category!.name !=
+                                          'Diamond'
                                       ? Row(
                                           children: [
                                             Row(
@@ -397,8 +635,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                                           height: 0,
                                         ),
                                   productDetailProvidervalue.productDetails!
-                                              .data!.category!.name ==
-                                          'Gold'
+                                              .data!.category!.name !=
+                                          'Diamond'
                                       ? customSizedBox(querySize)
                                       : SizedBox(),
                                   Row(
@@ -474,8 +712,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                                                         .productDetails!
                                                         .data!
                                                         .category!
-                                                        .name ==
-                                                    'Gold'
+                                                        .name !=
+                                                    'Diamond'
                                                 ? "Type"
                                                 : "Gold Weight",
                                             style: TextStyle(
@@ -489,8 +727,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                                                         .productDetails!
                                                         .data!
                                                         .category!
-                                                        .name ==
-                                                    'Gold'
+                                                        .name !=
+                                                    'Diamond'
                                                 ? "${productDetailProvidervalue.productDetails!.data!.type ?? "N/A"}KT"
                                                 : "${productDetailProvidervalue.productDetails!.data!.goldWeight ?? "N/A"} gm",
                                             style: TextStyle(
@@ -527,8 +765,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                                                         .productDetails!
                                                         .data!
                                                         .category!
-                                                        .name ==
-                                                    'Gold'
+                                                        .name !=
+                                                    'Diamond'
                                                 ? productDetailProvidervalue
                                                         .productDetails!
                                                         .data!
@@ -537,7 +775,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                                                 : productDetailProvidervalue
                                                         .productDetails!
                                                         .data!
-                                                        .diamondColour ??
+                                                        .goldColour ??
                                                     "N/A",
                                             style: TextStyle(
                                                 fontWeight: FontWeight.w600,
@@ -565,8 +803,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                                                         .productDetails!
                                                         .data!
                                                         .category!
-                                                        .name ==
-                                                    'Gold'
+                                                        .name !=
+                                                    'Diamond'
                                                 ? "Weight"
                                                 : "Gold Purity",
                                             style: TextStyle(
@@ -580,8 +818,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                                                         .productDetails!
                                                         .data!
                                                         .category!
-                                                        .name ==
-                                                    'Gold'
+                                                        .name !=
+                                                    'Diamond'
                                                 ? "${productDetailProvidervalue.productDetails!.data!.goldWeight ?? "N/A"} gm"
                                                 : productDetailProvidervalue
                                                     .productDetails!
@@ -597,8 +835,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                                         ],
                                       ),
                                       productDetailProvidervalue.productDetails!
-                                                  .data!.category!.name ==
-                                              'Gold'
+                                                  .data!.category!.name !=
+                                              'Diamond'
                                           ? SizedBox(
                                               height: querySize.height * 0.049,
                                               child: VerticalDivider(
@@ -610,8 +848,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                                             )
                                           : SizedBox(),
                                       productDetailProvidervalue.productDetails!
-                                                  .data!.category!.name ==
-                                              'Gold'
+                                                  .data!.category!.name !=
+                                              'Diamond'
                                           ? Column(
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
@@ -775,16 +1013,49 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                               child: Column(
                                 children: [
                                   customSizedBox(querySize),
-                                  Text(
-                                    productDetailProvidervalue.productDetails!
-                                            .data!.longDescription ??
-                                        "N/A",
-                                    style: TextStyle(
-                                        fontSize: querySize.width * 0.03,
+                                  Html(
+                                    data: productDetailProvidervalue
+                                            .productDetails!
+                                            .data!
+                                            .longDescription ??
+                                        '',
+                                    style: {
+                                      "p": Style(
+                                        fontSize:
+                                            FontSize.small, // Set font size
+                                        color: Colors.black, // Set text color
+                                        textAlign:
+                                            TextAlign.justify, // Align text
                                         fontFamily: 'Segoe',
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.w500),
+                                      ),
+                                      "h1": Style(
+                                        // fontSize: FontSize.xLarge, // Larger font for h1
+                                        fontWeight:
+                                            FontWeight.bold, // Bold font weight
+                                        color: Colors
+                                            .blueAccent, // Different color for h1
+                                      ),
+                                      "a": Style(
+                                        color: Colors.blue, // Link color
+                                        textDecoration: TextDecoration
+                                            .underline, // Underline links
+                                      ),
+                                      // fontSize: querySize.width * 0.03,
+                                      // fontFamily: 'Segoe',
+                                      // color: Colors.black,
+                                      // fontWeight: FontWeight.w500,
+                                    },
                                   ),
+                                  // Text(
+                                  //   productDetailProvidervalue.productDetails!
+                                  //           .data!.longDescription ??
+                                  //       "N/A",
+                                  //   style: TextStyle(
+                                  //       fontSize: querySize.width * 0.03,
+                                  //       fontFamily: 'Segoe',
+                                  //       color: Colors.black,
+                                  //       fontWeight: FontWeight.w500),
+                                  // ),
                                 ],
                               ),
                             ),
@@ -813,7 +1084,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                                 physics: const ScrollPhysics(
                                     parent: BouncingScrollPhysics()),
                                 scrollDirection: Axis.horizontal,
-                                itemCount: giftByCateogryListName.length,
+                                itemCount: productDetailProvidervalue
+                                    .productDetails!.relatedProducts!.length,
                                 itemBuilder: (context, index) {
                                   return GestureDetector(
                                       onTap: () {},
@@ -821,70 +1093,93 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          Container(
-                                            margin: EdgeInsets.only(
-                                                right: querySize.width * 0.025),
-                                            width: 159.16 /
-                                                375.0 *
-                                                querySize.width,
-                                            height: 178.7 /
-                                                812.0 *
-                                                querySize.height,
-                                            decoration: BoxDecoration(
-                                              color: const Color(0xFFE7E7E7),
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                              image: DecorationImage(
-                                                image: index % 2 == 0
-                                                    ? const AssetImage(
-                                                        "assets/images/wishlist_one.png")
-                                                    : const AssetImage(
-                                                        "assets/images/wishlist_two.png"),
-                                                fit: BoxFit.cover,
+                                          GestureDetector(
+                                            onTap: () {
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        ProductDetailScreen(
+                                                            productId: productDetailProvidervalue
+                                                                .productDetails!
+                                                                .relatedProducts![
+                                                                    index]
+                                                                .id!),
+                                                  ));
+                                            },
+                                            child: Container(
+                                              margin: EdgeInsets.only(
+                                                  right:
+                                                      querySize.width * 0.025),
+                                              width: 159.16 /
+                                                  375.0 *
+                                                  querySize.width,
+                                              height: 178.7 /
+                                                  812.0 *
+                                                  querySize.height,
+                                              decoration: BoxDecoration(
+                                                color: const Color(0xFFE7E7E7),
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                                image: DecorationImage(
+                                                  image: NetworkImage(
+                                                      productDetailProvidervalue
+                                                          .productDetails!
+                                                          .relatedProducts![
+                                                              index]
+                                                          .thumbImage!),
+                                                  fit: BoxFit.cover,
+                                                ),
                                               ),
-                                            ),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.end,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Padding(
-                                                  padding: EdgeInsets.only(
-                                                      top: querySize.height *
-                                                          0.008,
-                                                      right: querySize.height *
-                                                          0.012),
-                                                  child: CircleAvatar(
-                                                    radius:
-                                                        querySize.width * 0.033,
-                                                    backgroundColor:
-                                                        Colors.white,
-                                                    child: Image.asset(
-                                                      'assets/images/home/favourite.png',
-                                                      width: querySize.width *
-                                                          0.075,
-                                                      height: querySize.height *
-                                                          0.035,
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.end,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Padding(
+                                                    padding: EdgeInsets.only(
+                                                        top: querySize.height *
+                                                            0.008,
+                                                        right:
+                                                            querySize.height *
+                                                                0.012),
+                                                    child: CircleAvatar(
+                                                      radius: querySize.width *
+                                                          0.033,
+                                                      backgroundColor:
+                                                          Colors.white,
+                                                      child: Image.asset(
+                                                        'assets/images/home/favourite.png',
+                                                        width: querySize.width *
+                                                            0.075,
+                                                        height:
+                                                            querySize.height *
+                                                                0.035,
+                                                      ),
                                                     ),
                                                   ),
-                                                ),
-                                              ],
+                                                ],
+                                              ),
                                             ),
                                           ),
                                           SizedBox(
                                               height: querySize.height * 0.01),
-                                          const Row(
+                                          Row(
                                             children: [
                                               Text(
-                                                "QAR",
+                                                "QAR ",
                                                 style: TextStyle(
                                                   color: Color(0xFF000000),
                                                   fontSize: 10.0,
                                                 ),
                                               ),
                                               Text(
-                                                " 756",
+                                                productDetailProvidervalue
+                                                    .productDetails!
+                                                    .relatedProducts![index]
+                                                    .price
+                                                    .toString(),
                                                 style: TextStyle(
                                                   color: Color(0xFF000000),
                                                   fontSize: 13.0,
@@ -894,7 +1189,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                                             ],
                                           ),
                                           Text(
-                                            "Product | Name and Price Laura",
+                                            productDetailProvidervalue
+                                                    .productDetails!
+                                                    .relatedProducts![index]
+                                                    .name ??
+                                                '',
                                             style: TextStyle(
                                               fontFamily: 'Segoebold',
                                               fontWeight: FontWeight.w600,
@@ -917,12 +1216,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                   ),
                 ),
               ),
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: addToCartAndBuyNowButton(querySize, context),
-              ),
+              productDetailProvidervalue.productDetails!.data!.stock! > 0
+                  ? Positioned(
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      child: addToCartAndBuyNowButton(querySize, context,
+                          productDetailProvidervalue.productDetails!),
+                    )
+                  : SizedBox(),
             ],
           );
         },
@@ -930,14 +1232,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
     );
   }
 
-  Container addToCartAndBuyNowButton(Size querySize, BuildContext context) {
+  Container addToCartAndBuyNowButton(
+      Size querySize, BuildContext context, ProductDetailModel product) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.2),
-            //spreadRadius: 0,
             blurRadius: 4,
             offset: const Offset(0, -5),
           ),
@@ -949,7 +1251,48 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           ElevatedButton(
-            onPressed: () {},
+            onPressed: () {
+              final cartItem = HiveCartModel(
+                type: '1',
+                productId: product.data!.id!,
+                productName: product.data!.name ?? '',
+                description: product.data!.sku ?? '',
+                price: product.data!.price?.toDouble() ?? 0.0,
+                size: 'Default Size',
+                image: (product.data!.images != null &&
+                        product.data!.images!.isNotEmpty)
+                    ? product
+                        .data!.images!.first // Use the first image if available
+                    : 'assets/images/placeholder.png', // Default placeholder image
+                stock: product.data!.stock ?? 0,
+                quantity: 1,
+              );
+
+              Provider.of<CartProvider>(context, listen: false)
+                  .addToCart(cartItem);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                    content: Text("${product.data!.name ?? ''} added to cart")),
+              );
+              // final cartItem = CartModel(
+              //   productId: product.data!.id!,
+              //   image: (product.data!.images != null &&
+              //           product.data!.images!.isNotEmpty)
+              //       ? product
+              //           .data!.images!.first // Use the first image if available
+              //       : 'assets/images/placeholder.png', // Provide a default placeholder image
+              //   stock: product.data!.stock ?? 0,
+              //   productName: product.data!.name ?? '',
+              //   description: product.data!.sku ?? '',
+              //   price: product.data!.price!.toDouble(),
+              //   size: 'Default Size',
+              // );
+
+              // Provider.of<CartProvider>(context, listen: false)
+              //     .addToCart(cartItem);
+              // customSnackBar(
+              //     context, "${product.data!.name ?? ''} added to cart");
+            },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF008186),
               minimumSize: Size(
@@ -966,7 +1309,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
             ),
           ),
           ElevatedButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        BuyNowCheckOutScreen(productId: product.data!.id!),
+                  ));
+            },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF008186),
               minimumSize: Size(
@@ -986,4 +1336,77 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
       ),
     );
   }
+
+  // Container addToCartAndBuyNowButton(
+  //     Size querySize, BuildContext context, ProductDetailModel product) {
+  //   return Container(
+  //     decoration: BoxDecoration(
+  //       color: Colors.white,
+  //       boxShadow: [
+  //         BoxShadow(
+  //           color: Colors.black.withOpacity(0.2),
+  //           //spreadRadius: 0,
+  //           blurRadius: 4,
+  //           offset: const Offset(0, -5),
+  //         ),
+  //       ],
+  //       borderRadius: BorderRadius.circular(10),
+  //     ),
+  //     padding: EdgeInsets.all(querySize.width * 0.04),
+  //     child: Row(
+  //       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+  //       children: [
+  //         ElevatedButton(
+  //           onPressed: () {
+  //             final cartItem = CartModel(
+  //               image: product.data!.images![1],
+  //               stock: product.data!.stock ?? 0,
+  //               productName: product.data!.name ?? '',
+  //               description: product.data!.sku ?? '',
+  //               price: product.data!.price!.toDouble(),
+  //               size: 'Default Size',
+  //             );
+  //             Provider.of<CartProvider>(context, listen: false)
+  //                 .addToCart(cartItem);
+  //             ScaffoldMessenger.of(context).showSnackBar(
+  //               SnackBar(
+  //                   content: Text("${product.data!.name ?? ''} added to cart")),
+  //             );
+  //           },
+  //           style: ElevatedButton.styleFrom(
+  //             backgroundColor: const Color(0xFF008186),
+  //             minimumSize: Size(
+  //               MediaQuery.of(context).size.width * (137 / 375),
+  //               MediaQuery.of(context).size.height * (42 / 812),
+  //             ),
+  //             shape: RoundedRectangleBorder(
+  //               borderRadius: BorderRadius.circular(8),
+  //             ),
+  //           ),
+  //           child: const Text(
+  //             'Add to cart',
+  //             style: TextStyle(color: Colors.white),
+  //           ),
+  //         ),
+  //         ElevatedButton(
+  //           onPressed: () {},
+  //           style: ElevatedButton.styleFrom(
+  //             backgroundColor: const Color(0xFF008186),
+  //             minimumSize: Size(
+  //               MediaQuery.of(context).size.width * (137 / 375),
+  //               MediaQuery.of(context).size.height * (42 / 812),
+  //             ),
+  //             shape: RoundedRectangleBorder(
+  //               borderRadius: BorderRadius.circular(8),
+  //             ),
+  //           ),
+  //           child: const Text(
+  //             'Buy Now',
+  //             style: TextStyle(color: Colors.white),
+  //           ),
+  //         )
+  //       ],
+  //     ),
+  //   );
+  // }
 }

@@ -65,7 +65,10 @@ class GiftByVoucherScreen extends StatelessWidget {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) =>
-                                        GiftByVoucherDetailScreen(),
+                                        GiftByVoucherDetailScreen(
+                                      id: giftByVoucherProvider
+                                          .giftByVoucherItems!.data![index].id!,
+                                    ),
                                   ));
                             },
                             child: Container(

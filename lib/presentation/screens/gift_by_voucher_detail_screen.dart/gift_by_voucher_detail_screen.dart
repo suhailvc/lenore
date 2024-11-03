@@ -1,23 +1,50 @@
-import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
+import 'package:lenore/application/provider/cart_provider/cart_provider.dart';
+import 'package:lenore/application/provider/voucher_detail_provider/voucher_detail_provider.dart';
 import 'package:lenore/core/constant.dart';
-import 'package:lenore/presentation/screens/product_detail_screen/widgets/contant.dart';
-import 'package:lenore/presentation/widgets/custom_top_bar.dart';
-import 'package:flutter/material.dart';
+import 'package:lenore/domain/hive_model/hive_cart_model/hive_cart_model.dart';
+import 'package:lenore/domain/voucher_detail_model/voucher_detail_model.dart';
 
-class GiftByVoucherDetailScreen extends StatelessWidget {
-  const GiftByVoucherDetailScreen({super.key});
+import 'package:lenore/presentation/widgets/custom_top_bar.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter_html/flutter_html.dart';
+
+class GiftByVoucherDetailScreen extends StatefulWidget {
+  final int id;
+  const GiftByVoucherDetailScreen({required this.id, super.key});
+
+  @override
+  State<GiftByVoucherDetailScreen> createState() =>
+      _GiftByVoucherDetailScreenState();
+}
+
+class _GiftByVoucherDetailScreenState extends State<GiftByVoucherDetailScreen> {
+  @override
+  void initState() {
+    Provider.of<VocherDetailProvider>(context, listen: false)
+        .fetchVoucherDetail(widget.id);
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     var querySize = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Stack(
-        children: [
-          SafeArea(
-            child: SingleChildScrollView(
-              child: Column(
+      body: Consumer<VocherDetailProvider>(
+          builder: (context, voucherValue, child) {
+        if (voucherValue.isLoading) {
+          return lenoreGif(querySize);
+        }
+        if (voucherValue.voucherDetail == null) {
+          return lenoreGif(querySize);
+        }
+        return Stack(
+          children: [
+            SafeArea(
+              child: SingleChildScrollView(
+                  child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
@@ -37,9 +64,9 @@ class GiftByVoucherDetailScreen extends StatelessWidget {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(
                                     querySize.height * 0.01),
-                                image: const DecorationImage(
-                                  image: AssetImage(
-                                      "assets/images/wishlist_one.png"),
+                                image: DecorationImage(
+                                  image: NetworkImage(voucherValue
+                                      .voucherDetail!.data![0].image!),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -76,37 +103,39 @@ class GiftByVoucherDetailScreen extends StatelessWidget {
                           ],
                         ),
                         SizedBox(height: querySize.height * 0.01),
-                        buildDescriptionSection(querySize),
+                        buildDescriptionSection(
+                            querySize, voucherValue.voucherDetail!),
                       ],
                     ),
                   ),
-                  buildSimilarProductsSection(querySize),
+                  // buildSimilarProductsSection(querySize),
                   SizedBox(
-                    height: querySize.height * 0.12,
+                    height: querySize.height * 0.2,
                   ),
                 ],
-              ),
+              )),
             ),
-          ),
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: addToCartAndBuyNowButton(querySize, context),
-          ),
-        ],
-      ),
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: addToCartAndBuyNowButton(
+                  querySize, context, voucherValue.voucherDetail!),
+            ),
+          ],
+        );
+      }),
     );
   }
 
-  Widget buildDescriptionSection(Size querySize) {
+  Widget buildDescriptionSection(Size querySize, VoucherDetailModel voucher) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: querySize.width * 0.027),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'QAR 100 Voucher',
+            'QAR ${voucher.data![0].amount}',
             style: TextStyle(
               fontFamily: 'ElMessirisemibold',
               fontSize: querySize.height * 0.025,
@@ -117,7 +146,7 @@ class GiftByVoucherDetailScreen extends StatelessWidget {
             height: querySize.height * 0.003,
           ),
           Text(
-            'Eid Special Voucher',
+            voucher.data![0].name!,
             style: TextStyle(
                 fontWeight: FontWeight.w600,
                 color: const Color(0xFF008186),
@@ -137,14 +166,29 @@ class GiftByVoucherDetailScreen extends StatelessWidget {
           SizedBox(
             height: querySize.height * 0.005,
           ),
-          Text(
-            "Lorem Ipsum is simply dummy text of the printing and typesetting industry. survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-            style: TextStyle(
-              fontSize: querySize.width * 0.03,
-              fontFamily: 'Segoe',
-              color: Colors.black,
-              fontWeight: FontWeight.w500,
-            ),
+          Html(
+            data: voucher.data![0].description!,
+            style: {
+              "p": Style(
+                fontSize: FontSize.medium, // Set font size
+                color: Colors.black, // Set text color
+                textAlign: TextAlign.justify, // Align text
+                fontFamily: 'Segoe',
+              ),
+              "h1": Style(
+                // fontSize: FontSize.xLarge, // Larger font for h1
+                fontWeight: FontWeight.bold, // Bold font weight
+                color: Colors.blueAccent, // Different color for h1
+              ),
+              "a": Style(
+                color: Colors.blue, // Link color
+                textDecoration: TextDecoration.underline, // Underline links
+              ),
+              // fontSize: querySize.width * 0.03,
+              // fontFamily: 'Segoe',
+              // color: Colors.black,
+              // fontWeight: FontWeight.w500,
+            },
           ),
         ],
       ),
@@ -258,8 +302,10 @@ class GiftByVoucherDetailScreen extends StatelessWidget {
   }
 }
 
-Container addToCartAndBuyNowButton(Size querySize, BuildContext context) {
+Container addToCartAndBuyNowButton(
+    Size querySize, BuildContext context, VoucherDetailModel voucher) {
   return Container(
+    height: querySize.height * 0.085,
     decoration: BoxDecoration(
       color: Colors.white,
       boxShadow: [
@@ -276,7 +322,25 @@ Container addToCartAndBuyNowButton(Size querySize, BuildContext context) {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         ElevatedButton(
-          onPressed: () {},
+          onPressed: () {
+            final cartItem = HiveCartModel(
+              type: '2',
+              productId: voucher.data![0].id!,
+              productName: voucher.data![0].name ?? '',
+              description: '',
+              price: voucher.data![0].amount!.toDouble(),
+              size: 'Default Size',
+              image: voucher.data![0].image!, // Default placeholder image
+              stock: 10000,
+              quantity: 1,
+            );
+
+            Provider.of<CartProvider>(context, listen: false)
+                .addToCart(cartItem);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("voucher added to cart")),
+            );
+          },
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF008186),
             minimumSize: Size(

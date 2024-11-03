@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:lenore/core/constant.dart';
 
-Column customCheckOutField(
-    BuildContext context, String assetName, String fieldText, String name) {
+Column customCheckOutField(BuildContext context, String assetName,
+    String fieldText, String name, TextEditingController controller,
+    {String? errorMessage}) {
   var sizeQuery = MediaQuery.of(context).size;
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
@@ -36,6 +38,18 @@ Column customCheckOutField(
             ),
             Expanded(
               child: TextField(
+                keyboardType:
+                    name == "Mobile Number" || name == 'Giftee Mobile Number'
+                        ? TextInputType.number
+                        : null,
+                controller: controller,
+                inputFormatters:
+                    name == "Mobile Number" || name == 'Giftee Mobile Number'
+                        ? [
+                            LengthLimitingTextInputFormatter(8),
+                            FilteringTextInputFormatter.digitsOnly,
+                          ]
+                        : null,
                 decoration: InputDecoration(
                   hintStyle: const TextStyle(color: Color(0xFFD0D0D0)),
                   border: InputBorder.none,
@@ -49,6 +63,18 @@ Column customCheckOutField(
           ],
         ),
       ),
+      if (errorMessage != null)
+        Padding(
+          padding: EdgeInsets.only(top: sizeQuery.height * 0.005),
+          child: Text(
+            errorMessage,
+            style: TextStyle(
+              color: Colors.red,
+              fontSize: 12,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        ),
     ],
   );
 }

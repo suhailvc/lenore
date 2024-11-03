@@ -8,11 +8,12 @@ class OtpProvider with ChangeNotifier {
   bool get isLoading => _isLoading;
 
   // Function to call the OTP verification service
-  Future<dynamic> verifyOtp(String phoneNumber, String otp) async {
+  Future<dynamic> verifyOtp(
+      String phoneNumber, String otp, BuildContext context) async {
     _isLoading = true;
     notifyListeners();
 
-    var response = await OtpApiService().verifyOtp(phoneNumber, otp);
+    var response = await OtpApiService().verifyOtp(phoneNumber, otp, context);
     notifyListeners();
 
     _isLoading = false;

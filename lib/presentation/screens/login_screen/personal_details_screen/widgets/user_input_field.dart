@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:lenore/core/constant.dart';
 
 Column userInputField(BuildContext context, String assetName, String fieldText,
@@ -37,6 +38,9 @@ Column userInputField(BuildContext context, String assetName, String fieldText,
             Expanded(
               child: TextField(
                 controller: controller,
+                inputFormatters: name == "QID/ Passport"
+                    ? [LengthLimitingTextInputFormatter(11)]
+                    : null,
                 decoration: InputDecoration(
                   hintStyle: const TextStyle(color: Color(0xFFD0D0D0)),
                   border: InputBorder.none,

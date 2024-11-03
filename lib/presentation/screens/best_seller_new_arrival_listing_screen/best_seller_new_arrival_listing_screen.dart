@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:lenore/application/provider/auth_provider/auth_provider.dart';
 import 'package:lenore/application/provider/bestseller_new_aarival_product_list_provider/bestseller_new_aarival_product_list_provider.dart';
+import 'package:lenore/application/provider/wishlist_provider/whishlist_provider.dart';
 
 import 'package:lenore/core/constant.dart';
 import 'package:lenore/presentation/screens/filter_screen/filter_screen.dart';
 import 'package:lenore/presentation/screens/product_detail_screen/product_detail_screen.dart';
+import 'package:lenore/presentation/widgets/custom_snack_bar.dart';
 import 'package:lenore/presentation/widgets/custom_top_bar.dart';
 import 'package:provider/provider.dart';
 
@@ -33,14 +36,20 @@ class _BestSellerNewArrivalListingScreenState
             eventName: widget.eventName,
             pageNo: pageNo.toString(),
             isPagination: false); // False because it's the initial load
+    _fetchWishlist();
   }
-  // @override
-  // void initState() {
-  //   Provider.of<ProductListProvider>(context, listen: false)
-  //       .productListProviderMethod(
-  //           eventId: widget.eventId.toString(), pageNo: pageNo.toString());
-  //   super.initState();
-  // }
+
+  Future<void> _fetchWishlist() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final token = await authProvider.getToken();
+    if (token != null) {
+      Provider.of<WishlistProvider>(context, listen: false)
+          .fetchWishlist(token);
+    } else {
+      // Handle case where token is null, e.g., show an error or prompt login
+      print("Token not available");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +75,7 @@ class _BestSellerNewArrivalListingScreenState
                     child: Consumer<BestsellerNewAarivalProductListProvider>(
                       builder: (context, productListvalue, child) {
                         if (productListvalue.isLoading && pageNo == 1) {
-                          return CircularProgressIndicator();
+                          return lenoreGif(querySize);
                         } else if (productListvalue.productListItems.data ==
                                 null ||
                             productListvalue.productListItems.data!.isEmpty) {
@@ -150,18 +159,88 @@ class _BestSellerNewArrivalListingScreenState
                                                         0.008,
                                                     right: querySize.height *
                                                         0.012),
-                                                child: CircleAvatar(
-                                                  radius:
-                                                      querySize.width * 0.033,
-                                                  backgroundColor: Colors.white,
-                                                  child: Image.asset(
-                                                    'assets/images/home/favourite.png',
-                                                    width:
-                                                        querySize.width * 0.075,
-                                                    height: querySize.height *
-                                                        0.035,
-                                                  ),
+                                                child:
+                                                    Consumer<WishlistProvider>(
+                                                  builder: (context,
+                                                      wishlistProvider, child) {
+                                                    final isInWishlist =
+                                                        wishlistProvider
+                                                            .isProductInWishlist(
+                                                                productListvalue
+                                                                    .productListItems
+                                                                    .data![
+                                                                        index]
+                                                                    .id!);
+
+                                                    return GestureDetector(
+                                                      onTap: () async {
+                                                        final authProvider =
+                                                            Provider.of<
+                                                                    AuthProvider>(
+                                                                context,
+                                                                listen: false);
+                                                        final token =
+                                                            await authProvider
+                                                                .getToken();
+
+                                                        if (token == null) {
+                                                          customSnackBar(
+                                                              context,
+                                                              'Please SignIn');
+                                                          return;
+                                                        }
+
+                                                        // Toggle wishlist status for this specific product
+                                                        await wishlistProvider
+                                                            .toggleWishlist(
+                                                                token,
+                                                                productListvalue
+                                                                    .productListItems
+                                                                    .data![
+                                                                        index]
+                                                                    .id!);
+                                                      },
+                                                      child: CircleAvatar(
+                                                        radius:
+                                                            querySize.width *
+                                                                0.033,
+                                                        backgroundColor:
+                                                            Colors.white,
+                                                        child: isInWishlist
+                                                            ? Image.asset(
+                                                                'assets/images/love (1).png',
+                                                                width: querySize
+                                                                        .width *
+                                                                    0.048,
+                                                                height: querySize
+                                                                        .height *
+                                                                    0.018,
+                                                              )
+                                                            : Image.asset(
+                                                                'assets/images/home/favourite.png',
+                                                                width: querySize
+                                                                        .width *
+                                                                    0.075,
+                                                                height: querySize
+                                                                        .height *
+                                                                    0.037,
+                                                              ),
+                                                      ),
+                                                    );
+                                                  },
                                                 ),
+                                                // child: CircleAvatar(
+                                                //   radius:
+                                                //       querySize.width * 0.033,
+                                                //   backgroundColor: Colors.white,
+                                                //   child: Image.asset(
+                                                //     'assets/images/home/favourite.png',
+                                                //     width:
+                                                //         querySize.width * 0.075,
+                                                //     height: querySize.height *
+                                                //         0.035,
+                                                //   ),
+                                                // ),
                                                 // Image.asset(
                                                 //   'assets/images/home/favourite.png',
                                                 //   width: querySize.width * 0.075,

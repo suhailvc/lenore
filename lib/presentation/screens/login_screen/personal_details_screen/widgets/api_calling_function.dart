@@ -26,6 +26,7 @@ Future<void> handleOtpSubmission(
   // }
 
   var response = await userRegistrationProvider.userRegistration(
+      context: context,
       fName: fName,
       sName: sName,
       email: email,

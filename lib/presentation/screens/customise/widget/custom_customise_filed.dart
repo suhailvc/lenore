@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:lenore/core/constant.dart';
 
 Column customCustomiseField(
@@ -42,6 +43,15 @@ Column customCustomiseField(
             Expanded(
               child: TextField(
                 controller: controller,
+                keyboardType:
+                    name == "Mobile Number" ? TextInputType.number : null,
+                inputFormatters: name == "Mobile Number"
+                    ? [
+                        LengthLimitingTextInputFormatter(8),
+                        FilteringTextInputFormatter
+                            .digitsOnly, // Allows only digits
+                      ]
+                    : null,
                 decoration: InputDecoration(
                   // errorText: errorText,
                   hintStyle: const TextStyle(color: Color(0xFFD0D0D0)),

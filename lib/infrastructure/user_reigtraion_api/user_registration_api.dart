@@ -1,13 +1,16 @@
 import 'dart:convert';
 
+import 'package:lenore/application/provider/auth_provider/auth_provider.dart';
 import 'package:lenore/core/constant.dart';
 import 'package:http/http.dart' as http;
 import 'package:lenore/domain/user_registration_model/user_registration_data_taken.dart';
 import 'package:lenore/domain/user_registration_model/user_registration_success_model.dart';
 import 'package:lenore/presentation/widgets/shared_pref_method.dart';
+import 'package:provider/provider.dart';
 
 Future<dynamic> userRegistrationService(
-    {required String fName,
+    {required context,
+    required String fName,
     required String sName,
     required String email,
     required String qId,
@@ -30,7 +33,9 @@ Future<dynamic> userRegistrationService(
         print('user registered-----------------------------------');
         final UserRegistrationSuccessModel userRegistration =
             UserRegistrationSuccessModel.fromJson(responseData);
-        saveToken(userRegistration.token.toString());
+        await Provider.of<AuthProvider>(context, listen: false)
+            .setToken(userRegistration.token.toString());
+
         return userRegistration;
       } else if (responseData['response_code'] == '0') {
         print('fieled alredy present-----------------------------------');
