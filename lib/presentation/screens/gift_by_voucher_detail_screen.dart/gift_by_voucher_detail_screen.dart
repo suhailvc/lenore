@@ -4,6 +4,8 @@ import 'package:lenore/application/provider/voucher_detail_provider/voucher_deta
 import 'package:lenore/core/constant.dart';
 import 'package:lenore/domain/hive_model/hive_cart_model/hive_cart_model.dart';
 import 'package:lenore/domain/voucher_detail_model/voucher_detail_model.dart';
+import 'package:lenore/presentation/screens/buy_now_check_out_screen/buy_now_check_out_screen.dart';
+import 'package:lenore/presentation/screens/voucher_buy_now_checkout_screen.dart/voucher_buy_now_checkout_screen.dart';
 
 import 'package:lenore/presentation/widgets/custom_top_bar.dart';
 import 'package:provider/provider.dart';
@@ -73,33 +75,33 @@ class _GiftByVoucherDetailScreenState extends State<GiftByVoucherDetailScreen> {
                               height: querySize.height * 0.3, // Set height
                               width: double.infinity, // Set width to fill
                             ),
-                            Positioned(
-                              top: querySize.height * 0.025,
-                              right: querySize.height * 0.02,
-                              child: Row(
-                                children: [
-                                  CircleAvatar(
-                                    radius: querySize.width * 0.033,
-                                    backgroundColor: Colors.white,
-                                    child: Image.asset(
-                                      'assets/images/product_detail_image/share.png',
-                                      width: querySize.width * 0.04,
-                                      height: querySize.height * 0.017,
-                                    ),
-                                  ),
-                                  SizedBox(width: querySize.width * 0.02),
-                                  CircleAvatar(
-                                    radius: querySize.width * 0.033,
-                                    backgroundColor: Colors.white,
-                                    child: Image.asset(
-                                      'assets/images/home/favourite.png',
-                                      width: querySize.width * 0.075,
-                                      height: querySize.height * 0.037,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            )
+                            // Positioned(
+                            //   top: querySize.height * 0.025,
+                            //   right: querySize.height * 0.02,
+                            //   child: Row(
+                            //     children: [
+                            //       CircleAvatar(
+                            //         radius: querySize.width * 0.033,
+                            //         backgroundColor: Colors.white,
+                            //         child: Image.asset(
+                            //           'assets/images/product_detail_image/share.png',
+                            //           width: querySize.width * 0.04,
+                            //           height: querySize.height * 0.017,
+                            //         ),
+                            //       ),
+                            //       SizedBox(width: querySize.width * 0.02),
+                            //       CircleAvatar(
+                            //         radius: querySize.width * 0.033,
+                            //         backgroundColor: Colors.white,
+                            //         child: Image.asset(
+                            //           'assets/images/home/favourite.png',
+                            //           width: querySize.width * 0.075,
+                            //           height: querySize.height * 0.037,
+                            //         ),
+                            //       ),
+                            //     ],
+                            //   ),
+                            // )
                           ],
                         ),
                         SizedBox(height: querySize.height * 0.01),
@@ -324,11 +326,13 @@ Container addToCartAndBuyNowButton(
         ElevatedButton(
           onPressed: () {
             final cartItem = HiveCartModel(
+              voucherDiscount: voucher.data![0].discount ?? 0.0,
               type: '2',
               productId: voucher.data![0].id!,
               productName: voucher.data![0].name ?? '',
               description: '',
-              price: voucher.data![0].amount!.toDouble(),
+              price:
+                  double.tryParse(voucher.data![0].priceAfterDiscount!) ?? 0.0,
               size: 'Default Size',
               image: voucher.data![0].image!, // Default placeholder image
               stock: 10000,
@@ -357,7 +361,16 @@ Container addToCartAndBuyNowButton(
           ),
         ),
         ElevatedButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => VoucherBuyNowCheckoutScreen(
+                    productId: voucher.data![0].id!,
+                    quantity: 2,
+                  ),
+                ));
+          },
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF008186),
             minimumSize: Size(

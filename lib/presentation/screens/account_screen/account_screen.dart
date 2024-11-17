@@ -13,6 +13,7 @@ import 'package:lenore/presentation/screens/profile_screen.dart/profile_screen.d
 import 'package:lenore/presentation/screens/repair_screen/repair_screen.dart';
 import 'package:lenore/presentation/screens/wish_list_screen/wish_list_screen.dart';
 import 'package:lenore/presentation/widgets/custom_profile_top_bar.dart';
+import 'package:lenore/presentation/widgets/delete_pop_up.dart';
 
 import 'package:lenore/presentation/widgets/logout_pop_up.dart';
 import 'package:lenore/presentation/widgets/top_bar_title.dart';
@@ -353,10 +354,15 @@ class AccountScreen extends StatelessWidget {
                                   SizedBox(
                                     height: querySize.height * 0.015,
                                   ),
-                                  customAccountListTile(
-                                      querySize,
-                                      "assets/images/account/delete_icon.png",
-                                      "Delete Account")
+                                  GestureDetector(
+                                    onTap: () {
+                                      deleteAccountPopUp(context, querySize);
+                                    },
+                                    child: customAccountListTile(
+                                        querySize,
+                                        "assets/images/account/delete_icon.png",
+                                        "Delete Account"),
+                                  )
                                 ],
                               )
                       ],

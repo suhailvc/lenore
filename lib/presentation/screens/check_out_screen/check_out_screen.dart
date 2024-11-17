@@ -36,10 +36,10 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
   String? selfSelectedDay;
   String anonymous = '0';
   bool isAnonymous = false;
-  bool todaySelected = true;
+  bool todaySelected = false;
   bool tommorrowSelected = false;
   bool pickAdate = false;
-  bool selfTodaySelected = true;
+  bool selfTodaySelected = false;
   bool selfTommorrowSelected = false;
   bool selfPickAdate = false;
   String? nameError;

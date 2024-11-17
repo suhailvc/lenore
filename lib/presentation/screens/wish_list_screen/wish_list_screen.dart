@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 
 import 'package:lenore/application/provider/auth_provider/auth_provider.dart';
+import 'package:lenore/application/provider/cart_provider/cart_provider.dart';
+import 'package:lenore/application/provider/product_detail_provider/product_detail_provider.dart';
 
 import 'package:lenore/application/provider/wishlist_provider/whishlist_provider.dart';
 import 'package:lenore/core/constant.dart';
+import 'package:lenore/domain/hive_model/hive_cart_model/hive_cart_model.dart';
+import 'package:lenore/presentation/screens/product_detail_screen/product_detail_screen.dart';
 import 'package:lenore/presentation/widgets/custom_snack_bar.dart';
 
 import 'package:lenore/presentation/widgets/custom_top_bar.dart';
+import 'package:lenore/presentation/widgets/name_top_bar.dart';
 import 'package:lenore/presentation/widgets/sign_out_widget.dart';
 import 'package:provider/provider.dart';
 
@@ -49,7 +54,7 @@ class _WishListScreenState extends State<WishListScreen> {
                 ? Column(
                     children: [
                       customOneSizedBox(querySize),
-                      customTopBar(querySize, context),
+                      nameTopBar(querySize, context, 'Wishlist'),
                       askSignIn(querySize),
                     ],
                   )
@@ -61,23 +66,37 @@ class _WishListScreenState extends State<WishListScreen> {
                         return lenoreGif(querySize);
                       } else if (wishlistProvider.wishlist == null ||
                           wishlistProvider.wishlist!.data.isEmpty) {
-                        return Center(child: Text('Your wishlist is empty.'));
+                        return Center(
+                            child: Column(
+                          children: [
+                            customOneSizedBox(querySize),
+                            nameTopBar(querySize, context, 'Wishlist'),
+                            SizedBox(
+                              height: querySize.height * 0.4,
+                            ),
+                            Text(
+                              'Your wishlist is empty.',
+                              style:
+                                  TextStyle(fontFamily: 'Segoe', fontSize: 14),
+                            ),
+                          ],
+                        ));
                       }
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           customOneSizedBox(querySize),
-                          customTopBar(querySize, context),
+                          nameTopBar(querySize, context, 'Wishlist'),
                           customSizedBox(querySize),
-                          Text(
-                            'Wishlist',
-                            style: TextStyle(
-                                color: const Color(0xFF008186),
-                                fontSize: querySize.width * 0.05,
-                                fontWeight: FontWeight.bold,
-                                fontFamily: 'ElMessiri'),
-                          ),
-                          customSizedBox(querySize),
+                          // Text(
+                          //   'Wishlist',
+                          //   style: TextStyle(
+                          //       color: const Color(0xFF008186),
+                          //       fontSize: querySize.width * 0.05,
+                          //       fontWeight: FontWeight.bold,
+                          //       fontFamily: 'ElMessiri'),
+                          // ),
+                          // customSizedBox(querySize),
                           GridView.builder(
                             physics: const NeverScrollableScrollPhysics(),
                             shrinkWrap: true,
@@ -96,66 +115,80 @@ class _WishListScreenState extends State<WishListScreen> {
                               return Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Container(
-                                    height: querySize.height * 0.2,
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFE7E7E7),
-                                      borderRadius: BorderRadius.circular(10),
-                                      image: DecorationImage(
-                                        image: NetworkImage(item.thumbImage),
-                                        fit: BoxFit.cover,
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                ProductDetailScreen(
+                                                    productId: item.id),
+                                          ));
+                                    },
+                                    child: Container(
+                                      height: querySize.height * 0.2,
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFE7E7E7),
+                                        borderRadius: BorderRadius.circular(10),
+                                        image: DecorationImage(
+                                          image: NetworkImage(item.thumbImage),
+                                          fit: BoxFit.cover,
+                                        ),
                                       ),
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Padding(
-                                          padding: EdgeInsets.only(
-                                            top: querySize.height * 0.008,
-                                            right: querySize.height * 0.012,
-                                          ),
-                                          child: GestureDetector(
-                                            onTap: () async {
-                                              final authProvider =
-                                                  Provider.of<AuthProvider>(
-                                                      context,
-                                                      listen: false);
-                                              final token =
-                                                  await authProvider.getToken();
-                                              if (token == null) {
-                                                customSnackBar(
-                                                    context, "Please SignIn");
-                                                return;
-                                              }
-                                              // Toggle wishlist status for specific item
-                                              await wishlistProvider
-                                                  .toggleWishlist(
-                                                      token, item.id);
-                                            },
-                                            child: CircleAvatar(
-                                              radius: querySize.width * 0.03,
-                                              backgroundColor: Colors.white,
-                                              child: isInWishlist
-                                                  ? Image.asset(
-                                                      'assets/images/love (1).png',
-                                                      width: querySize.width *
-                                                          0.048,
-                                                      height: querySize.height *
-                                                          0.018,
-                                                    )
-                                                  : Image.asset(
-                                                      'assets/images/home/favourite.png',
-                                                      width: querySize.width *
-                                                          0.075,
-                                                      height: querySize.height *
-                                                          0.037,
-                                                    ),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Padding(
+                                            padding: EdgeInsets.only(
+                                              top: querySize.height * 0.008,
+                                              right: querySize.height * 0.012,
+                                            ),
+                                            child: GestureDetector(
+                                              onTap: () async {
+                                                final authProvider =
+                                                    Provider.of<AuthProvider>(
+                                                        context,
+                                                        listen: false);
+                                                final token = await authProvider
+                                                    .getToken();
+                                                if (token == null) {
+                                                  customSnackBar(
+                                                      context, "Please SignIn");
+                                                  return;
+                                                }
+                                                // Toggle wishlist status for specific item
+                                                await wishlistProvider
+                                                    .toggleWishlist(
+                                                        token, item.id);
+                                              },
+                                              child: CircleAvatar(
+                                                radius: querySize.width * 0.03,
+                                                backgroundColor: Colors.white,
+                                                child: isInWishlist
+                                                    ? Image.asset(
+                                                        'assets/images/love (1).png',
+                                                        width: querySize.width *
+                                                            0.048,
+                                                        height:
+                                                            querySize.height *
+                                                                0.018,
+                                                      )
+                                                    : Image.asset(
+                                                        'assets/images/home/favourite.png',
+                                                        width: querySize.width *
+                                                            0.075,
+                                                        height:
+                                                            querySize.height *
+                                                                0.037,
+                                                      ),
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
                                   ),
                                   SizedBox(height: querySize.height * 0.01),
@@ -187,10 +220,51 @@ class _WishListScreenState extends State<WishListScreen> {
                                         ),
                                       ),
                                       Spacer(),
-                                      Image.asset(
-                                        'assets/images/bag.png',
-                                        width: querySize.width * 0.088,
-                                        height: querySize.height * 0.028,
+                                      GestureDetector(
+                                        onTap: () async {
+                                          final authProvider =
+                                              Provider.of<AuthProvider>(context,
+                                                  listen: false);
+                                          final token =
+                                              await authProvider.getToken();
+                                          wishlistProvider.toggleWishlist(
+                                              token!, item.id);
+                                          var productDetail = await Provider.of<
+                                                      ProductDetailProvider>(
+                                                  context,
+                                                  listen: false)
+                                              .fetchProductDetails(id: item.id);
+                                          final cartItem = HiveCartModel(
+                                            type: '1',
+                                            productId: productDetail!.data!.id!,
+                                            productName:
+                                                productDetail.data!.name ?? '',
+                                            description:
+                                                productDetail.data!.sku ?? '',
+                                            price: productDetail.data!.price!
+                                                .toDouble(),
+                                            size: 'Default Size',
+                                            image: (productDetail
+                                                            .data!.images !=
+                                                        null &&
+                                                    productDetail.data!.images!
+                                                        .isNotEmpty)
+                                                ? productDetail.data!.images!
+                                                    .first // Use the first image if available
+                                                : 'assets/images/placeholder.png', // Default placeholder image
+                                            stock:
+                                                productDetail.data!.stock ?? 0,
+                                            quantity: 1,
+                                          );
+                                          Provider.of<CartProvider>(context,
+                                                  listen: false)
+                                              .addToCart(cartItem);
+                                        },
+                                        child: Image.asset(
+                                          'assets/images/bag.png',
+                                          width: querySize.width * 0.088,
+                                          height: querySize.height * 0.028,
+                                        ),
                                       ),
                                     ],
                                   ),

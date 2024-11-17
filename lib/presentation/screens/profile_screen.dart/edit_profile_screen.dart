@@ -436,9 +436,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       SizedBox(height: querySize.height * 0.03),
                       qidField(
                         context,
-                        "assets/images/profile/email_icon.png",
+                        "assets/images/profile/qatar_flag_icon.png",
                         "Enter Your Email",
-                        "Phone",
+                        "Mobile Number",
                         phoneController,
                       ),
                       SizedBox(height: querySize.height * 0.03),
@@ -581,7 +581,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       style: ElevatedButton.styleFrom(
         backgroundColor: buttonColor,
         minimumSize: Size(querySize.width * 0.4, querySize.height * 0.05),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+          side: BorderSide(
+            color: appColor, // Set your desired border color here
+            width: 2, // Set the border width if needed
+          ),
+        ),
       ),
       child: Text(buttonText, style: TextStyle(color: textColor)),
     );

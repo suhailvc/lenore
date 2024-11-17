@@ -12,7 +12,7 @@ class ProductDetailProvider with ChangeNotifier {
   String? get error => _error;
   ProductDetailModel? get productDetails => _productDetails;
 
-  Future<void> fetchProductDetails({
+  Future<ProductDetailModel?> fetchProductDetails({
     required int id,
   }) async {
     _setLoading(true);
@@ -21,13 +21,16 @@ class ProductDetailProvider with ChangeNotifier {
       final response = await productDetailService(id);
       if (response != null) {
         _productDetails = response;
+        return response;
       } else {
         _productDetails = null; // Set to null if there's no data
         _setError("No data available for this category");
+        return null;
       }
     } catch (error) {
       _productDetails = null; // Clear data in case of error
       _setError("Error fetching subcategories: $error");
+      return null;
     } finally {
       _setLoading(false);
     }

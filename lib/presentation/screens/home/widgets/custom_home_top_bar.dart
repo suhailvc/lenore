@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:lenore/application/provider/search_provider/search_provider.dart';
+import 'package:lenore/application/provider/cart_provider/cart_provider.dart';
+
 import 'package:lenore/presentation/screens/cart_screen/cart_screen.dart';
 import 'package:lenore/presentation/screens/search_screen/search_screen.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
@@ -67,19 +68,38 @@ Row customHomeTopBar(Size querySize, BuildContext context) {
           ),
         ),
       ),
-      IconButton(
-        icon: Image.asset(
-          'assets/images/bag-2.png',
-          height: querySize.height * 0.035,
-        ),
-        onPressed: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const CartScreen(),
-              ));
-        },
-      ),
+      Consumer<CartProvider>(builder: (context, cartValue, child) {
+        return Stack(
+          children: [
+            IconButton(
+              icon: Image.asset(
+                'assets/images/bag-2.png',
+                height: querySize.height * 0.035,
+              ),
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const CartScreen(),
+                    ));
+              },
+            ),
+            if (cartValue.items.isNotEmpty)
+              Positioned(
+                right: querySize.height * 0.026,
+                top: querySize.width * 0.064,
+                child: Container(
+                  width: 5.9,
+                  height: 5.9,
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ),
+          ],
+        );
+      }),
       // Expanded(
       //   child: Container(
       //     margin: EdgeInsets.symmetric(horizontal: querySize.height * 0.01),

@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:lenore/application/provider/auth_provider/auth_provider.dart';
 import 'package:lenore/application/provider/check_out_provider/check_box_provider.dart';
 import 'package:lenore/application/provider/product_detail_provider/product_detail_provider.dart';
+import 'package:lenore/application/provider/voucher_detail_provider/voucher_detail_provider.dart';
 import 'package:lenore/core/constant.dart';
 import 'package:lenore/domain/check_out_model/check_out_model.dart';
 import 'package:lenore/domain/product_detail_model/product_detail_model.dart';
+import 'package:lenore/domain/voucher_detail_model/voucher_detail_model.dart';
 import 'package:lenore/presentation/screens/buy_now_payment_screen/buy_now_payment_screen.dart';
+import 'package:lenore/presentation/screens/buy_now_voucher_payment.dart/buy_now_voucher_payment.dart.dart';
 
 import 'package:lenore/presentation/screens/check_out_screen/widget/customCheckOutField.dart';
 import 'package:lenore/presentation/screens/payment_screen/payment_screen.dart';
@@ -18,7 +21,9 @@ import 'package:intl/intl.dart';
 
 class BuyNowCheckOutScreen extends StatefulWidget {
   final int productId;
-  const BuyNowCheckOutScreen({required this.productId, super.key});
+  final int quantity;
+  const BuyNowCheckOutScreen(
+      {required this.quantity, required this.productId, super.key});
 
   @override
   State<BuyNowCheckOutScreen> createState() => _BuyNowCheckOutScreenState();
@@ -46,10 +51,10 @@ class _BuyNowCheckOutScreenState extends State<BuyNowCheckOutScreen> {
   String? selfSelectedDay;
   String anonymous = '0';
   bool isAnonymous = false;
-  bool todaySelected = true;
+  bool todaySelected = false;
   bool tommorrowSelected = false;
   bool pickAdate = false;
-  bool selfTodaySelected = true;
+  bool selfTodaySelected = false;
   bool selfTommorrowSelected = false;
   bool selfPickAdate = false;
   String? nameError;
@@ -88,177 +93,184 @@ class _BuyNowCheckOutScreenState extends State<BuyNowCheckOutScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF8F8F8),
       body: SingleChildScrollView(
-        child: SafeArea(child: Consumer<ProductDetailProvider>(
-            builder: (context, productValue, child) {
-          return Column(
-            children: [
-              Padding(
-                padding:
-                    EdgeInsets.symmetric(horizontal: querySize.width * 0.04),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    customOneSizedBox(querySize),
-                    cartTopBar(querySize, context, 'Check Out'),
-                    customSizedBox(querySize),
+        child: SafeArea(child: Consumer<VocherDetailProvider>(
+            builder: (context, voucherValue, child) {
+          return Consumer<ProductDetailProvider>(
+              builder: (context, productValue, child) {
+            return Column(
+              children: [
+                Padding(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: querySize.width * 0.04),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      customOneSizedBox(querySize),
+                      cartTopBar(querySize, context, 'Check Outt'),
+                      customSizedBox(querySize),
 
-                    // Cart Item List (using ListView.builder within a fixed-height container)
-                    Container(
-                      width: querySize.width,
-                      height: querySize.height * 0.15,
-                      margin: EdgeInsets.only(bottom: querySize.height * 0.01),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius:
-                            BorderRadius.circular(querySize.width * 0.03),
-                      ),
-                      child: Row(
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.all(querySize.width * 0.03),
-                            child: Container(
-                              width: querySize.width * 0.25,
-                              height: querySize.width * 0.25,
-                              decoration: BoxDecoration(
-                                image: DecorationImage(
-                                  image: NetworkImage(productValue
-                                      .productDetails!.data!.images![0]),
-                                  fit: BoxFit.cover,
+                      // Cart Item List (using ListView.builder within a fixed-height container)
+                      Container(
+                        width: querySize.width,
+                        height: querySize.height * 0.15,
+                        margin:
+                            EdgeInsets.only(bottom: querySize.height * 0.01),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius:
+                              BorderRadius.circular(querySize.width * 0.03),
+                        ),
+                        child: Row(
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.all(querySize.width * 0.03),
+                              child: Container(
+                                width: querySize.width * 0.25,
+                                height: querySize.width * 0.25,
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                    image: widget.quantity == 1
+                                        ? NetworkImage(productValue
+                                            .productDetails!.data!.images![0])
+                                        : NetworkImage(voucherValue
+                                            .voucherDetail!.data![0].image!),
+                                    fit: BoxFit.cover,
+                                  ),
+                                  borderRadius: BorderRadius.circular(
+                                      querySize.width * 0.02),
                                 ),
-                                borderRadius: BorderRadius.circular(
-                                    querySize.width * 0.02),
                               ),
                             ),
-                          ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              SizedBox(
-                                height: querySize.height * 0.03,
-                              ),
-                              Text(
-                                productValue.productDetails!.data!.name!,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: querySize.height * 0.02,
-                                  color: Colors.black,
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(
+                                  height: querySize.height * 0.03,
                                 ),
-                              ),
-                              SizedBox(height: querySize.height * 0.009),
-                              Text(
-                                  'QAR ${productValue.productDetails!.data!.price}',
-                                  style: TextStyle(color: Colors.grey)),
-                            ],
-                          ),
-                        ],
+                                Text(
+                                  productValue.productDetails!.data!.name!,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: querySize.height * 0.02,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                SizedBox(height: querySize.height * 0.009),
+                                Text(
+                                    'QAR ${productValue.productDetails!.data!.price}',
+                                    style: TextStyle(color: Colors.grey)),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    customSizedBox(querySize),
+                      customSizedBox(querySize),
 
-                    // Message Section
-                    Text(
-                      'Send Message',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        color: const Color(0xFF667080),
-                        fontFamily: 'Segoe',
-                        fontSize: querySize.height * 0.017,
+                      // Message Section
+                      Text(
+                        'Send Message',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF667080),
+                          fontFamily: 'Segoe',
+                          fontSize: querySize.height * 0.017,
+                        ),
                       ),
-                    ),
-                    Consumer<CheckBoxProvider>(
-                        builder: (context, checkBox, child) {
-                      return Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Checkbox(
-                                visualDensity: VisualDensity.compact,
-                                value: checkBox.giftMySelfChecked,
-                                activeColor: textColor,
-                                onChanged: (value) {
-                                  checkBox.toggleMySelf();
-                                },
-                                side: WidgetStateBorderSide.resolveWith(
-                                  (states) => BorderSide(
-                                    width: querySize.width * 0.003,
-                                    color: textColor,
+                      Consumer<CheckBoxProvider>(
+                          builder: (context, checkBox, child) {
+                        return Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Checkbox(
+                                  visualDensity: VisualDensity.compact,
+                                  value: checkBox.giftMySelfChecked,
+                                  activeColor: textColor,
+                                  onChanged: (value) {
+                                    checkBox.toggleMySelf();
+                                  },
+                                  side: WidgetStateBorderSide.resolveWith(
+                                    (states) => BorderSide(
+                                      width: querySize.width * 0.003,
+                                      color: textColor,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              SizedBox(width: querySize.width * 0.004),
-                              Text(
-                                'For Myself',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.black,
-                                  fontFamily: 'Segoe',
-                                  fontSize: querySize.height * 0.016,
+                                SizedBox(width: querySize.width * 0.004),
+                                Text(
+                                  'For Myself',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.black,
+                                    fontFamily: 'Segoe',
+                                    fontSize: querySize.height * 0.016,
+                                  ),
+                                )
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                Checkbox(
+                                  visualDensity: VisualDensity.compact,
+                                  activeColor: textColor,
+                                  side: WidgetStateBorderSide.resolveWith(
+                                    (states) => BorderSide(
+                                      width: querySize.width * 0.003,
+                                      color: textColor,
+                                    ),
+                                  ),
+                                  value: checkBox.sendAsGift,
+                                  onChanged: (value) {
+                                    checkBox.toggleSendAsGift();
+                                  },
                                 ),
-                              )
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              Checkbox(
-                                visualDensity: VisualDensity.compact,
-                                activeColor: textColor,
-                                side: WidgetStateBorderSide.resolveWith(
-                                  (states) => BorderSide(
-                                    width: querySize.width * 0.003,
-                                    color: textColor,
+                                SizedBox(width: querySize.width * 0.004),
+                                Text(
+                                  'Send As a Gift',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.black,
+                                    fontFamily: 'Segoe',
+                                    fontSize: querySize.height * 0.016,
                                   ),
                                 ),
-                                value: checkBox.sendAsGift,
-                                onChanged: (value) {
-                                  checkBox.toggleSendAsGift();
-                                },
-                              ),
-                              SizedBox(width: querySize.width * 0.004),
-                              Text(
-                                'Send As a Gift',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.black,
-                                  fontFamily: 'Segoe',
-                                  fontSize: querySize.height * 0.016,
-                                ),
-                              ),
-                            ],
-                          ),
-                          if (checkBox.giftMySelfChecked)
-                            giftMySelfSection(
-                                querySize,
-                                context,
-                                productValue.productDetails!,
-                                productValue.productDetails!.data!.price!
-                                    .toString(),
-                                myNameController,
-                                myMobileNumberController,
-                                mySelfTo,
-                                mySelfMessage),
-                          if (checkBox.sendAsGift)
-                            sendAsGiftSection(
-                                querySize,
-                                context,
-                                productValue.productDetails!,
-                                productValue.productDetails!.data!.price!
-                                    .toString(),
-                                myNameController,
-                                myMobileNumberController,
-                                giftteeNameController,
-                                giftteemobileNumberController,
-                                giftteeTo,
-                                giftteeMessage),
-                        ],
-                      );
-                    })
-                  ],
+                              ],
+                            ),
+                            if (checkBox.giftMySelfChecked)
+                              giftMySelfSection(
+                                  querySize,
+                                  context,
+                                  productValue.productDetails,
+                                  productValue.productDetails!.data!.price
+                                      .toString(),
+                                  myNameController,
+                                  myMobileNumberController,
+                                  mySelfTo,
+                                  mySelfMessage),
+                            if (checkBox.sendAsGift)
+                              sendAsGiftSection(
+                                  querySize,
+                                  context,
+                                  productValue.productDetails,
+                                  productValue.productDetails!.data!.price
+                                      .toString(),
+                                  myNameController,
+                                  myMobileNumberController,
+                                  giftteeNameController,
+                                  giftteemobileNumberController,
+                                  giftteeTo,
+                                  giftteeMessage),
+                          ],
+                        );
+                      })
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          );
+              ],
+            );
+          });
         })),
       ),
     );
@@ -268,8 +280,8 @@ class _BuyNowCheckOutScreenState extends State<BuyNowCheckOutScreen> {
   Column sendAsGiftSection(
     Size querySize,
     BuildContext context,
-    ProductDetailModel item,
-    String total,
+    ProductDetailModel? item,
+    String? total,
     TextEditingController myName,
     TextEditingController myMobileNumber,
     TextEditingController giftteeName,
@@ -583,10 +595,21 @@ class _BuyNowCheckOutScreenState extends State<BuyNowCheckOutScreen> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => BuyNowPaymentScreen(
-                            product: item,
+                            quantity: widget.quantity,
+                            product: item!,
                             addressId: response.addressId.toString(),
                           ),
                         ));
+
+                    // Navigator.push(
+                    //     context,
+                    //     MaterialPageRoute(
+                    //       builder: (context) => BuyNowPaymentScreen(
+                    //         quantity: widget.quantity,
+                    //         product: item,
+                    //         addressId: response.addressId.toString(),
+                    //       ),
+                    //     ));
                   }
                 }
               },
@@ -621,8 +644,8 @@ class _BuyNowCheckOutScreenState extends State<BuyNowCheckOutScreen> {
   Column giftMySelfSection(
     Size querySize,
     BuildContext context,
-    ProductDetailModel item,
-    String total,
+    ProductDetailModel? item,
+    String? total,
     TextEditingController myName,
     TextEditingController myMobileNumber,
     TextEditingController toContoller,
@@ -869,7 +892,8 @@ class _BuyNowCheckOutScreenState extends State<BuyNowCheckOutScreen> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => BuyNowPaymentScreen(
-                            product: item,
+                            quantity: widget.quantity,
+                            product: item!,
                             addressId: response.addressId.toString(),
                           ),
                         ));

@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:lenore/application/provider/auth_provider/auth_provider.dart';
 import 'package:lenore/application/provider/payment_provider/payment_provider.dart';
+import 'package:lenore/presentation/screens/my_fatoorah_screen/fatoorah_payment_screen.dart';
 import 'package:lenore/presentation/screens/payment_success_screen/payment_success_screen.dart';
+import 'package:lenore/presentation/widgets/custom_snack_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:lenore/application/provider/cart_provider/cart_provider.dart';
 import 'package:lenore/application/provider/check_out_provider/check_box_provider.dart';
 import 'package:lenore/application/provider/coupon_provider/coupon_provider.dart';
 import 'package:lenore/core/constant.dart';
 import 'package:lenore/presentation/widgets/custom_profile_top_bar.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_launcher_icons/xml_templates.dart';
-import 'package:lenore/core/constant.dart';
-import 'package:lenore/presentation/screens/persistant_bottom_nav_bar/persistant_bottom_nav_bar.dart';
+
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 
 class PaymentScreen extends StatefulWidget {
@@ -50,6 +49,10 @@ class _PaymentScreenState extends State<PaymentScreen> {
           discount = (offerType == 'percentage')
               ? cartProvider.subTotal * (discountValue / 100)
               : discountValue;
+          if (discount > cartProvider.subTotal) {
+            customSnackBar(context, 'You are not eligible');
+            discount = 0;
+          }
         });
       } else {
         setState(() {
@@ -99,7 +102,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                           customProfileTopBar(querySize, context, "Payment"),
                           customSizedBox(querySize),
                           Text(
-                            "Delivery Address",
+                            "Delivery Addressssssssssss",
                             style: TextStyle(
                               fontWeight: FontWeight.w600,
                               fontSize: querySize.width * 0.037,
@@ -274,6 +277,28 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                     ),
                                   ],
                                 ),
+                                // SizedBox(height: querySize.height * 0.01),
+                                // Row(
+                                //   children: [
+                                //     Text(
+                                //       "Voucher Discount",
+                                //       style: TextStyle(
+                                //           fontWeight: FontWeight.w600,
+                                //           color: const Color(0xFF667080),
+                                //           fontFamily: 'Segoe',
+                                //           fontSize: querySize.height * 0.017),
+                                //     ),
+                                //     const Spacer(),
+                                //     Text(
+                                //       "${cartValue.subTotal} QAR",
+                                //       style: TextStyle(
+                                //           fontWeight: FontWeight.w600,
+                                //           color: const Color(0xFFC3C6C9),
+                                //           fontFamily: 'Segoe',
+                                //           fontSize: querySize.height * 0.017),
+                                //     ),
+                                //   ],
+                                // ),
                                 SizedBox(height: querySize.height * 0.01),
                                 Row(
                                   children: [
@@ -375,37 +400,45 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                 const Spacer(),
                                 ElevatedButton(
                                   onPressed: () async {
-                                    String token =
-                                        await Provider.of<AuthProvider>(context,
-                                                    listen: false)
-                                                .getToken() ??
-                                            '';
-                                    print(token);
-                                    String result =
-                                        await Provider.of<PaymentProvider>(
-                                                context,
-                                                listen: false)
-                                            .placeOrder(
-                                      token: token,
-                                      addressId: widget.addressId,
-                                      paymentMethod: 'card',
-                                      cart: cartValue.getCartDataForApi(),
-                                      totalAmount: totalAmount,
-                                      discount: discount,
-                                      couponCode: couponCode,
-                                      deliveryCharge: deliveryFee,
-                                      quantity: quantity,
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => CardPaymentScreen(
+                                          totalAmount: totalAmount,
+                                        ),
+                                      ),
                                     );
-                                    if (result == 'success') {
-                                      cartValue.clearCart();
-                                      PersistentNavBarNavigator.pushNewScreen(
-                                        context,
-                                        screen: PaymentSuccessScreen(),
-                                        withNavBar: false,
-                                        pageTransitionAnimation:
-                                            PageTransitionAnimation.cupertino,
-                                      );
-                                    }
+                                    // String token =
+                                    //     await Provider.of<AuthProvider>(context,
+                                    //                 listen: false)
+                                    //             .getToken() ??
+                                    //         '';
+                                    // print(token);
+                                    // String result =
+                                    //     await Provider.of<PaymentProvider>(
+                                    //             context,
+                                    //             listen: false)
+                                    //         .placeOrder(
+                                    //   token: token,
+                                    //   addressId: widget.addressId,
+                                    //   paymentMethod: 'card',
+                                    //   cart: cartValue.getCartDataForApi(),
+                                    //   totalAmount: totalAmount,
+                                    //   discount: discount,
+                                    //   couponCode: couponCode,
+                                    //   deliveryCharge: deliveryFee,
+                                    //   quantity: quantity,
+                                    // );
+                                    // if (result == 'success') {
+                                    //   cartValue.clearCart();
+                                    //   PersistentNavBarNavigator.pushNewScreen(
+                                    //     context,
+                                    //     screen: PaymentSuccessScreen(),
+                                    //     withNavBar: false,
+                                    //     pageTransitionAnimation:
+                                    //         PageTransitionAnimation.cupertino,
+                                    //   );
+                                    // }
                                   },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: const Color(0xFF00ACB3),

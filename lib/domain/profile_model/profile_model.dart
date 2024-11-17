@@ -31,6 +31,7 @@ class ProfileData {
   final String fName;
   final String? lName;
   final String email;
+  final int emailVerified; // Changed emailVerified to int
   final String qId;
   final String phone;
   final String gender;
@@ -41,6 +42,7 @@ class ProfileData {
     required this.fName,
     this.lName,
     required this.email,
+    required this.emailVerified, // Include in constructor
     required this.qId,
     required this.phone,
     required this.gender,
@@ -53,6 +55,7 @@ class ProfileData {
       fName: json['f_name'] ?? '',
       lName: json['l_name'],
       email: json['email'] ?? '',
+      emailVerified: json['email_verified'] ?? 0, // Parse emailVerified as int
       qId: json['q_id'] ?? '',
       phone: json['phone'] ?? '',
       gender: json['gender'] ?? '',
@@ -68,6 +71,7 @@ class ProfileData {
       'f_name': fName,
       'l_name': lName,
       'email': email,
+      'email_verified': emailVerified, // Serialize emailVerified as int
       'q_id': qId,
       'phone': phone,
       'gender': gender,
@@ -90,8 +94,8 @@ class ProfileData {
 
 //   factory ProfileModel.fromJson(Map<String, dynamic> json) {
 //     return ProfileModel(
-//       status: json['status'],
-//       message: json['message'],
+//       status: json['status'] ?? false,
+//       message: json['message'] ?? '',
 //       data: ProfileData.fromJson(json['data']),
 //     );
 //   }
@@ -128,14 +132,16 @@ class ProfileData {
 
 //   factory ProfileData.fromJson(Map<String, dynamic> json) {
 //     return ProfileData(
-//       id: json['id'],
-//       fName: json['f_name'],
+//       id: json['id'] ?? 0,
+//       fName: json['f_name'] ?? '',
 //       lName: json['l_name'],
-//       email: json['email'],
-//       qId: json['q_id'],
-//       phone: json['phone'],
-//       gender: json['gender'],
-//       image: json['image'],
+//       email: json['email'] ?? '',
+//       qId: json['q_id'] ?? '',
+//       phone: json['phone'] ?? '',
+//       gender: json['gender'] ?? '',
+//       image: json['image'] is String
+//           ? json['image']
+//           : null, // Handle image as String or null
 //     );
 //   }
 

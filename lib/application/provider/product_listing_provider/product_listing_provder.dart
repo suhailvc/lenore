@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lenore/domain/product_listing_model/product_listing_model.dart';
 import 'package:lenore/infrastructure/product_listing_api/product_listing_api.dart';
+import 'package:lenore/presentation/screens/best_seller_new_arrival_listing_screen/widget/constants.dart';
 
 class ProductListProvider extends ChangeNotifier {
   bool _isLoading = false;
@@ -20,10 +21,12 @@ class ProductListProvider extends ChangeNotifier {
       var response = await productListingService(pageNo, eventName, id);
       if (response != null) {
         if (isPagination) {
+          newAllrivalList = response;
           // Append new data to the existing list
           _productListItems.data!.addAll(response.data!);
         } else {
           // Replace the data for the first page or on refresh
+          newAllrivalList = response;
           _productListItems = response;
         }
       }

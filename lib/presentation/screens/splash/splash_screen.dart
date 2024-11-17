@@ -18,12 +18,19 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var querySize = MediaQuery.of(context).size;
     return Container(
       color: Colors.white,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         //crossAxisAlignment: CrossAxisAlignment.center,
-        children: [Image.asset("assets/images/splash_screen.png")],
+        children: [
+          Image.asset(
+            "assets/images/splash.png",
+            width: querySize.width * 0.45, // Set the desired width
+            height: querySize.height * 0.4,
+          )
+        ],
       ),
     );
   }

@@ -38,6 +38,7 @@ Column userDetailColumn(
             ),
             Expanded(
               child: Text(
+                overflow: TextOverflow.ellipsis,
                 columnName,
                 style: TextStyle(
                   color: Colors.black,

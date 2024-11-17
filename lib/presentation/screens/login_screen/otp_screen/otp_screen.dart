@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:lenore/application/provider/login_provider/login_provider.dart';
+import 'package:lenore/application/provider/mobile_number_provider/mobile_number_provider.dart';
 import 'package:lenore/application/provider/otp_provider/otp_provider.dart';
 import 'package:lenore/core/constant.dart';
+import 'package:lenore/domain/mobile_number_model/mobile_number_model.dart';
 import 'package:lenore/domain/otp_model/existing_user_otp_model.dart';
 import 'package:lenore/domain/otp_model/new_user_otp_model.dart';
 import 'package:lenore/presentation/screens/login_screen/personal_details_screen/personal_details_screen.dart';
-
 import 'package:lenore/presentation/screens/login_screen/widget/login_custom_button.dart';
 import 'package:lenore/presentation/screens/persistant_bottom_nav_bar/persistant_bottom_nav_bar.dart';
+import 'package:lenore/presentation/widgets/custom_snack_bar.dart';
 import 'package:provider/provider.dart';
 
 class OtpScreen extends StatefulWidget {
@@ -28,6 +30,38 @@ class _OtpScreenState extends State<OtpScreen> {
   void initState() {
     super.initState();
     Provider.of<TimerProvider>(context, listen: false).startTimer();
+
+    // Add listeners to OTP controllers
+    otpController1.addListener(_onOtpChanged);
+    otpController2.addListener(_onOtpChanged);
+    otpController3.addListener(_onOtpChanged);
+    otpController4.addListener(_onOtpChanged);
+  }
+
+  @override
+  void dispose() {
+    // Dispose controllers and remove listeners
+    otpController1.removeListener(_onOtpChanged);
+    otpController2.removeListener(_onOtpChanged);
+    otpController3.removeListener(_onOtpChanged);
+    otpController4.removeListener(_onOtpChanged);
+
+    otpController1.dispose();
+    otpController2.dispose();
+    otpController3.dispose();
+    otpController4.dispose();
+    super.dispose();
+  }
+
+  void _onOtpChanged() {
+    // Check if all fields are filled
+    if (otpController1.text.isNotEmpty &&
+        otpController2.text.isNotEmpty &&
+        otpController3.text.isNotEmpty &&
+        otpController4.text.isNotEmpty) {
+      // Call OTP submission function
+      _handleOtpSubmission(context);
+    }
   }
 
   Future<void> _handleOtpSubmission(BuildContext context) async {
@@ -38,9 +72,7 @@ class _OtpScreenState extends State<OtpScreen> {
         otpController4.text;
 
     if (otp.isEmpty || otp.length < 4) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a valid OTP')),
-      );
+      customSnackBar(context, 'Please enter a valid otp');
       return;
     }
 
@@ -65,6 +97,8 @@ class _OtpScreenState extends State<OtpScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(response['error'])),
       );
+    } else {
+      customSnackBar(context, 'Please enter a valid otp');
     }
   }
 
@@ -131,29 +165,36 @@ class _OtpScreenState extends State<OtpScreen> {
               const SizedBox(height: 20),
               Row(
                 children: [
-                  Text(
-                    'Resend OTP?',
-                    style: TextStyle(
-                      fontFamily: 'Jost',
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: appColor,
+                  GestureDetector(
+                    onTap: () async {
+                      await Provider.of<MobileNumberProvider>(context,
+                              listen: false)
+                          .sendMobileNumber(widget.mobileNumber);
+                    },
+                    child: Text(
+                      'Resend OTP?',
+                      style: TextStyle(
+                        fontFamily: 'Jost',
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: appColor,
+                      ),
                     ),
                   ),
-                  const Spacer(),
-                  Consumer<TimerProvider>(
-                    builder: (context, timerProvider, child) {
-                      return Text(
-                        '${timerProvider.start} seconds',
-                        style: TextStyle(
-                          fontFamily: 'Segoe',
-                          fontSize: querySize.height * 0.018,
-                          fontWeight: FontWeight.w500,
-                          color: Color(0x80292D32),
-                        ),
-                      );
-                    },
-                  ),
+                  // const Spacer(),
+                  // Consumer<TimerProvider>(
+                  //   builder: (context, timerProvider, child) {
+                  //     return Text(
+                  //       '${timerProvider.start} seconds',
+                  //       style: TextStyle(
+                  //         fontFamily: 'Segoe',
+                  //         fontSize: querySize.height * 0.018,
+                  //         fontWeight: FontWeight.w500,
+                  //         color: Color(0x80292D32),
+                  //       ),
+                  //     );
+                  //   },
+                  // ),
                 ],
               ),
               SizedBox(
@@ -193,9 +234,10 @@ Widget _otpTextField(BuildContext context, TextEditingController controller,
     child: TextFormField(
       maxLength: 1,
       controller: controller,
-      autofocus: true,
+      autofocus: false, // Prevents keyboard flickering when switching fields
       obscureText: true,
       keyboardType: TextInputType.number,
+      textInputAction: last ? TextInputAction.done : TextInputAction.next,
       textAlign: TextAlign.center,
       style: const TextStyle(fontSize: 24),
       decoration: const InputDecoration(
@@ -221,7 +263,230 @@ Widget _otpTextField(BuildContext context, TextEditingController controller,
   );
 }
 
+// import 'package:flutter/material.dart';
+// import 'package:lenore/application/provider/login_provider/login_provider.dart';
+// import 'package:lenore/application/provider/otp_provider/otp_provider.dart';
+// import 'package:lenore/core/constant.dart';
+// import 'package:lenore/domain/otp_model/existing_user_otp_model.dart';
+// import 'package:lenore/domain/otp_model/new_user_otp_model.dart';
+// import 'package:lenore/presentation/screens/login_screen/personal_details_screen/personal_details_screen.dart';
+
+// import 'package:lenore/presentation/screens/login_screen/widget/login_custom_button.dart';
+// import 'package:lenore/presentation/screens/persistant_bottom_nav_bar/persistant_bottom_nav_bar.dart';
+// import 'package:provider/provider.dart';
+
+// class OtpScreen extends StatefulWidget {
+//   final String mobileNumber;
+//   const OtpScreen({required this.mobileNumber, super.key});
+
+//   @override
+//   State<OtpScreen> createState() => _OtpScreenState();
+// }
+
 // class _OtpScreenState extends State<OtpScreen> {
+//   final TextEditingController otpController1 = TextEditingController();
+//   final TextEditingController otpController2 = TextEditingController();
+//   final TextEditingController otpController3 = TextEditingController();
+//   final TextEditingController otpController4 = TextEditingController();
+
+//   @override
+//   void initState() {
+//     super.initState();
+//     Provider.of<TimerProvider>(context, listen: false).startTimer();
+//   }
+
+//   Future<void> _handleOtpSubmission(BuildContext context) async {
+//     final otpProvider = Provider.of<OtpProvider>(context, listen: false);
+//     String otp = otpController1.text +
+//         otpController2.text +
+//         otpController3.text +
+//         otpController4.text;
+
+//     if (otp.isEmpty || otp.length < 4) {
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         const SnackBar(content: Text('Please enter a valid OTP')),
+//       );
+//       return;
+//     }
+
+//     var response =
+//         await otpProvider.verifyOtp(widget.mobileNumber, otp, context);
+
+//     if (response is ExistingUserOtpModel) {
+//       Navigator.pushReplacement(
+//         context,
+//         MaterialPageRoute(
+//             builder: (context) => const PersistantBottomNavBarScreen()),
+//       );
+//     } else if (response is NewUserOtpModel) {
+//       Navigator.pushReplacement(
+//         context,
+//         MaterialPageRoute(
+//             builder: (context) =>
+//                 PersonalDetailsScreen(mobileNumber: widget.mobileNumber)),
+//       );
+//     } else if (response is Map<String, dynamic> &&
+//         response.containsKey('error')) {
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(content: Text(response['error'])),
+//       );
+//     }
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     var querySize = MediaQuery.of(context).size;
+
+//     return Scaffold(
+//       backgroundColor: Colors.white,
+//       resizeToAvoidBottomInset: false,
+//       body: SafeArea(
+//         child: Padding(
+//           padding: const EdgeInsets.symmetric(horizontal: 24.0),
+//           child: Column(
+//             crossAxisAlignment: CrossAxisAlignment.start,
+//             children: [
+//               const SizedBox(height: 60),
+//               const Text(
+//                 'Enter Your OTP to Continue',
+//                 style: TextStyle(
+//                   fontSize: 36,
+//                   fontWeight: FontWeight.w500,
+//                   fontFamily: 'Lora',
+//                 ),
+//               ),
+//               const SizedBox(height: 20),
+//               RichText(
+//                 text: TextSpan(
+//                   style: const TextStyle(
+//                     fontSize: 14,
+//                     fontWeight: FontWeight.w400,
+//                     fontFamily: 'serif',
+//                     color: Colors.black,
+//                   ),
+//                   children: <TextSpan>[
+//                     const TextSpan(text: 'Code has been sent to '),
+//                     TextSpan(
+//                       text: widget.mobileNumber,
+//                       style: const TextStyle(
+//                         fontSize: 14,
+//                         fontWeight: FontWeight.w400,
+//                         color: Color(0xFF00ACB3),
+//                       ),
+//                     ),
+//                   ],
+//                 ),
+//               ),
+//               const SizedBox(height: 20),
+//               Form(
+//                 child: Row(
+//                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                   children: [
+//                     _otpTextField(context, otpController1,
+//                         first: true, last: false),
+//                     _otpTextField(context, otpController2,
+//                         first: false, last: false),
+//                     _otpTextField(context, otpController3,
+//                         first: false, last: false),
+//                     _otpTextField(context, otpController4,
+//                         first: false, last: true),
+//                   ],
+//                 ),
+//               ),
+//               const SizedBox(height: 20),
+//               Row(
+//                 children: [
+//                   Text(
+//                     'Resend OTP?',
+//                     style: TextStyle(
+//                       fontFamily: 'Jost',
+//                       fontSize: 16,
+//                       fontWeight: FontWeight.w500,
+//                       color: appColor,
+//                     ),
+//                   ),
+//                   const Spacer(),
+//                   Consumer<TimerProvider>(
+//                     builder: (context, timerProvider, child) {
+//                       return Text(
+//                         '${timerProvider.start} seconds',
+//                         style: TextStyle(
+//                           fontFamily: 'Segoe',
+//                           fontSize: querySize.height * 0.018,
+//                           fontWeight: FontWeight.w500,
+//                           color: Color(0x80292D32),
+//                         ),
+//                       );
+//                     },
+//                   ),
+//                 ],
+//               ),
+//               SizedBox(
+//                 height: querySize.height * 0.43,
+//               ),
+//               Consumer<OtpProvider>(
+//                 builder: (context, otpProvider, child) {
+//                   return otpProvider.isLoading
+//                       ? const Center(child: CircularProgressIndicator())
+//                       : loginCustomButton(
+//                           context,
+//                           querySize,
+//                           "CONTINUE",
+//                           () {
+//                             _handleOtpSubmission(context);
+//                           },
+//                         );
+//                 },
+//               ),
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
+
+// Widget _otpTextField(BuildContext context, TextEditingController controller,
+//     {required bool first, required bool last}) {
+//   return Container(
+//     width: 77,
+//     height: 55,
+//     decoration: BoxDecoration(
+//       border: Border.all(color: const Color(0xFF00ACB3), width: 1.5),
+//       borderRadius: BorderRadius.circular(28),
+//     ),
+//     child: TextFormField(
+//       maxLength: 1,
+//       controller: controller,
+//       autofocus: true,
+//       obscureText: true,
+//       keyboardType: TextInputType.number,
+//       textAlign: TextAlign.center,
+//       style: const TextStyle(fontSize: 24),
+//       decoration: const InputDecoration(
+//         counterText: "", // Hides the character counter
+//         border: InputBorder.none,
+//         contentPadding: EdgeInsets.all(10),
+//       ),
+//       onChanged: (value) {
+//         if (value.length == 1 && !last) {
+//           FocusScope.of(context).nextFocus();
+//         }
+//         if (value.isEmpty && !first) {
+//           FocusScope.of(context).previousFocus();
+//         }
+//       },
+//       validator: (value) {
+//         if (value == null || value.isEmpty) {
+//           return 'Please enter a digit';
+//         }
+//         return null;
+//       },
+//     ),
+//   );
+// }
+
+// class _OtpScreenState extends State<OtpScreen> {=====================================================================
 //   final TextEditingController otpController = TextEditingController();
 
 //   @override

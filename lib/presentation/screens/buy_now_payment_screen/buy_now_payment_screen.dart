@@ -7,14 +7,19 @@ import 'package:lenore/core/constant.dart';
 import 'package:lenore/domain/product_detail_model/product_detail_model.dart';
 import 'package:lenore/presentation/screens/payment_success_screen/payment_success_screen.dart';
 import 'package:lenore/presentation/widgets/custom_profile_top_bar.dart';
+import 'package:lenore/presentation/widgets/custom_snack_bar.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 import 'package:provider/provider.dart';
 
 class BuyNowPaymentScreen extends StatefulWidget {
+  final int quantity;
   final String addressId;
   final ProductDetailModel product;
   const BuyNowPaymentScreen(
-      {required this.product, required this.addressId, super.key});
+      {required this.quantity,
+      required this.product,
+      required this.addressId,
+      super.key});
 
   @override
   State<BuyNowPaymentScreen> createState() => _BuyNowPaymentScreenState();
@@ -47,6 +52,10 @@ class _BuyNowPaymentScreenState extends State<BuyNowPaymentScreen> {
           discount = (offerType == 'percentage')
               ? widget.product.data!.price! * (discountValue / 100)
               : discountValue;
+          if (discount > widget.product.data!.price!) {
+            customSnackBar(context, 'You are not eligible');
+            discount = 0;
+          }
         });
       } else {
         setState(() {
@@ -84,7 +93,6 @@ class _BuyNowPaymentScreenState extends State<BuyNowPaymentScreen> {
                   double subTotal = widget.product.data!.price!.toDouble();
                   double totalAmount = subTotal - discount + deliveryFee;
                   String couponCode = couponController.text.trim();
-                  int quantity = 1;
 
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -267,6 +275,28 @@ class _BuyNowPaymentScreenState extends State<BuyNowPaymentScreen> {
                             Row(
                               children: [
                                 Text(
+                                  "Voucher Discount",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      color: const Color(0xFF667080),
+                                      fontFamily: 'Segoe',
+                                      fontSize: querySize.height * 0.017),
+                                ),
+                                const Spacer(),
+                                Text(
+                                  "-${discount.toStringAsFixed(2)} QAR",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      color: const Color(0xFFC3C6C9),
+                                      fontFamily: 'Segoe',
+                                      fontSize: querySize.height * 0.017),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: querySize.height * 0.01),
+                            Row(
+                              children: [
+                                Text(
                                   "Discount",
                                   style: TextStyle(
                                       fontWeight: FontWeight.w600,
@@ -298,7 +328,7 @@ class _BuyNowPaymentScreenState extends State<BuyNowPaymentScreen> {
                                 ),
                                 const Spacer(),
                                 Text(
-                                  "${widget.product.data!.price!} QAR",
+                                  "10 QAR",
                                   style: TextStyle(
                                       fontWeight: FontWeight.w600,
                                       color: const Color(0xFFC3C6C9),
@@ -365,10 +395,12 @@ class _BuyNowPaymentScreenState extends State<BuyNowPaymentScreen> {
                             ElevatedButton(
                               onPressed: () async {
                                 Map<String, dynamic> cartItem = {
-                                  "id": widget.product.data?.id,
-                                  "name": widget.product.data?.name,
+                                  "product_id": widget.product.data?.id,
+                                  // "product_id":
+                                  // "name": widget.product.data?.name,
                                   "price": widget.product.data?.price,
-                                  "quantity": quantity,
+                                  "quantity": widget.quantity,
+                                  "type": widget.quantity
                                 };
 
                                 List<Map<String, dynamic>> cart = [cartItem];
@@ -390,7 +422,7 @@ class _BuyNowPaymentScreenState extends State<BuyNowPaymentScreen> {
                                   discount: discount,
                                   couponCode: couponCode,
                                   deliveryCharge: deliveryFee,
-                                  quantity: quantity,
+                                  quantity: 1,
                                 );
                                 if (result == 'success') {
                                   PersistentNavBarNavigator.pushNewScreen(

@@ -28,6 +28,9 @@
 //   @HiveField(7)
 //   int quantity;
 
+//   @HiveField(8)
+//   final String type; // Required String field without default
+
 //   HiveCartModel({
 //     required this.productId,
 //     required this.productName,
@@ -36,6 +39,7 @@
 //     required this.size,
 //     required this.image,
 //     required this.stock,
+//     required this.type, // Marked as required
 //     this.quantity = 1,
 //   });
 
@@ -48,7 +52,7 @@
 //       "product_id": productId,
 //       "quantity": quantity,
 //       "price": price,
-//       "type": 1, // Assuming 'type' is always 1 for your use case
+//       "type": type,
 //     };
 //   }
 
@@ -101,6 +105,9 @@ class HiveCartModel extends HiveObject {
   @HiveField(8)
   final String type; // Required String field without default
 
+  @HiveField(9)
+  final double voucherDiscount; // New field for voucher discount
+
   HiveCartModel({
     required this.productId,
     required this.productName,
@@ -111,9 +118,10 @@ class HiveCartModel extends HiveObject {
     required this.stock,
     required this.type, // Marked as required
     this.quantity = 1,
+    this.voucherDiscount = 0.0, // Default value for voucher discount
   });
 
-  double get totalPrice => price * quantity;
+  double get totalPrice => (price * quantity) - voucherDiscount;
 
   // Convert this model to a map for the API
   Map<String, dynamic> toMap() {
@@ -123,6 +131,7 @@ class HiveCartModel extends HiveObject {
       "quantity": quantity,
       "price": price,
       "type": type,
+      "voucher_discount": voucherDiscount, // Include the new field
     };
   }
 

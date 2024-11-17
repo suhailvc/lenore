@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:lenore/application/provider/auth_provider/auth_provider.dart';
+import 'package:lenore/application/provider/filter_provider/filter_provider.dart';
 
 import 'package:lenore/application/provider/product_listing_provider/product_listing_provder.dart';
 import 'package:lenore/application/provider/wishlist_provider/whishlist_provider.dart';
 import 'package:lenore/core/constant.dart';
+import 'package:lenore/presentation/screens/best_seller_new_arrival_listing_screen/widget/constants.dart';
 import 'package:lenore/presentation/screens/filter_screen/filter_screen.dart';
 import 'package:lenore/presentation/screens/product_detail_screen/product_detail_screen.dart';
 import 'package:lenore/presentation/widgets/custom_snack_bar.dart';
@@ -28,7 +30,7 @@ class SubCategoryProductListingScreen extends StatefulWidget {
 class _SubCategoryProductListingScreenState
     extends State<SubCategoryProductListingScreen> {
   int pageNo = 1;
-  bool showFilter = true;
+
   @override
   void initState() {
     // Load the first page when the screen is initialized
@@ -84,16 +86,15 @@ class _SubCategoryProductListingScreenState
                 Padding(
                     padding: EdgeInsets.symmetric(
                         horizontal: querySize.width * 0.04),
-                    child: Consumer<ProductListProvider>(
-                      builder: (context, productListvalue, child) {
+                    child: Consumer2<ProductListProvider, FilterProvider>(
+                      builder: (context, productListvalue, filterValue, child) {
                         if (productListvalue.isLoading && pageNo == 1) {
                           return lenoreGif(querySize);
-                        } else if (productListvalue.productListItems.data ==
-                                null ||
-                            productListvalue.productListItems.data!.isEmpty) {
-                          //setState(() {
-                          showFilter = false;
-                          //});
+                        } else if ( //productListvalue.productListItems.data ==
+                            //  null ||
+                            //  productListvalue.productListItems.data!.isEmpty
+                            newAllrivalList.data == null ||
+                                newAllrivalList.data!.isEmpty) {
                           return Container(
                             height: querySize.height * 0.77,
                             child: Center(
@@ -116,14 +117,15 @@ class _SubCategoryProductListingScreenState
                               GridView.builder(
                                 physics: const NeverScrollableScrollPhysics(),
                                 shrinkWrap: true,
-                                itemCount: productListvalue
-                                    .productListItems.data!.length,
+                                itemCount: newAllrivalList
+                                    .data!.length, //productListvalue
+                                //.productListItems.data!.length,
                                 gridDelegate:
                                     SliverGridDelegateWithFixedCrossAxisCount(
                                   crossAxisCount: 2,
                                   crossAxisSpacing: querySize.height * 0.015,
                                   // mainAxisSpacing: querySize.height * 001,
-                                  childAspectRatio: 0.8,
+                                  childAspectRatio: 0.75,
                                 ),
                                 itemBuilder: (context, index) {
                                   return Column(
@@ -137,11 +139,13 @@ class _SubCategoryProductListingScreenState
                                               MaterialPageRoute(
                                                 builder: (context) =>
                                                     ProductDetailScreen(
-                                                  productId: productListvalue
-                                                      .productListItems
-                                                      .data![index]
-                                                      .id!,
-                                                ),
+                                                        productId: newAllrivalList
+                                                            .data![index]
+                                                            .id! // productListvalue
+                                                        // .productListItems
+                                                        // .data![index]
+                                                        // .id!,
+                                                        ),
                                               ));
                                         },
                                         child: Container(
@@ -152,10 +156,13 @@ class _SubCategoryProductListingScreenState
                                                 BorderRadius.circular(10),
                                             image: DecorationImage(
                                               image: NetworkImage(
-                                                  productListvalue
-                                                      .productListItems
-                                                      .data![index]
-                                                      .thumbImage!),
+                                                  newAllrivalList
+                                                      .data![index].thumbImage!
+                                                  // productListvalue
+                                                  //     .productListItems
+                                                  //     .data![index]
+                                                  // .thumbImage!
+                                                  ),
                                               fit: BoxFit.cover,
                                             ),
                                           ),
@@ -175,14 +182,16 @@ class _SubCategoryProductListingScreenState
                                                     Consumer<WishlistProvider>(
                                                   builder: (context,
                                                       wishlistProvider, child) {
-                                                    final isInWishlist =
-                                                        wishlistProvider
-                                                            .isProductInWishlist(
-                                                                productListvalue
-                                                                    .productListItems
-                                                                    .data![
-                                                                        index]
-                                                                    .id!);
+                                                    final isInWishlist = wishlistProvider
+                                                        .isProductInWishlist(
+                                                            // productListvalue
+                                                            //     .productListItems
+                                                            //     .data![
+                                                            //         index]
+                                                            //     .id! //
+                                                            newAllrivalList
+                                                                .data![index]
+                                                                .id!);
 
                                                     return GestureDetector(
                                                       onTap: () async {
@@ -206,11 +215,15 @@ class _SubCategoryProductListingScreenState
                                                         await wishlistProvider
                                                             .toggleWishlist(
                                                                 token,
-                                                                productListvalue
-                                                                    .productListItems
+                                                                newAllrivalList
                                                                     .data![
                                                                         index]
-                                                                    .id!);
+                                                                    .id!
+                                                                // productListvalue
+                                                                //     .productListItems
+                                                                //     .data![index]
+                                                                // .id!
+                                                                );
                                                       },
                                                       child: CircleAvatar(
                                                         radius:
@@ -262,9 +275,11 @@ class _SubCategoryProductListingScreenState
                                             ),
                                           ),
                                           Text(
-                                            productListvalue.productListItems
-                                                .data![index].price
+                                            newAllrivalList.data![index].price
                                                 .toString(),
+                                            // productListvalue.productListItems
+                                            //     .data![index].price
+                                            //     .toString(),
                                             style: TextStyle(
                                               color: Color(0xFF000000),
                                               fontSize: 13.0,
@@ -274,11 +289,15 @@ class _SubCategoryProductListingScreenState
                                         ],
                                       ),
                                       Text(
-                                        productListvalue.productListItems
-                                            .data![index].name!,
+                                        newAllrivalList.data![index].name!,
+                                        // productListvalue.productListItems
+                                        //     .data![index].name!,
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
                                         style: TextStyle(
-                                          fontSize: querySize.width * 0.02,
-                                          color: const Color(0xFF525252),
+                                          fontFamily: 'Segoe',
+                                          fontSize: querySize.width * 0.032,
+                                          color: Colors.black,
                                         ),
                                       ),
                                     ],
@@ -362,52 +381,49 @@ class _SubCategoryProductListingScreenState
             ),
           ),
         ),
-        floatingActionButton: showFilter == true
-            ? SizedBox(
-                width: querySize.width * 0.5,
-                height: querySize.height * 0.055,
-                child: FloatingActionButton(
-                  shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(querySize.height * 0.03),
-                  ),
-                  onPressed: () {
-                    showModalBottomSheet(
-                      backgroundColor: Colors.white,
-                      showDragHandle: true,
-                      enableDrag: true,
-                      context: context,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.vertical(
-                          top: Radius.circular(querySize.width * 0.05),
-                        ),
-                      ),
-                      builder: (context) => const FilterScreen(),
-                    );
-                  },
-                  backgroundColor: const Color(0xFF00ACB3),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.asset(
-                        'assets/images/product_list/filter.png',
-                        width: querySize.width * 0.06,
-                      ),
-                      SizedBox(
-                        width: querySize.height * 0.01,
-                      ),
-                      const Text(
-                        "Filter",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontFamily: 'ElMessiri',
-                            fontWeight: FontWeight.bold),
-                      )
-                    ],
+        floatingActionButton: SizedBox(
+          width: querySize.width * 0.5,
+          height: querySize.height * 0.055,
+          child: FloatingActionButton(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(querySize.height * 0.03),
+            ),
+            onPressed: () {
+              showModalBottomSheet(
+                backgroundColor: Colors.white,
+                showDragHandle: true,
+                enableDrag: true,
+                context: context,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(querySize.width * 0.05),
                   ),
                 ),
-              )
-            : SizedBox(),
+                builder: (context) => const FilterScreen(),
+              );
+            },
+            backgroundColor: const Color(0xFF00ACB3),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset(
+                  'assets/images/product_list/filter.png',
+                  width: querySize.width * 0.06,
+                ),
+                SizedBox(
+                  width: querySize.height * 0.01,
+                ),
+                const Text(
+                  "Filter",
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontFamily: 'ElMessiri',
+                      fontWeight: FontWeight.bold),
+                )
+              ],
+            ),
+          ),
+        ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat);
   }
 }

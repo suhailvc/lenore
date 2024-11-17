@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 
 import 'package:lenore/domain/product_listing_model/product_listing_model.dart';
 import 'package:lenore/infrastructure/bestseller_new_aarival_product_list_api/bestseller_new_aarival_product_list_provider.dart';
+import 'package:lenore/presentation/screens/best_seller_new_arrival_listing_screen/widget/constants.dart';
 
 class BestsellerNewAarivalProductListProvider extends ChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
-  ProductListModel _productListItems = ProductListModel(data: []);
+  ProductListModel _productListItems =
+      ProductListModel(); // ProductListModel(data: []);
   ProductListModel get productListItems => _productListItems;
 
   Future<void> bestsellerNewAarivalProviderMethod({
@@ -23,10 +25,12 @@ class BestsellerNewAarivalProductListProvider extends ChangeNotifier {
       if (response != null) {
         if (isPagination) {
           // Append new data to the existing list
-          _productListItems.data!.addAll(response.data!);
+          newAllrivalList = response;
+          // _productListItems.data!.addAll(response.data!);
         } else {
           // Replace the data for the first page or on refresh
-          _productListItems = response;
+          newAllrivalList = response;
+          //  _productListItems = response;
         }
       }
     } catch (error) {

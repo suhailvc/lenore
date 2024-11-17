@@ -2,10 +2,6 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:lenore/core/constant.dart';
 import 'package:lenore/domain/profile_model/profile_model.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:lenore/core/constant.dart';
-import 'package:lenore/domain/profile_model/profile_model.dart';
 
 Future<ProfileModel?> getProfileDetailsService(String token) async {
   final url = Uri.parse('${baseUrl}/api/get-profile');

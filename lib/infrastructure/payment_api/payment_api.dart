@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:lenore/core/constant.dart';
 
 Future<String> paymentService({
   required String token,
@@ -12,7 +13,7 @@ Future<String> paymentService({
   required double deliveryCharge,
   required int quantity,
 }) async {
-  const String url = 'https://lenore.qa/api/place-order';
+  String url = '${baseUrl}/api/place-order';
 
   // Create the MultipartRequest
   var request = http.MultipartRequest('POST', Uri.parse(url));
@@ -43,7 +44,13 @@ Future<String> paymentService({
     print('Order placed successfully');
     return 'success';
   } else {
+    print(cart);
+    print(token);
     print('Failed to place order: ${response.statusCode}');
+    print("address id ${addressId}");
+    print("pay meth ${paymentMethod}");
+    print("total amount ${totalAmount}");
+    print("quantity ${quantity}");
     return 'error';
   }
 }

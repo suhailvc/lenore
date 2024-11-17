@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lenore/application/provider/mobile_number_provider/mobile_number_provider.dart';
 import 'package:lenore/core/constant.dart';
+import 'package:lenore/presentation/screens/account_screen/widgets/whats_app.dart';
 import 'package:lenore/presentation/screens/login_screen/otp_screen/otp_screen.dart';
 import 'package:lenore/presentation/screens/login_screen/widget/login_custom_button.dart';
 import 'package:lenore/presentation/screens/login_screen/widget/user_input_field.dart';
@@ -126,12 +127,17 @@ class _MobileNumberInputScreenState extends State<MobileNumberInputScreen> {
                 height: querySize.height * 0.02,
               ),
               Center(
-                child: Text(
-                  "Need Help?",
-                  style: TextStyle(
-                    color: appColor,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
+                child: GestureDetector(
+                  onTap: () async {
+                    await openWhatsApp();
+                  },
+                  child: Text(
+                    "Need Help?",
+                    style: TextStyle(
+                      color: appColor,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
               ),

@@ -6,9 +6,12 @@ import 'package:lenore/application/provider/bestseller_new_aarival_product_list_
 import 'package:lenore/application/provider/cart_provider/cart_provider.dart';
 import 'package:lenore/application/provider/coupon_provider/coupon_provider.dart';
 import 'package:lenore/application/provider/customization_provider/customization_provider.dart';
+import 'package:lenore/application/provider/delivery_fee_provider/delivery_fee_provider.dart';
 
 import 'package:lenore/application/provider/edit_profile_provider/edit_profile_provider.dart';
+import 'package:lenore/application/provider/filter_provider/filter_provider.dart';
 import 'package:lenore/application/provider/get_wishlist_provider/get_wishlist_provider.dart';
+import 'package:lenore/application/provider/gold_purity_provider/gold_purity_provider.dart';
 import 'package:lenore/application/provider/home_provider/best_seller_provider/best_seller_provider.dart';
 import 'package:lenore/application/provider/check_out_provider/check_box_provider.dart';
 
@@ -39,13 +42,10 @@ import 'package:lenore/application/provider/user_registration_provider/user_regi
 import 'package:lenore/application/provider/voucher_detail_provider/voucher_detail_provider.dart';
 import 'package:lenore/application/provider/wishlist_provider/whishlist_provider.dart';
 import 'package:lenore/domain/hive_model/hive_cart_model/hive_cart_model.dart';
-import 'package:lenore/presentation/screens/landing_screen/landing_screen.dart';
 
-import 'package:lenore/presentation/screens/persistant_bottom_nav_bar/persistant_bottom_nav_bar.dart';
-import 'package:lenore/presentation/screens/search_screen/search_screen.dart';
 import 'package:lenore/presentation/screens/splash/splash_screen.dart';
-import 'package:lenore/presentation/widgets/shimmer_widget.dart';
 
+import 'package:myfatoorah_flutter/myfatoorah_flutter.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
@@ -54,6 +54,10 @@ void main() async {
   if (!Hive.isAdapterRegistered(HiveCartModelAdapter().typeId)) {
     Hive.registerAdapter(HiveCartModelAdapter());
   }
+  MFSDK.init(
+      "rLtt6JWvbUHDDhsZnfpAhpYk4dxYDQkbcPTyGaKp2TYqQgG7FGZ5Th_WD53Oq8Ebz6A53njUoo1w3pjU1D4vs_ZMqFiz_j0urb_BH9Oq9VZoKFoJEDAbRZepGcQanImyYrry7Kt6MnMdgfG5jn4HngWoRdKduNNyP4kzcp3mRv7x00ahkm9LAK7ZRieg7k1PDAnBIOG3EyVSJ5kK4WLMvYr7sCwHbHcu4A5WwelxYK0GMJy37bNAarSJDFQsJ2ZvJjvMDmfWwDVFEVe_5tOomfVNt6bOg9mexbGjMrnHBnKnZR1vQbBtQieDlQepzTZMuQrSuKn-t5XZM7V6fCW7oP-uXGX-sMOajeX65JOf6XVpk29DP6ro8WTAflCDANC193yof8-f5_EYY-3hXhJj7RBXmizDpneEQDSaSz5sFk0sV5qPcARJ9zGG73vuGFyenjPPmtDtXtpx35A-BVcOSBYVIWe9kndG3nclfefjKEuZ3m4jL9Gg1h2JBvmXSMYiZtp9MR5I6pvbvylU_PP5xJFSjVTIz7IQSjcVGO41npnwIxRXNRxFOdIUHn0tjQ-7LwvEcTXyPsHXcMD8WtgBh-wxR8aKX7WPSsT1O8d8reb2aR7K3rkV3K82K_0OgawImEpwSvp9MNKynEAJQS6ZHe_J_l77652xwPNxMRTMASk1ZsJL",
+      MFCountry.KUWAIT,
+      MFEnvironment.TEST);
   await Hive.openBox<HiveCartModel>('cartBox');
   // Routes.initializeRouter();
   runApp(const MyApp());
@@ -168,6 +172,15 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (context) => WishlistProvider(),
         ),
+        ChangeNotifierProvider(
+          create: (context) => FilterProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => GoldPurityProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => DeliveryFeeProvider(),
+        ),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -186,7 +199,7 @@ class MyApp extends StatelessWidget {
         // home: const SplashScreen(),
         //home: const BottomNaveBar(),
         //home: const CollectionScreen(),
-        //home: const HomeScreen(),
+        // home: const MobileNumberInputScreen(),
         // home: PersistantBottomNavBarScreen(),
         home: const SplashScreen(),
         // home: const ShimmerLoading(

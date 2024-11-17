@@ -4,6 +4,7 @@ import 'package:lenore/application/provider/order_history_provider/order_history
 import 'package:lenore/core/constant.dart';
 import 'package:lenore/presentation/screens/order_detail_screen/order_detail_screen.dart';
 import 'package:lenore/presentation/widgets/custom_top_bar.dart';
+import 'package:lenore/presentation/widgets/name_top_bar.dart';
 import 'package:lenore/presentation/widgets/sign_out_widget.dart';
 import 'package:provider/provider.dart';
 
@@ -45,17 +46,18 @@ class _OrderHistoryState extends State<OrderHistory> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 customOneSizedBox(querySize),
-                customTopBar(querySize, context),
-                customSizedBox(querySize),
-                Text(
-                  "Order History",
-                  style: TextStyle(
-                    fontSize: querySize.width * 0.06,
-                    fontWeight: FontWeight.w600,
-                    fontFamily: 'ElMessiri',
-                    color: textColor,
-                  ),
-                ),
+                nameTopBar(querySize, context, 'Order History'),
+                //  customTopBar(querySize, context),
+                // customSizedBox(querySize),
+                // Text(
+                //   "Order History",
+                //   style: TextStyle(
+                //     fontSize: querySize.width * 0.06,
+                //     fontWeight: FontWeight.w600,
+                //     fontFamily: 'ElMessiri',
+                //     color: textColor,
+                //   ),
+                // ),
                 customSizedBox(querySize),
                 !Provider.of<AuthProvider>(context).hasToken
                     ? askSignIn(querySize)

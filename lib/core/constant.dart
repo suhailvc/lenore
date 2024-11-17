@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:lenore/application/provider/auth_provider/auth_provider.dart';
-import 'package:provider/provider.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 var baseUrl =
@@ -92,3 +91,5 @@ Future<bool> hasBearerToken() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   return prefs.containsKey('bearerToken');
 }
+
+var voucherDiscoutPrice;

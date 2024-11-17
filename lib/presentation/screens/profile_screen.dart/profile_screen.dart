@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:lenore/application/provider/auth_provider/auth_provider.dart';
 import 'package:lenore/application/provider/profile_provider/profile_provider.dart';
 import 'package:lenore/core/constant.dart';
+import 'package:lenore/infrastructure/email_verification_api.dart/email_verification_api.dart';
 import 'package:lenore/presentation/screens/profile_screen.dart/edit_profile_screen.dart';
+import 'package:lenore/presentation/screens/profile_screen.dart/widget/email_verification_widget.dart';
+import 'package:lenore/presentation/screens/profile_screen.dart/widget/email_widget.dart';
 import 'package:lenore/presentation/widgets/custom_profile_top_bar.dart';
 import 'package:lenore/presentation/screens/profile_screen.dart/widget/user_detail_column.dart';
 import 'package:lenore/presentation/widgets/sign_out_widget.dart';
@@ -22,11 +25,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     super.initState();
   }
 
+  String? _token;
   Future<void> _fetchProfile() async {
     final authProvider =
         await Provider.of<AuthProvider>(context, listen: false);
+    _token = await authProvider.getToken();
     final token = await authProvider.getToken();
 
+    print(token);
     if (token != null) {
       Provider.of<ProfileProvider>(context, listen: false).fetchProfile(token);
     }
@@ -35,6 +41,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     var querySize = MediaQuery.of(context).size;
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -55,6 +62,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           return askSignIn(querySize);
                         }
                         print(profileValue.profile!.data.image);
+                        print(profileValue.profile!.data.emailVerified);
                         return Column(
                           children: [
                             customHeightThree(querySize),
@@ -82,6 +90,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               padding: EdgeInsets.symmetric(
                                   horizontal: querySize.width * 0.07),
                               child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   userDetailColumn(
                                     context: context,
@@ -101,14 +110,73 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         profileValue.profile!.data.lName ?? '',
                                   ),
                                   customSizedBox(querySize),
-                                  userDetailColumn(
-                                    context: context,
-                                    assetName:
-                                        "assets/images/profile/email_icon.png",
-                                    columnHeading: 'Email ID',
-                                    columnName:
-                                        profileValue.profile!.data.email,
+                                  Row(
+                                    children: [
+                                      emailColumn(
+                                          context: context,
+                                          assetName:
+                                              "assets/images/profile/email_icon.png",
+                                          columnName:
+                                              profileValue.profile!.data.email),
+                                      SizedBox(
+                                        width: querySize.width * 0.01,
+                                      ),
+                                      if (profileValue
+                                              .profile!.data.emailVerified ==
+                                          0)
+                                        Column(
+                                          children: [
+                                            SizedBox(
+                                              height: querySize.height * 0.039,
+                                            ),
+                                            GestureDetector(
+                                              onTap: () async {
+                                                await emailVerificationApi(
+                                                    _token!);
+                                                emailVerifyPopUp(
+                                                    context, querySize);
+                                              },
+                                              child: Text(
+                                                "Verify ?",
+                                                style: TextStyle(
+                                                  color:
+                                                      const Color(0xFF00ACB3),
+                                                  fontSize:
+                                                      querySize.height * 0.018,
+                                                  fontFamily: 'Segoe',
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        )
+                                      else
+                                        Column(
+                                          children: [
+                                            SizedBox(
+                                              height: querySize.height * 0.039,
+                                            ),
+                                            Text(
+                                              "Verified",
+                                              style: TextStyle(
+                                                color: const Color(0xFF00ACB3),
+                                                fontSize:
+                                                    querySize.height * 0.017,
+                                                fontFamily: 'Segoe',
+                                              ),
+                                            ),
+                                          ],
+                                        )
+                                    ],
                                   ),
+
+                                  // userDetailColumn(
+                                  //   context: context,
+                                  //   assetName:
+                                  //       "assets/images/profile/email_icon.png",
+                                  //   columnHeading: 'Email ID',
+                                  //   columnName:
+                                  //       profileValue.profile!.data.email,
+                                  // ),
                                   customSizedBox(querySize),
                                   userDetailColumn(
                                     context: context,

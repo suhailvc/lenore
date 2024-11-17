@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:lenore/core/constant.dart';
 import 'package:lenore/domain/voucher_detail_model/voucher_detail_model.dart';
 
 Future<VoucherDetailModel?> vocherDetailApi(int id) async {
-  final url = Uri.parse(
-      "https://project.artisans.qa/lenore-latest/api/voucher-details?id=$id");
+  final url = Uri.parse("$baseUrl/api/voucher-details?id=$id");
 
   try {
     final response = await http.get(url);

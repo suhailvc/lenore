@@ -2,6 +2,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:lenore/application/provider/auth_provider/auth_provider.dart';
+import 'package:lenore/application/provider/delivery_fee_provider/delivery_fee_provider.dart';
 
 import 'package:lenore/application/provider/home_provider/collection_provider/collection_provider.dart';
 import 'package:lenore/application/provider/home_provider/gift_by_category/gift_by_category_provider.dart';
@@ -31,6 +32,7 @@ import 'package:lenore/presentation/screens/sub_category_screen/sub_category_scr
 import 'package:lenore/presentation/widgets/custom_snack_bar.dart';
 import 'package:lenore/presentation/widgets/cutom_bottom_bar_top_bar.dart';
 import 'package:lenore/presentation/widgets/shimmer_widget.dart';
+import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
@@ -106,6 +108,8 @@ class _HomeScreenState extends State<HomeScreen> {
             .bestSellerProviderMethod(pageNo: '1', eventName: 'best-sellers');
         Provider.of<NewArrivalProvider>(context, listen: false)
             .newArrivalProviderMethod(pageNo: '1', eventName: 'new-arrivals');
+        // Provider.of<DeliveryFeeProvider>(context, listen: false)
+        //     .fetchDeliveryFee();
 
         WidgetsBinding.instance.addPostFrameCallback((_) {
           Provider.of<CollectionProvider>(context, listen: false)
@@ -142,57 +146,95 @@ class _HomeScreenState extends State<HomeScreen> {
                         return Column(
                           children: [
                             CarouselSlider.builder(
-                                itemCount: homeBannerProvidervalue
-                                    .giftByVoucherItems.data!.length,
-                                itemBuilder: (context, index, realIndex) {
-                                  return Padding(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: querySize.width * 0.02),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(
-                                          querySize.height * 0.02),
-                                      child: Image.network(
-                                        homeBannerProvidervalue
-                                            .giftByVoucherItems
-                                            .data![index]
-                                            .image!,
-                                        fit: BoxFit.cover,
-                                        // width: double
-                                        //     .infinity, // Ensures the image takes full width of its parent
-                                        // height: double
-                                        //     .infinity, // Ensures the image takes full height of its parent
+                              itemCount: homeBannerProvidervalue
+                                  .giftByVoucherItems.data!.length,
+                              itemBuilder: (context, index, realIndex) {
+                                return Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: querySize.width * 0.02),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(
+                                        querySize.height * 0.02),
+                                    child: Container(
+                                      width: double.infinity,
+                                      height: querySize.height * 0.24,
+                                      decoration: BoxDecoration(
+                                        image: DecorationImage(
+                                          image: NetworkImage(
+                                            homeBannerProvidervalue
+                                                .giftByVoucherItems
+                                                .data![index]
+                                                .image!,
+                                          ),
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(
+                                            16.0), // Adjust padding as needed
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            SizedBox(
+                                              height: querySize.height * 0.07,
+                                            ),
+                                            Row(
+                                              children: [
+                                                SizedBox(
+                                                  width: querySize.width * 0.02,
+                                                ),
+                                                Flexible(
+                                                  child: Text(
+                                                    homeBannerProvidervalue
+                                                            .giftByVoucherItems
+                                                            .data![index]
+                                                            .titleOne ??
+                                                        "", // Replace with the desired text property
+                                                    style: TextStyle(
+                                                      fontFamily: 'ElMessiri',
+                                                      color: Colors.white,
+                                                      fontSize: 18,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      shadows: [
+                                                        Shadow(
+                                                          blurRadius: 5.0,
+                                                          color: Colors.black
+                                                              .withOpacity(0.7),
+                                                          offset:
+                                                              Offset(2.0, 2.0),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    maxLines:
+                                                        3, // Limits to 1 line and adds ellipsis if overflow
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            // Add other content below the text if needed
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                  );
-
-                                  // return Container(
-                                  //   margin: EdgeInsets.only(
-                                  //       right: querySize.width * 0.025),
-                                  //   decoration: BoxDecoration(
-                                  //     borderRadius: BorderRadius.circular(
-                                  //         querySize.height * 0.01),
-                                  //     image: DecorationImage(
-                                  //       image: NetworkImage(
-                                  //           homeBannerProvidervalue
-                                  //               .giftByVoucherItems
-                                  //               .data![index]
-                                  //               .image!),
-                                  //       fit: BoxFit.cover,
-                                  //     ),
-                                  //   ),
-                                  // );
+                                  ),
+                                );
+                              },
+                              options: CarouselOptions(
+                                onPageChanged: (index, reason) {
+                                  setState(() {
+                                    activeIndex = index;
+                                  });
                                 },
-                                options: CarouselOptions(
-                                    onPageChanged: (index, reason) {
-                                      setState(() {
-                                        activeIndex = index;
-                                      });
-                                    },
-                                    viewportFraction: 1,
-                                    height: querySize.height * 0.24,
-                                    autoPlay: true,
-                                    autoPlayInterval:
-                                        const Duration(seconds: 5))),
+                                viewportFraction: 1,
+                                height: querySize.height * 0.24,
+                                autoPlay: true,
+                                autoPlayInterval: const Duration(seconds: 5),
+                              ),
+                            ),
                             SizedBox(
                               height: querySize.height * 0.01,
                             ),
@@ -201,12 +243,82 @@ class _HomeScreenState extends State<HomeScreen> {
                               count: homeBannerProvidervalue
                                   .giftByVoucherItems.data!.length,
                               effect: SlideEffect(
-                                  dotHeight: querySize.height * 0.008,
-                                  dotWidth: querySize.width * 0.018,
-                                  activeDotColor: appColor),
-                            )
+                                dotHeight: querySize.height * 0.008,
+                                dotWidth: querySize.width * 0.018,
+                                activeDotColor: appColor,
+                              ),
+                            ),
                           ],
                         );
+
+                        // return Column(
+                        //   children: [
+                        //     CarouselSlider.builder(
+                        //         itemCount: homeBannerProvidervalue
+                        //             .giftByVoucherItems.data!.length,
+                        //         itemBuilder: (context, index, realIndex) {
+                        //           return Padding(
+                        //             padding: EdgeInsets.symmetric(
+                        //                 horizontal: querySize.width * 0.02),
+                        //             child: ClipRRect(
+                        //               borderRadius: BorderRadius.circular(
+                        //                   querySize.height * 0.02),
+                        //               child: Image.network(
+                        //                 homeBannerProvidervalue
+                        //                     .giftByVoucherItems
+                        //                     .data![index]
+                        //                     .image!,
+                        //                 fit: BoxFit.cover,
+                        //                 // width: double
+                        //                 //     .infinity, // Ensures the image takes full width of its parent
+                        //                 // height: double
+                        //                 //     .infinity, // Ensures the image takes full height of its parent
+                        //               ),
+                        //             ),
+                        //           );
+
+                        //           // return Container(
+                        //           //   margin: EdgeInsets.only(
+                        //           //       right: querySize.width * 0.025),
+                        //           //   decoration: BoxDecoration(
+                        //           //     borderRadius: BorderRadius.circular(
+                        //           //         querySize.height * 0.01),
+                        //           //     image: DecorationImage(
+                        //           //       image: NetworkImage(
+                        //           //           homeBannerProvidervalue
+                        //           //               .giftByVoucherItems
+                        //           //               .data![index]
+                        //           //               .image!),
+                        //           //       fit: BoxFit.cover,
+                        //           //     ),
+                        //           //   ),
+                        //           // );
+                        //         },
+                        //         options: CarouselOptions(
+                        //             onPageChanged: (index, reason) {
+                        //               setState(() {
+                        //                 activeIndex = index;
+                        //               });
+                        //             },
+                        //             viewportFraction: 1,
+                        //             height: querySize.height * 0.24,
+                        //             autoPlay: true,
+                        //             autoPlayInterval:
+                        //                 const Duration(seconds: 5))),
+                        //     SizedBox(
+                        //       height: querySize.height * 0.01,
+                        //     ),
+                        //     AnimatedSmoothIndicator(
+                        //       activeIndex: activeIndex,
+                        //       count: homeBannerProvidervalue
+                        //           .giftByVoucherItems.data!.length,
+                        //       effect: SlideEffect(
+                        //           dotHeight: querySize.height * 0.008,
+                        //           dotWidth: querySize.width * 0.018,
+                        //           activeDotColor: appColor),
+                        //     )
+                        //   ],
+                        // );
                       }
                     },
                   ),
@@ -1307,13 +1419,22 @@ class _HomeScreenState extends State<HomeScreen> {
                   const Spacer(),
                   GestureDetector(
                     onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => GiftByCategoryScreen(
-                              widget: customBottomBarTopBar(querySize, context),
-                            ),
-                          ));
+                      PersistentNavBarNavigator.pushNewScreen(
+                        context,
+                        screen: GiftByCategoryScreen(
+                          widget: customBottomBarTopBar(querySize, context),
+                        ),
+                        withNavBar: true, // OPTIONAL VALUE. True by default.
+                        pageTransitionAnimation:
+                            PageTransitionAnimation.cupertino,
+                      );
+                      // Navigator.push(
+                      //     context,
+                      //     MaterialPageRoute(
+                      //       builder: (context) => GiftByCategoryScreen(
+                      //         widget: customBottomBarTopBar(querySize, context),
+                      //       ),
+                      //     ));
                     },
                     child: Text(
                       "View More",

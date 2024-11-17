@@ -123,19 +123,19 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                                           right: querySize.height * 0.02,
                                           child: Row(
                                             children: [
-                                              CircleAvatar(
-                                                radius: querySize.width * 0.033,
-                                                backgroundColor: Colors.white,
-                                                child: Image.asset(
-                                                  'assets/images/product_detail_image/share.png',
-                                                  width: querySize.width * 0.04,
-                                                  height:
-                                                      querySize.height * 0.017,
-                                                ),
-                                              ),
-                                              SizedBox(
-                                                  width:
-                                                      querySize.width * 0.02),
+                                              // CircleAvatar(
+                                              //   radius: querySize.width * 0.033,
+                                              //   backgroundColor: Colors.white,
+                                              //   child: Image.asset(
+                                              //     'assets/images/product_detail_image/share.png',
+                                              //     width: querySize.width * 0.04,
+                                              //     height:
+                                              //         querySize.height * 0.017,
+                                              //   ),
+                                              // ),
+                                              // SizedBox(
+                                              //     width:
+                                              //         querySize.width * 0.02),
                                               // Consumer2<GetWishListProvider,
                                               //     AddToWishlistProvider>(
                                               //   builder: (context,
@@ -364,7 +364,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                                                     ),
                                                   );
                                                 },
-                                              )
+                                              ),
+                                              SizedBox(
+                                                  width:
+                                                      querySize.width * 0.02),
                                             ],
                                           ),
                                         ),
@@ -1313,8 +1316,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) =>
-                        BuyNowCheckOutScreen(productId: product.data!.id!),
+                    builder: (context) => BuyNowCheckOutScreen(
+                      productId: product.data!.id!,
+                      quantity: 1,
+                    ),
                   ));
             },
             style: ElevatedButton.styleFrom(

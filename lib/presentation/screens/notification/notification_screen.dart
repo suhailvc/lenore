@@ -3,6 +3,7 @@ import 'package:lenore/application/provider/notification_provider/notification_p
 import 'package:lenore/application/provider/profile_provider/profile_provider.dart';
 import 'package:lenore/core/constant.dart';
 import 'package:lenore/presentation/widgets/custom_top_bar.dart';
+import 'package:lenore/presentation/widgets/name_top_bar.dart';
 import 'package:provider/provider.dart';
 
 class NotificationScreen extends StatefulWidget {
@@ -38,16 +39,17 @@ class _NotificationScreenState extends State<NotificationScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 customOneSizedBox(querySize),
-                customTopBar(querySize, context),
-                customSizedBox(querySize),
-                Text(
-                  "Notifications",
-                  style: TextStyle(
-                      fontSize: querySize.width * 0.06,
-                      fontWeight: FontWeight.w600,
-                      fontFamily: 'ElMessiri',
-                      color: textColor),
-                ),
+                nameTopBar(querySize, context, 'Notifications'),
+                // customTopBar(querySize, context),
+                // customSizedBox(querySize),
+                // Text(
+                //   "Notifications",
+                //   style: TextStyle(
+                //       fontSize: querySize.width * 0.06,
+                //       fontWeight: FontWeight.w600,
+                //       fontFamily: 'ElMessiri',
+                //       color: textColor),
+                // ),
                 customSizedBox(querySize),
                 // Text(
                 //   "15 August 2024",
@@ -83,7 +85,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                       decoration: BoxDecoration(
                                         image: const DecorationImage(
                                           image: AssetImage(
-                                              "assets/images/carts/check_out_image.png"),
+                                              "assets/images/app icon.png"),
                                           fit: BoxFit.cover,
                                         ),
                                         borderRadius: BorderRadius.circular(
