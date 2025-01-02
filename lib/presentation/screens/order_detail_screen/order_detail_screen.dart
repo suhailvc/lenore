@@ -4,6 +4,7 @@ import 'package:lenore/application/provider/order_detail_provider/order_detail_p
 import 'package:lenore/core/constant.dart';
 import 'package:lenore/domain/order_detail_model/order_detail_model.dart';
 import 'package:lenore/presentation/widgets/custom_profile_top_bar.dart';
+import 'package:lenore/presentation/widgets/multiple_shimmer.dart';
 import 'package:provider/provider.dart';
 
 class OrderDetailScreen extends StatefulWidget {
@@ -50,7 +51,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               Consumer<OrderDetailProvider>(
                   builder: (context, orderDetailValue, child) {
                 if (orderDetailValue.isLoading) {
-                  return lenoreGif(querySize);
+                  return multipleShimmerLoading(
+                      containerHeight: querySize.height * 0.06);
+                  // return lenoreGif(querySize);
                 } else if (orderDetailValue.orderDetail == null ||
                     orderDetailValue
                         .orderDetail!.data!.productDetails!.isEmpty) {
@@ -289,28 +292,28 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                               thickness: querySize.height * 0.0007,
                               color: const Color(0x6670802E),
                             ),
-                            SizedBox(
-                              height: querySize.height * 0.01,
-                            ),
-                            Container(
-                              width: double.infinity,
-                              height: querySize.height * 0.053,
-                              decoration: BoxDecoration(
-                                color: appColor,
-                                borderRadius: BorderRadius.circular(
-                                    querySize.width * 0.08),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  'Share Reciept',
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.white,
-                                      fontFamily: 'Segoe',
-                                      fontSize: querySize.height * 0.017),
-                                ),
-                              ),
-                            ),
+                            // SizedBox(
+                            //   height: querySize.height * 0.01,
+                            // ),
+                            // Container(
+                            //   width: double.infinity,
+                            //   height: querySize.height * 0.053,
+                            //   decoration: BoxDecoration(
+                            //     color: appColor,
+                            //     borderRadius: BorderRadius.circular(
+                            //         querySize.width * 0.08),
+                            //   ),
+                            //   child: Center(
+                            //     child: Text(
+                            //       'Share Reciept',
+                            //       style: TextStyle(
+                            //           fontWeight: FontWeight.w600,
+                            //           color: Colors.white,
+                            //           fontFamily: 'Segoe',
+                            //           fontSize: querySize.height * 0.017),
+                            //     ),
+                            //   ),
+                            // ),
                             SizedBox(
                               height: querySize.height * 0.03,
                             )

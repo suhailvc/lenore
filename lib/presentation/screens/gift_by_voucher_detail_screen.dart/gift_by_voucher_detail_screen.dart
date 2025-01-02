@@ -8,6 +8,7 @@ import 'package:lenore/presentation/screens/buy_now_check_out_screen/buy_now_che
 import 'package:lenore/presentation/screens/voucher_buy_now_checkout_screen.dart/voucher_buy_now_checkout_screen.dart';
 
 import 'package:lenore/presentation/widgets/custom_top_bar.dart';
+import 'package:lenore/presentation/widgets/multiple_shimmer.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_html/flutter_html.dart';
 
@@ -37,10 +38,14 @@ class _GiftByVoucherDetailScreenState extends State<GiftByVoucherDetailScreen> {
       body: Consumer<VocherDetailProvider>(
           builder: (context, voucherValue, child) {
         if (voucherValue.isLoading) {
-          return lenoreGif(querySize);
+          return multipleShimmerLoading(
+              containerHeight: querySize.height * 0.06);
+          // return lenoreGif(querySize);
         }
         if (voucherValue.voucherDetail == null) {
-          return lenoreGif(querySize);
+          return multipleShimmerLoading(
+              containerHeight: querySize.height * 0.06);
+          // return lenoreGif(querySize);
         }
         return Stack(
           children: [
@@ -331,8 +336,8 @@ Container addToCartAndBuyNowButton(
               productId: voucher.data![0].id!,
               productName: voucher.data![0].name ?? '',
               description: '',
-              price:
-                  double.tryParse(voucher.data![0].priceAfterDiscount!) ?? 0.0,
+              price: voucher.data![0].amount!.toDouble(),
+              // double.tryParse(voucher.data![0].priceAfterDiscount!) ?? 0.0,
               size: 'Default Size',
               image: voucher.data![0].image!, // Default placeholder image
               stock: 10000,

@@ -13,6 +13,7 @@ import 'package:lenore/domain/product_detail_model/product_detail_model.dart';
 import 'package:lenore/presentation/screens/buy_now_check_out_screen/buy_now_check_out_screen.dart';
 
 import 'package:lenore/presentation/widgets/custom_top_bar.dart';
+import 'package:lenore/presentation/widgets/multiple_shimmer.dart';
 import 'package:provider/provider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -67,7 +68,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
       body: Consumer<ProductDetailProvider>(
         builder: (context, productDetailProvidervalue, child) {
           if (productDetailProvidervalue.isLoading) {
-            return lenoreGif(querySize);
+            return multipleShimmerLoading(
+                containerHeight: querySize.height * 0.06);
+            // return lenoreGif(querySize);
           }
           if (productDetailProvidervalue.productDetails == null) {
             return Container(

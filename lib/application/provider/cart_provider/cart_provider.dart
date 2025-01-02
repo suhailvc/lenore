@@ -12,6 +12,8 @@ class CartProvider with ChangeNotifier {
 
   List<HiveCartModel> get items => _items;
   double get subTotal => _items.fold(0, (sum, item) => sum + item.totalPrice);
+  double get totalVoucherDiscount =>
+      _items.fold(0, (sum, item) => sum + item.totalVoucherDiscount);
 
   Future<void> _loadCart() async {
     _cartBox = Hive.box<HiveCartModel>('cartBox');

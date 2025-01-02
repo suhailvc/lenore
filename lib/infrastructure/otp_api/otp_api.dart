@@ -60,7 +60,7 @@ class OtpApiService {
         return {'error': 'Server error. Please try again later.'};
       }
     } catch (error) {
-      print('handNNetweerrrrorrrrrrr-----------------------------------');
+      print('handNNetweerrrrorrrrrrr-----------------------------------$error');
       // Handle network error
       return {'error': 'Connection error. Please try again later.'};
     }

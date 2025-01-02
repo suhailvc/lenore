@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="a" xmlns="http://www.w3.org/2000/svg" width="31.7" height="36.55" viewBox="0 0 31.7 36.55">
+  <defs>
+    <style>
+      .b {
+        fill: none;
+        stroke: #aaaeae;
+        stroke-miterlimit: 10;
+      }
+    </style>
+  </defs>
+  <polygon class="b" points="1.85 34.41 12.4 34.41 12.4 20.94 19.81 20.94 19.81 34.41 29.85 34.41 29.85 13.02 15.85 2.13 1.85 13.28 1.85 34.41"/>
+</svg>

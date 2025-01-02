@@ -25,7 +25,8 @@ class BestsellerNewAarivalProductListProvider extends ChangeNotifier {
       if (response != null) {
         if (isPagination) {
           // Append new data to the existing list
-          newAllrivalList = response;
+          // newAllrivalList = response;
+          newAllrivalList.data!.addAll(response.data!);
           // _productListItems.data!.addAll(response.data!);
         } else {
           // Replace the data for the first page or on refresh

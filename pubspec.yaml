@@ -55,6 +55,7 @@ dependencies:
   video_player: ^2.9.2
   chewie: ^1.8.5
   myfatoorah_flutter: ^3.1.5
+  webview_flutter: ^4.10.0
  
 dev_dependencies:
   build_runner: ^2.4.13
@@ -104,6 +105,7 @@ flutter:
     - assets/images/account/
     - assets/images/carts/
     - assets/images/sub_category_product/
+    - assets/images/order_status/
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 

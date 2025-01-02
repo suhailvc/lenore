@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:lenore/application/provider/home_provider/gift_by_category/gift_by_category_provider.dart';
 import 'package:lenore/core/constant.dart';
 
+import 'package:lenore/presentation/screens/sub_category_product_listing_screen/sub_category_product_listing_screen.dart';
+
 import 'package:lenore/presentation/screens/sub_category_screen/sub_category_screen.dart';
+import 'package:lenore/presentation/widgets/multiple_shimmer.dart';
 
 import 'package:provider/provider.dart';
 
@@ -64,7 +67,9 @@ class _GiftByCategoryScreenState extends State<GiftByCategoryScreen> {
                     child: Consumer<GiftByCategoryProvider>(
                       builder: (context, giftByCategoryValue, child) {
                         if (giftByCategoryValue.isLoading) {
-                          return lenoreGif(querySize);
+                          return multipleShimmerLoading(
+                              containerHeight: querySize.height * 0.06);
+                          // return lenoreGif(querySize);
                         } else if (giftByCategoryValue.cachedResponse!.data ==
                                 null ||
                             giftByCategoryValue.cachedResponse!.data!.isEmpty) {
@@ -89,15 +94,30 @@ class _GiftByCategoryScreenState extends State<GiftByCategoryScreen> {
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => SubCategoryScreen(
-                                          categoryName: "gift-by-category",
-                                          id: giftByCategoryValue
-                                              .cachedResponse!.data![index].id!,
-                                          screenName: giftByCategoryValue
-                                              .cachedResponse!
-                                              .data![index]
-                                              .name!),
-                                    ));
+                                        builder: (context) => giftByCategoryValue
+                                                    .cachedResponse!
+                                                    .data![index]
+                                                    .id !=
+                                                8
+                                            ? SubCategoryScreen(
+                                                categoryName:
+                                                    "gift-by-category",
+                                                id: giftByCategoryValue
+                                                    .cachedResponse!
+                                                    .data![index]
+                                                    .id!,
+                                                screenName: giftByCategoryValue
+                                                    .cachedResponse!
+                                                    .data![index]
+                                                    .name!)
+                                            : SubCategoryProductListingScreen(
+                                                eventId: 4,
+                                                eventName: 'all',
+                                                productListingScreenName:
+                                                    giftByCategoryValue
+                                                        .cachedResponse!
+                                                        .data![index]
+                                                        .name!)));
                                 // }
                                 // if (index == 1) {
                                 //   Navigator.push(

@@ -116,6 +116,7 @@ class _CustomisationScreenState extends State<CustomisationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print(widget.widgetName);
     final customizationProvider = Provider.of<CustomizationProvider>(context);
     var querySize = MediaQuery.of(context).size;
 

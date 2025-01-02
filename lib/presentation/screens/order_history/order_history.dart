@@ -3,7 +3,9 @@ import 'package:lenore/application/provider/auth_provider/auth_provider.dart';
 import 'package:lenore/application/provider/order_history_provider/order_history_provider.dart';
 import 'package:lenore/core/constant.dart';
 import 'package:lenore/presentation/screens/order_detail_screen/order_detail_screen.dart';
+import 'package:lenore/presentation/screens/order_history/order_status.dart';
 import 'package:lenore/presentation/widgets/custom_top_bar.dart';
+import 'package:lenore/presentation/widgets/multiple_shimmer.dart';
 import 'package:lenore/presentation/widgets/name_top_bar.dart';
 import 'package:lenore/presentation/widgets/sign_out_widget.dart';
 import 'package:provider/provider.dart';
@@ -47,24 +49,15 @@ class _OrderHistoryState extends State<OrderHistory> {
               children: [
                 customOneSizedBox(querySize),
                 nameTopBar(querySize, context, 'Order History'),
-                //  customTopBar(querySize, context),
-                // customSizedBox(querySize),
-                // Text(
-                //   "Order History",
-                //   style: TextStyle(
-                //     fontSize: querySize.width * 0.06,
-                //     fontWeight: FontWeight.w600,
-                //     fontFamily: 'ElMessiri',
-                //     color: textColor,
-                //   ),
-                // ),
                 customSizedBox(querySize),
                 !Provider.of<AuthProvider>(context).hasToken
                     ? askSignIn(querySize)
                     : Consumer<OrderHistoryProvider>(
                         builder: (context, orderHistoryProvider, child) {
                           if (orderHistoryProvider.isLoading) {
-                            return lenoreGif(querySize);
+                            return multipleShimmerLoading(
+                                containerHeight: querySize.height * 0.06);
+                            // return lenoreGif(querySize);
                           }
                           if (orderHistoryProvider.orderitems == null ||
                               orderHistoryProvider.orderitems!.data!.isEmpty) {
@@ -164,7 +157,10 @@ class _OrderHistoryState extends State<OrderHistory> {
                                             ),
                                           ],
                                         ),
-                                        Spacer(),
+                                        //  Spacer(),
+                                        SizedBox(
+                                          width: querySize.width * 0.14,
+                                        ),
                                         Column(
                                           children: [
                                             Spacer(),
@@ -172,36 +168,76 @@ class _OrderHistoryState extends State<OrderHistory> {
                                               padding: EdgeInsets.only(
                                                   bottom:
                                                       querySize.height * 0.015),
-                                              child: GestureDetector(
-                                                onTap: () {
-                                                  Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          OrderDetailScreen(
-                                                        orderId:
-                                                            order.orderId ?? '',
+                                              child: Row(
+                                                children: [
+                                                  GestureDetector(
+                                                    onTap: () {
+                                                      Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              OrderDetailScreen(
+                                                            orderId:
+                                                                order.orderId ??
+                                                                    '',
+                                                          ),
+                                                        ),
+                                                      );
+                                                    },
+                                                    child: Text(
+                                                      'Detail',
+                                                      style: TextStyle(
+                                                        fontSize:
+                                                            querySize.width *
+                                                                0.028,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        fontFamily: 'Jost',
+                                                        color: const Color(
+                                                            0xFF667080),
+                                                        decoration:
+                                                            TextDecoration
+                                                                .underline,
                                                       ),
                                                     ),
-                                                  );
-                                                },
-                                                child: Text(
-                                                  'Order Detail',
-                                                  style: TextStyle(
-                                                    fontSize:
-                                                        querySize.width * 0.028,
-                                                    fontWeight: FontWeight.w600,
-                                                    fontFamily: 'Jost',
-                                                    color:
-                                                        const Color(0xFF667080),
-                                                    decoration: TextDecoration
-                                                        .underline,
                                                   ),
-                                                ),
+                                                  SizedBox(
+                                                      width: querySize.width *
+                                                          0.03),
+                                                  GestureDetector(
+                                                    onTap: () {
+                                                      Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              OrderStatusScreen(
+                                                            orderId:
+                                                                order.orderId ??
+                                                                    '',
+                                                          ),
+                                                        ),
+                                                      );
+                                                    },
+                                                    child: Text(
+                                                      'Track',
+                                                      style: TextStyle(
+                                                        fontSize:
+                                                            querySize.width *
+                                                                0.028,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        fontFamily: 'Jost',
+                                                        color: const Color(
+                                                            0xFF667080),
+                                                        decoration:
+                                                            TextDecoration
+                                                                .underline,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
                                             ),
-                                            SizedBox(
-                                                width: querySize.width * 0.03),
                                           ],
                                         ),
                                         SizedBox(

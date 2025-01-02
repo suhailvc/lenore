@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lenore/application/provider/filter_provider/filter_provider.dart';
+import 'package:lenore/application/provider/home_provider/best_seller_provider/best_seller_provider.dart';
 
 import 'package:lenore/presentation/screens/filter_screen/widgets/collection_filter.dart';
 import 'package:lenore/presentation/screens/filter_screen/widgets/gift_by_event_filter.dart';
@@ -9,7 +10,8 @@ import 'package:lenore/presentation/screens/filter_screen/widgets/product_type_w
 import 'package:provider/provider.dart';
 
 class FilterScreen extends StatefulWidget {
-  const FilterScreen({super.key});
+  final VoidCallback onResetFilters;
+  const FilterScreen({required this.onResetFilters, super.key});
 
   @override
   State<FilterScreen> createState() => _FilterScreenState();
@@ -27,11 +29,7 @@ class _FilterScreenState extends State<FilterScreen> {
   Widget build(BuildContext context) {
     var querySize = MediaQuery.of(context).size;
 
-    return SafeArea(
-        // child: Consumer<GiftByCategoryProvider>(
-        //     builder: (context, giftBvhjvyCategoryValue, child) {
-        //return
-        child: Container(
+    return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(querySize.width * 0.06),
         color: Colors.white,
@@ -42,7 +40,7 @@ class _FilterScreenState extends State<FilterScreen> {
             child: Padding(
               padding: EdgeInsets.symmetric(
                 horizontal: querySize.width * 0.04,
-                vertical: querySize.height * 0.1,
+                vertical: querySize.height * 0.03,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -63,6 +61,7 @@ class _FilterScreenState extends State<FilterScreen> {
                         onTap: () {
                           Provider.of<FilterProvider>(context, listen: false)
                               .resetFilters();
+                          widget.onResetFilters();
                           Navigator.pop(context);
                         },
                         child: Text(
@@ -125,9 +124,7 @@ class _FilterScreenState extends State<FilterScreen> {
           ),
         ],
       ),
-    )
-        // }),
-        );
+    );
   }
 }
 

@@ -8,6 +8,7 @@ import 'package:lenore/presentation/screens/profile_screen.dart/widget/email_ver
 import 'package:lenore/presentation/screens/profile_screen.dart/widget/email_widget.dart';
 import 'package:lenore/presentation/widgets/custom_profile_top_bar.dart';
 import 'package:lenore/presentation/screens/profile_screen.dart/widget/user_detail_column.dart';
+import 'package:lenore/presentation/widgets/multiple_shimmer.dart';
 import 'package:lenore/presentation/widgets/sign_out_widget.dart';
 import 'package:provider/provider.dart';
 
@@ -56,7 +57,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: Consumer<ProfileProvider>(
                       builder: (context, profileValue, child) {
                         if (profileValue.showGif) {
-                          return lenoreGif(querySize);
+                          return multipleShimmerLoading(
+                              containerHeight: querySize.height * 0.06);
+                          // return lenoreGif(querySize);
                         }
                         if (profileValue.profile == null) {
                           return askSignIn(querySize);

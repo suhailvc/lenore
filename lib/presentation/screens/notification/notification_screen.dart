@@ -3,6 +3,7 @@ import 'package:lenore/application/provider/notification_provider/notification_p
 import 'package:lenore/application/provider/profile_provider/profile_provider.dart';
 import 'package:lenore/core/constant.dart';
 import 'package:lenore/presentation/widgets/custom_top_bar.dart';
+import 'package:lenore/presentation/widgets/multiple_shimmer.dart';
 import 'package:lenore/presentation/widgets/name_top_bar.dart';
 import 'package:provider/provider.dart';
 
@@ -62,7 +63,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
                 Consumer<NotificationProvider>(
                   builder: (context, notificationValue, child) {
                     if (notificationValue.showGif) {
-                      return lenoreGif(querySize);
+                      return multipleShimmerLoading(
+                          containerHeight: querySize.height * 0.06);
+                      // return lenoreGif(querySize);
                     } else if (notificationValue.profile == null) {
                       return SizedBox();
                     }

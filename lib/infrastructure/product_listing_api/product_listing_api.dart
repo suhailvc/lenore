@@ -5,6 +5,8 @@ import 'package:lenore/domain/product_listing_model/product_listing_model.dart';
 
 Future<ProductListModel?> productListingService(
     String pageNo, String eventName, int? id) async {
+  print(eventName);
+  print(id);
   final url = Uri.parse(
       '$baseUrl/api/products-list?filter_type=${eventName}&id=${id}&per_page=10&page=${pageNo}');
 

@@ -126,21 +126,21 @@ class _MobileNumberInputScreenState extends State<MobileNumberInputScreen> {
               SizedBox(
                 height: querySize.height * 0.02,
               ),
-              Center(
-                child: GestureDetector(
-                  onTap: () async {
-                    await openWhatsApp();
-                  },
-                  child: Text(
-                    "Need Help?",
-                    style: TextStyle(
-                      color: appColor,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ),
+              // Center(
+              //   child: GestureDetector(
+              //     onTap: () async {
+              //       await openWhatsApp();
+              //     },
+              //     child: Text(
+              //       "Need Help?",
+              //       style: TextStyle(
+              //         color: appColor,
+              //         fontSize: 16,
+              //         fontWeight: FontWeight.w500,
+              //       ),
+              //     ),
+              //   ),
+              // ),
               SizedBox(
                 height: querySize.height * 0.08,
               )

@@ -102,22 +102,41 @@ class _PersistantBottomNavBarScreenState
   List<PersistentBottomNavBarItem> _buildNavBarItems(Size querySize) {
     return [
       PersistentBottomNavBarItem(
-        inactiveColorPrimary: Colors.black,
+        // inactiveColorPrimary: Colors.black,
         activeColorPrimary: appColor,
         icon: SvgPicture.asset(
-          color: _controller.index == 0 ? appColor : Color(0xFFAAAEAE),
           "assets/images/bottom_nav1/home.svg",
+          //  color: _controller.index == 1 ? appColor : Color(0xFFAAAEAE),
           width: querySize.width * 0.07,
           height: querySize.width * 0.07,
         ),
+        // icon: Image.asset(
+        //   'assets/images/bottom_nav1/home.png',
+        //   width: querySize.width * 0.07,
+        //   height: querySize.width * 0.07,
+        // ),
+        //SvgPicture.asset(
+        //  color: /*_controller.index == 0 ? */ appColor, //: Color(0xFFAAAEAE),
+        //   "assets/images/bottom_nav1/home.svg",
+        //   width: querySize.width * 0.07,
+        //   height: querySize.width * 0.07,
+        // ),
         title: 'Home',
       ),
       PersistentBottomNavBarItem(
         inactiveColorSecondary: Colors.black,
-        inactiveColorPrimary: Colors.black,
-        icon: SvgPicture.asset(
+        // Dynamically change the icon based on the selected index
+        icon:
+            // _controller.index == 1
+            //       ? Image.asset(
+            //           'assets/images/profile/email_icon.png',
+            //           width: querySize.width * 0.07,
+            //           height: querySize.width * 0.07,
+            //         )
+            //       :
+            SvgPicture.asset(
           "assets/images/bottom_nav1/category.svg",
-          color: _controller.index == 1 ? appColor : Color(0xFFAAAEAE),
+          //  color: _controller.index == 1 ? appColor : Color(0xFFAAAEAE),
           width: querySize.width * 0.07,
           height: querySize.width * 0.07,
         ),
@@ -129,7 +148,7 @@ class _PersistantBottomNavBarScreenState
         inactiveColorSecondary: Colors.black,
         inactiveColorPrimary: Colors.black,
         icon: SvgPicture.asset(
-          color: _controller.index == 2 ? appColor : Color(0xFFAAAEAE),
+          //  color: _controller.index == 2 ? appColor : Color(0xFFAAAEAE),
           "assets/images/bottom_nav1/customise.svg",
           width: querySize.width * 0.07,
           height: querySize.width * 0.07,
@@ -139,7 +158,7 @@ class _PersistantBottomNavBarScreenState
       ),
       PersistentBottomNavBarItem(
         icon: SvgPicture.asset(
-          color: _controller.index == 3 ? appColor : Color(0xFFAAAEAE),
+          //  color: _controller.index == 3 ? appColor : Color(0xFFAAAEAE),
           "assets/images/bottom_nav1/repair.svg",
           width: querySize.width * 0.07,
           height: querySize.width * 0.07,
@@ -149,7 +168,7 @@ class _PersistantBottomNavBarScreenState
       ),
       PersistentBottomNavBarItem(
         icon: SvgPicture.asset(
-          color: _controller.index == 4 ? appColor : Color(0xFFAAAEAE),
+          // color: _controller.index == 4 ? appColor : Color(0xFFAAAEAE),
           "assets/images/bottom_nav1/account.svg",
           width: querySize.width * 0.07,
           height: querySize.width * 0.07,
@@ -159,6 +178,66 @@ class _PersistantBottomNavBarScreenState
       ),
     ];
   }
+  // List<PersistentBottomNavBarItem> _buildNavBarItems(Size querySize) {
+  //   return [
+  //     PersistentBottomNavBarItem(
+  //       inactiveColorPrimary: Colors.black,
+  //       activeColorPrimary: appColor,
+  //       icon: SvgPicture.asset(
+  //         color: _controller.index == 0 ? appColor : Color(0xFFAAAEAE),
+  //         "assets/images/bottom_nav1/home.svg",
+  //         width: querySize.width * 0.07,
+  //         height: querySize.width * 0.07,
+  //       ),
+  //       title: 'Home',
+  //     ),
+  //     PersistentBottomNavBarItem(
+  //       inactiveColorSecondary: Colors.black,
+  //       inactiveColorPrimary: Colors.black,
+  //       icon: SvgPicture.asset(
+  //         "assets/images/bottom_nav1/category.svg",
+  //         color: _controller.index == 1 ? appColor : Color(0xFFAAAEAE),
+  //         width: querySize.width * 0.07,
+  //         height: querySize.width * 0.07,
+  //       ),
+  //       title: 'Category',
+  //       activeColorPrimary: appColor,
+  //       activeColorSecondary: appColor,
+  //     ),
+  //     PersistentBottomNavBarItem(
+  //       inactiveColorSecondary: Colors.black,
+  //       inactiveColorPrimary: Colors.black,
+  //       icon: SvgPicture.asset(
+  //         color: _controller.index == 2 ? appColor : Color(0xFFAAAEAE),
+  //         "assets/images/bottom_nav1/customise.svg",
+  //         width: querySize.width * 0.07,
+  //         height: querySize.width * 0.07,
+  //       ),
+  //       title: 'Customise',
+  //       activeColorPrimary: appColor,
+  //     ),
+  //     PersistentBottomNavBarItem(
+  //       icon: SvgPicture.asset(
+  //         color: _controller.index == 3 ? appColor : Color(0xFFAAAEAE),
+  //         "assets/images/bottom_nav1/repair.svg",
+  //         width: querySize.width * 0.07,
+  //         height: querySize.width * 0.07,
+  //       ),
+  //       title: 'Repair',
+  //       activeColorPrimary: appColor,
+  //     ),
+  //     PersistentBottomNavBarItem(
+  //       icon: SvgPicture.asset(
+  //         color: _controller.index == 4 ? appColor : Color(0xFFAAAEAE),
+  //         "assets/images/bottom_nav1/account.svg",
+  //         width: querySize.width * 0.07,
+  //         height: querySize.width * 0.07,
+  //       ),
+  //       title: 'Account',
+  //       activeColorPrimary: appColor,
+  //     ),
+  //   ];
+  // }
 }
 
 // class PersistantBottomNavBarScreen extends StatefulWidget {
@@ -222,75 +301,75 @@ class _PersistantBottomNavBarScreenState
 //     );
 //   }
 
-//   List<PersistentBottomNavBarItem> _buildNavBarItems(Size querySize) {
-//     return [
-//       PersistentBottomNavBarItem(
-//         inactiveColorPrimary: Colors.black,
-//         activeColorPrimary: appColor,
-//         icon: SvgPicture.asset(
-//           color: _controller.index == 0 ? appColor : Color(0xFFAAAEAE),
-//           "assets/images/bottom_nav1/home.svg",
-//           width: querySize.width * 0.07,
-//           height: querySize.width * 0.07,
-//         ),
-//         title: 'Home',
+// List<PersistentBottomNavBarItem> _buildNavBarItems(Size querySize) {
+//   return [
+//     PersistentBottomNavBarItem(
+//       inactiveColorPrimary: Colors.black,
+//       activeColorPrimary: appColor,
+//       icon: SvgPicture.asset(
+//         color: _controller.index == 0 ? appColor : Color(0xFFAAAEAE),
+//         "assets/images/bottom_nav1/home.svg",
+//         width: querySize.width * 0.07,
+//         height: querySize.width * 0.07,
 //       ),
-//       PersistentBottomNavBarItem(
-//         inactiveColorSecondary: Colors.black,
-//         inactiveColorPrimary: Colors.black,
-//         // Dynamically change the icon based on the selected index
-//         icon:
-//             // _controller.index == 1
-//             //       ? Image.asset(
-//             //           'assets/images/profile/email_icon.png',
-//             //           width: querySize.width * 0.07,
-//             //           height: querySize.width * 0.07,
-//             //         )
-//             //       :
-//             SvgPicture.asset(
-//           "assets/images/bottom_nav1/category.svg",
-//           color: _controller.index == 1 ? appColor : Color(0xFFAAAEAE),
-//           width: querySize.width * 0.07,
-//           height: querySize.width * 0.07,
-//         ),
-//         title: 'Category',
-//         activeColorPrimary: appColor,
-//         activeColorSecondary: appColor,
+//       title: 'Home',
+//     ),
+//     PersistentBottomNavBarItem(
+//       inactiveColorSecondary: Colors.black,
+//       inactiveColorPrimary: Colors.black,
+//       // Dynamically change the icon based on the selected index
+//       icon:
+//           // _controller.index == 1
+//           //       ? Image.asset(
+//           //           'assets/images/profile/email_icon.png',
+//           //           width: querySize.width * 0.07,
+//           //           height: querySize.width * 0.07,
+//           //         )
+//           //       :
+//           SvgPicture.asset(
+//         "assets/images/bottom_nav1/category.svg",
+//         color: _controller.index == 1 ? appColor : Color(0xFFAAAEAE),
+//         width: querySize.width * 0.07,
+//         height: querySize.width * 0.07,
 //       ),
-//       PersistentBottomNavBarItem(
-//         inactiveColorSecondary: Colors.black,
-//         inactiveColorPrimary: Colors.black,
-//         icon: SvgPicture.asset(
-//           color: _controller.index == 2 ? appColor : Color(0xFFAAAEAE),
-//           "assets/images/bottom_nav1/customise.svg",
-//           width: querySize.width * 0.07,
-//           height: querySize.width * 0.07,
-//         ),
-//         title: 'Customise',
-//         activeColorPrimary: appColor,
+//       title: 'Category',
+//       activeColorPrimary: appColor,
+//       activeColorSecondary: appColor,
+//     ),
+//     PersistentBottomNavBarItem(
+//       inactiveColorSecondary: Colors.black,
+//       inactiveColorPrimary: Colors.black,
+//       icon: SvgPicture.asset(
+//         color: _controller.index == 2 ? appColor : Color(0xFFAAAEAE),
+//         "assets/images/bottom_nav1/customise.svg",
+//         width: querySize.width * 0.07,
+//         height: querySize.width * 0.07,
 //       ),
-//       PersistentBottomNavBarItem(
-//         icon: SvgPicture.asset(
-//           color: _controller.index == 3 ? appColor : Color(0xFFAAAEAE),
-//           "assets/images/bottom_nav1/repair.svg",
-//           width: querySize.width * 0.07,
-//           height: querySize.width * 0.07,
-//         ),
-//         title: 'Repair',
-//         activeColorPrimary: appColor,
+//       title: 'Customise',
+//       activeColorPrimary: appColor,
+//     ),
+//     PersistentBottomNavBarItem(
+//       icon: SvgPicture.asset(
+//         color: _controller.index == 3 ? appColor : Color(0xFFAAAEAE),
+//         "assets/images/bottom_nav1/repair.svg",
+//         width: querySize.width * 0.07,
+//         height: querySize.width * 0.07,
 //       ),
-//       PersistentBottomNavBarItem(
-//         icon: SvgPicture.asset(
-//           color: _controller.index == 4 ? appColor : Color(0xFFAAAEAE),
-//           "assets/images/bottom_nav1/account.svg",
-//           width: querySize.width * 0.07,
-//           height: querySize.width * 0.07,
-//         ),
-//         title: 'Account',
-//         activeColorPrimary: appColor,
+//       title: 'Repair',
+//       activeColorPrimary: appColor,
+//     ),
+//     PersistentBottomNavBarItem(
+//       icon: SvgPicture.asset(
+//         color: _controller.index == 4 ? appColor : Color(0xFFAAAEAE),
+//         "assets/images/bottom_nav1/account.svg",
+//         width: querySize.width * 0.07,
+//         height: querySize.width * 0.07,
 //       ),
-//     ];
-//   }
+//       title: 'Account',
+//       activeColorPrimary: appColor,
+//     ),
+//   ];
+// }
 // }
 
 

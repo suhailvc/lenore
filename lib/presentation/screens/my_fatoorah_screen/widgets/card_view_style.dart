@@ -1,6 +1,6 @@
 import 'package:myfatoorah_flutter/myfatoorah_flutter.dart';
 
-MFCardViewStyle cardViewStyle() {
+MFCardViewStyle cardViewStyl() {
   MFCardViewStyle style = MFCardViewStyle();
   style.cardHeight = 200;
   style.hideCardIcons = false;

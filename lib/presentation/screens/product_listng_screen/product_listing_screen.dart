@@ -9,6 +9,7 @@ import 'package:lenore/presentation/screens/product_detail_screen/product_detail
 import 'package:lenore/presentation/widgets/custom_snack_bar.dart';
 
 import 'package:lenore/presentation/widgets/custom_top_bar.dart';
+import 'package:lenore/presentation/widgets/multiple_shimmer.dart';
 import 'package:provider/provider.dart';
 
 class ProductListingScreen extends StatefulWidget {
@@ -61,6 +62,8 @@ class _ProductListingScreenState extends State<ProductListingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print(widget.eventId);
+    print(widget.productListingScreenName);
     var querySize = MediaQuery.of(context).size;
     return Scaffold(
         backgroundColor: Colors.white,
@@ -83,7 +86,9 @@ class _ProductListingScreenState extends State<ProductListingScreen> {
                     child: Consumer<GiftProductListingProvider>(
                       builder: (context, productListvalue, child) {
                         if (productListvalue.isLoading && pageNo == 1) {
-                          return lenoreGif(querySize);
+                          return multipleShimmerLoading(
+                              containerHeight: querySize.height * 0.06);
+                          // return lenoreGif(querySize);
                         } else if (productListvalue.productListItems.data ==
                                 null ||
                             productListvalue.productListItems.data!.isEmpty) {
@@ -377,7 +382,16 @@ class _ProductListingScreenState extends State<ProductListingScreen> {
                           top: Radius.circular(querySize.width * 0.05),
                         ),
                       ),
-                      builder: (context) => const FilterScreen(),
+                      builder: (context) => FilterScreen(
+                        onResetFilters: () {
+                          Provider.of<GiftProductListingProvider>(context,
+                                  listen: false)
+                              .productListProviderMethod(
+                                  eventId: widget.eventId.toString(),
+                                  pageNo: 1.toString(),
+                                  isPagination: false);
+                        },
+                      ),
                     );
                   },
                   backgroundColor: const Color(0xFF00ACB3),

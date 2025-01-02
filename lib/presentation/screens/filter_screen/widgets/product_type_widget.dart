@@ -4,10 +4,10 @@ import 'package:lenore/application/provider/sub_category_provider/sub_category_p
 import 'package:provider/provider.dart';
 
 class ProductSubCategory extends StatefulWidget {
-  final String categoryName;
-  final int id;
-  const ProductSubCategory(
-      {required this.categoryName, required this.id, Key? key})
+  final String? categoryName;
+  final int? id;
+
+  const ProductSubCategory({this.categoryName, this.id, Key? key})
       : super(key: key);
 
   @override
@@ -15,7 +15,6 @@ class ProductSubCategory extends StatefulWidget {
 }
 
 class _ProductSubCategoryState extends State<ProductSubCategory> {
-  final List<int> _selectedIndices = [];
   int? _previousCategoryId;
 
   @override
@@ -25,106 +24,117 @@ class _ProductSubCategoryState extends State<ProductSubCategory> {
 
     if (selectedCategoryId != null &&
         selectedCategoryId != _previousCategoryId) {
-      setState(() {
-        _selectedIndices.clear();
-      });
-      Provider.of<SubCategoryProvider>(context, listen: false)
-          .fetchSubCategoriesItems(
-              categoryName: widget.categoryName,
-              id: selectedCategoryId.toString());
+      if (widget.categoryName != null && selectedCategoryId != null) {
+        Provider.of<SubCategoryProvider>(context, listen: false)
+            .fetchSubCategoriesItems(
+          categoryName: widget.categoryName!,
+          id: selectedCategoryId.toString(),
+        );
+      }
       _previousCategoryId = selectedCategoryId;
     }
-  }
-
-  void _onCheckboxChanged(bool? value, int index, int subCategoryId) {
-    setState(() {
-      if (value == true) {
-        _selectedIndices.add(subCategoryId);
-      } else {
-        _selectedIndices.remove(subCategoryId);
-      }
-      Provider.of<FilterProvider>(context, listen: false)
-          .updateSubCategoryIds(_selectedIndices);
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     final Size querySize = MediaQuery.of(context).size;
 
-    return Consumer<SubCategoryProvider>(builder: (context, subValue, child) {
-      double itemHeight = querySize.height * 0.05;
-      double calculatedHeight =
-          itemHeight * subValue.subCategoryItems!.data!.length;
-      if (subValue.subCategoryItems!.data!.isEmpty) {
-        return SizedBox();
-      }
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "Product Sub Category",
-            style: TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.w600,
-              fontFamily: 'Segoe',
-              fontSize: querySize.height * 0.021,
+    return Consumer2<SubCategoryProvider, FilterProvider>(
+      builder: (context, subCategoryProvider, filterProvider, child) {
+        if (subCategoryProvider.subCategoryItems == null ||
+            subCategoryProvider.subCategoryItems!.data == null ||
+            subCategoryProvider.subCategoryItems!.data!.isEmpty) {
+          return const SizedBox();
+        }
+
+        double itemHeight = querySize.height * 0.05;
+        double calculatedHeight =
+            itemHeight * subCategoryProvider.subCategoryItems!.data!.length;
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "Product Sub Category",
+              style: TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.w600,
+                fontFamily: 'Segoe',
+                fontSize: querySize.height * 0.021,
+              ),
             ),
-          ),
-          SizedBox(height: querySize.height * 0.01),
-          SizedBox(
-            height: calculatedHeight < querySize.height * 0.3
-                ? calculatedHeight
-                : querySize.height * 0.3,
-            child: ListView.builder(
-              physics: NeverScrollableScrollPhysics(),
-              itemCount: subValue.subCategoryItems!.data!.length,
-              itemBuilder: (context, index) {
-                int subCategoryId = subValue.subCategoryItems!.data![index].id!;
-                return Row(
-                  children: [
-                    Transform.scale(
-                      scale: querySize.height * 0.0014,
-                      child: Checkbox(
-                        visualDensity: VisualDensity.compact,
-                        value: _selectedIndices.contains(subCategoryId),
-                        activeColor: Colors.black,
-                        onChanged: (value) =>
-                            _onCheckboxChanged(value, index, subCategoryId),
-                        side: MaterialStateBorderSide.resolveWith(
-                          (states) => BorderSide(
-                            width: querySize.width * 0.003,
-                            color: Colors.black,
+            SizedBox(height: querySize.height * 0.01),
+            SizedBox(
+              height: calculatedHeight < querySize.height * 0.3
+                  ? calculatedHeight
+                  : querySize.height * 0.3,
+              child: ListView.builder(
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: subCategoryProvider.subCategoryItems!.data!.length,
+                itemBuilder: (context, index) {
+                  int subCategoryId =
+                      subCategoryProvider.subCategoryItems!.data![index].id ??
+                          0;
+
+                  return Row(
+                    children: [
+                      Transform.scale(
+                        scale: querySize.height * 0.0014,
+                        child: Checkbox(
+                          visualDensity: VisualDensity.compact,
+                          value: filterProvider.selectedSubCategoryIds
+                              .contains(subCategoryId),
+                          activeColor: Colors.black,
+                          onChanged: (value) {
+                            if (value == true) {
+                              filterProvider.updateSubCategoryIds([
+                                ...filterProvider.selectedSubCategoryIds,
+                                subCategoryId,
+                              ]);
+                            } else {
+                              filterProvider.updateSubCategoryIds(
+                                filterProvider.selectedSubCategoryIds
+                                    .where((id) => id != subCategoryId)
+                                    .toList(),
+                              );
+                            }
+                          },
+                          side: MaterialStateBorderSide.resolveWith(
+                            (states) => BorderSide(
+                              width: querySize.width * 0.003,
+                              color: Colors.black,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    SizedBox(width: querySize.width * 0.03),
-                    Text(
-                      subValue.subCategoryItems!.data![index].name ?? '',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w600,
-                        fontFamily: 'Segoe',
-                        fontSize: querySize.height * 0.018,
+                      SizedBox(width: querySize.width * 0.03),
+                      Text(
+                        subCategoryProvider
+                                .subCategoryItems!.data![index].name ??
+                            '',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: 'Segoe',
+                          fontSize: querySize.height * 0.018,
+                        ),
                       ),
-                    ),
-                  ],
-                );
-              },
+                    ],
+                  );
+                },
+              ),
             ),
-          ),
-          const Divider(),
-        ],
-      );
-    });
+            const Divider(),
+          ],
+        );
+      },
+    );
   }
 }
 // class ProductSubCategory extends StatefulWidget {
-//   final String categoryName;
-//   final int id;
-//   const ProductSubCategory(
-//       {required this.categoryName, required this.id, Key? key})
+//   final String? categoryName;
+//   final int? id;
+//   const ProductSubCategory({this.categoryName, this.id, Key? key})
 //       : super(key: key);
 
 //   @override
@@ -132,28 +142,37 @@ class _ProductSubCategoryState extends State<ProductSubCategory> {
 // }
 
 // class _ProductSubCategoryState extends State<ProductSubCategory> {
+//   final List<int> _selectedIndices = [];
+//   int? _previousCategoryId;
+
 //   @override
 //   void didChangeDependencies() {
 //     super.didChangeDependencies();
 //     final selectedCategoryId = Provider.of<FilterProvider>(context).categoryId;
-//     if (selectedCategoryId != null) {
-//       Provider.of<SubCategoryProvider>(context, listen: false)
-//           .fetchSubCategoriesItems(
-//               categoryName: widget.categoryName,
-//               id: selectedCategoryId.toString());
+
+//     if (selectedCategoryId != null &&
+//         selectedCategoryId != _previousCategoryId) {
+//       setState(() {
+//         _selectedIndices.clear();
+//       });
+//       if (widget.categoryName != null && selectedCategoryId != null)
+//         Provider.of<SubCategoryProvider>(context, listen: false)
+//             .fetchSubCategoriesItems(
+//                 categoryName: widget.categoryName!,
+//                 id: selectedCategoryId.toString());
+//       _previousCategoryId = selectedCategoryId;
 //     }
 //   }
 
-//   final String title = "Product Sub Category";
-//   final List<int> _selectedIndices = [];
-
-//   void _onCheckboxChanged(bool? value, int index) {
+//   void _onCheckboxChanged(bool? value, int index, int subCategoryId) {
 //     setState(() {
 //       if (value == true) {
-//         _selectedIndices.add(index);
+//         _selectedIndices.add(subCategoryId);
 //       } else {
-//         _selectedIndices.remove(index);
+//         _selectedIndices.remove(subCategoryId);
 //       }
+//       Provider.of<FilterProvider>(context, listen: false)
+//           .updateSubCategoryIds(_selectedIndices);
 //     });
 //   }
 
@@ -162,17 +181,19 @@ class _ProductSubCategoryState extends State<ProductSubCategory> {
 //     final Size querySize = MediaQuery.of(context).size;
 
 //     return Consumer<SubCategoryProvider>(builder: (context, subValue, child) {
+//       if (subValue.subCategoryItems == null ||
+//           subValue.subCategoryItems!.data == null ||
+//           subValue.subCategoryItems!.data!.isEmpty) {
+//         return SizedBox();
+//       }
 //       double itemHeight = querySize.height * 0.05;
 //       double calculatedHeight =
 //           itemHeight * subValue.subCategoryItems!.data!.length;
-//       if (subValue.subCategoryItems!.data!.isEmpty) {
-//         return SizedBox();
-//       }
 //       return Column(
 //         crossAxisAlignment: CrossAxisAlignment.start,
 //         children: [
 //           Text(
-//             title,
+//             "Product Sub Category",
 //             style: TextStyle(
 //               color: Colors.black,
 //               fontWeight: FontWeight.w600,
@@ -189,232 +210,18 @@ class _ProductSubCategoryState extends State<ProductSubCategory> {
 //               physics: NeverScrollableScrollPhysics(),
 //               itemCount: subValue.subCategoryItems!.data!.length,
 //               itemBuilder: (context, index) {
+//                 int subCategoryId =
+//                     subValue.subCategoryItems!.data![index].id ?? 0;
 //                 return Row(
 //                   children: [
 //                     Transform.scale(
 //                       scale: querySize.height * 0.0014,
 //                       child: Checkbox(
 //                         visualDensity: VisualDensity.compact,
-//                         value: _selectedIndices.contains(index),
+//                         value: _selectedIndices.contains(subCategoryId),
 //                         activeColor: Colors.black,
-//                         onChanged: (value) => _onCheckboxChanged(value, index),
-//                         side: MaterialStateBorderSide.resolveWith(
-//                           (states) => BorderSide(
-//                             width: querySize.width * 0.003,
-//                             color: Colors.black,
-//                           ),
-//                         ),
-//                       ),
-//                     ),
-//                     SizedBox(width: querySize.width * 0.03),
-//                     Text(
-//                       subValue.subCategoryItems!.data![index].name ?? '',
-//                       style: TextStyle(
-//                         color: Colors.black,
-//                         fontWeight: FontWeight.w600,
-//                         fontFamily: 'Segoe',
-//                         fontSize: querySize.height * 0.018,
-//                       ),
-//                     ),
-//                   ],
-//                 );
-//               },
-//             ),
-//           ),
-//           const Divider(),
-//         ],
-//       );
-//     });
-//   }
-// }
-// class ProductSubCategory extends StatefulWidget {
-//   final String categoryName;
-//   final int id;
-//   const ProductSubCategory(
-//       {required this.categoryName, required this.id, Key? key})
-//       : super(key: key);
-
-//   @override
-//   _ProductSubCategoryState createState() => _ProductSubCategoryState();
-// }
-
-// class _ProductSubCategoryState extends State<ProductSubCategory> {
-//   @override
-//   void initState() {
-//     // Provider.of<SubCategoryProvider>(context, listen: false)
-//     //     .fetchSubCategoriesItems(
-//     //         categoryName: widget.categoryName,
-//     //         id: cateogryid.toString() /*widget.id.toString()*/);
-//     super.initState();
-//   }
-
-//   final String title =
-//       "Product Sub Category"; // Title defined directly in state
-
-//   final List<int> _selectedIndices = []; // Tracks selected checkboxes
-
-//   void _onCheckboxChanged(bool? value, int index) {
-//     setState(() {
-//       if (value == true) {
-//         _selectedIndices.add(index);
-//       } else {
-//         _selectedIndices.remove(index);
-//       }
-//     });
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final Size querySize =
-//         MediaQuery.of(context).size; // Screen size for responsiveness
-
-//     return Consumer<SubCategoryProvider>(builder: (context, subValue, child) {
-//       // Calculate dynamic height based on item count
-//       double itemHeight =
-//           querySize.height * 0.05; // approximate height of each item row
-//       double calculatedHeight =
-//           itemHeight * subValue.subCategoryItems!.data!.length;
-//       if (subValue.subCategoryItems!.data!.length == 0) {
-//         return SizedBox();
-//       }
-//       return Column(
-//         crossAxisAlignment: CrossAxisAlignment.start,
-//         children: [
-//           Text(
-//             title,
-//             style: TextStyle(
-//               color: Colors.black,
-//               fontWeight: FontWeight.w600,
-//               fontFamily: 'Segoe',
-//               fontSize: querySize.height * 0.021,
-//             ),
-//           ),
-//           SizedBox(height: querySize.height * 0.01),
-//           SizedBox(
-//             height: calculatedHeight < querySize.height * 0.3
-//                 ? calculatedHeight
-//                 : querySize.height * 0.3,
-//             child: ListView.builder(
-//               physics: NeverScrollableScrollPhysics(),
-//               itemCount: subValue.subCategoryItems!.data!.length,
-//               itemBuilder: (context, index) {
-//                 return Row(
-//                   children: [
-//                     Transform.scale(
-//                       scale: querySize.height * 0.0014,
-//                       child: Checkbox(
-//                         visualDensity: VisualDensity.compact,
-//                         value: _selectedIndices.contains(index),
-//                         activeColor: Colors.black,
-//                         onChanged: (value) => _onCheckboxChanged(value, index),
-//                         side: MaterialStateBorderSide.resolveWith(
-//                           (states) => BorderSide(
-//                             width: querySize.width * 0.003,
-//                             color: Colors.black,
-//                           ),
-//                         ),
-//                       ),
-//                     ),
-//                     SizedBox(width: querySize.width * 0.03),
-//                     Text(
-//                       subValue.subCategoryItems!.data![index].name ?? '',
-//                       style: TextStyle(
-//                         color: Colors.black,
-//                         fontWeight: FontWeight.w600,
-//                         fontFamily: 'Segoe',
-//                         fontSize: querySize.height * 0.018,
-//                       ),
-//                     ),
-//                   ],
-//                 );
-//               },
-//             ),
-//           ),
-//           const Divider(),
-//         ],
-//       );
-//     });
-//   }
-// }
-// class ProductType extends StatefulWidget {
-//   final String categoryName;
-//   final int id;
-//   const ProductType({required this.categoryName, required this.id, Key? key})
-//       : super(key: key);
-
-//   @override
-//   _ProductTypeState createState() => _ProductTypeState();
-// }
-
-// class _ProductTypeState extends State<ProductType> {
-//   @override
-//   void initState() {
-//     // Provider.of<SubCategoryProvider>(context, listen: false)
-//     //     .fetchSubCategoriesItems(
-//     //         categoryName: widget.categoryName,
-//     //         id: cateogryid.toString() /*widget.id.toString()*/);
-//     super.initState();
-//   }
-
-//   final String title =
-//       "Product Sub Category"; // Title defined directly in state
-
-//   final List<int> _selectedIndices = []; // Tracks selected checkboxes
-
-//   void _onCheckboxChanged(bool? value, int index) {
-//     setState(() {
-//       if (value == true) {
-//         _selectedIndices.add(index);
-//       } else {
-//         _selectedIndices.remove(index);
-//       }
-//     });
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final Size querySize =
-//         MediaQuery.of(context).size; // Screen size for responsiveness
-
-//     return Consumer<SubCategoryProvider>(builder: (context, subValue, child) {
-//       // Calculate dynamic height based on item count
-//       double itemHeight =
-//           querySize.height * 0.05; // approximate height of each item row
-//       double calculatedHeight =
-//           itemHeight * subValue.subCategoryItems!.data!.length;
-//       if (subValue.subCategoryItems!.data!.length == 0) {
-//         return SizedBox();
-//       }
-//       return Column(
-//         crossAxisAlignment: CrossAxisAlignment.start,
-//         children: [
-//           Text(
-//             title,
-//             style: TextStyle(
-//               color: Colors.black,
-//               fontWeight: FontWeight.w600,
-//               fontFamily: 'Segoe',
-//               fontSize: querySize.height * 0.021,
-//             ),
-//           ),
-//           SizedBox(height: querySize.height * 0.01),
-//           SizedBox(
-//             height: calculatedHeight < querySize.height * 0.3
-//                 ? calculatedHeight
-//                 : querySize.height * 0.3,
-//             child: ListView.builder(
-//               physics: NeverScrollableScrollPhysics(),
-//               itemCount: subValue.subCategoryItems!.data!.length,
-//               itemBuilder: (context, index) {
-//                 return Row(
-//                   children: [
-//                     Transform.scale(
-//                       scale: querySize.height * 0.0014,
-//                       child: Checkbox(
-//                         visualDensity: VisualDensity.compact,
-//                         value: _selectedIndices.contains(index),
-//                         activeColor: Colors.black,
-//                         onChanged: (value) => _onCheckboxChanged(value, index),
+//                         onChanged: (value) =>
+//                             _onCheckboxChanged(value, index, subCategoryId),
 //                         side: MaterialStateBorderSide.resolveWith(
 //                           (states) => BorderSide(
 //                             width: querySize.width * 0.003,
@@ -445,4 +252,4 @@ class _ProductSubCategoryState extends State<ProductSubCategory> {
 //   }
 // }
 
-int? cateogryid;
+//int? cateogryid;

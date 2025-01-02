@@ -11,6 +11,7 @@ import 'package:lenore/presentation/screens/product_detail_screen/product_detail
 import 'package:lenore/presentation/widgets/custom_snack_bar.dart';
 
 import 'package:lenore/presentation/widgets/custom_top_bar.dart';
+import 'package:lenore/presentation/widgets/multiple_shimmer.dart';
 import 'package:lenore/presentation/widgets/name_top_bar.dart';
 import 'package:lenore/presentation/widgets/sign_out_widget.dart';
 import 'package:provider/provider.dart';
@@ -63,7 +64,9 @@ class _WishListScreenState extends State<WishListScreen> {
                       if (wishlistProvider.isLoading &&
                           !wishlistProvider.isFirstLoadCompleted) {
                         // Show loading indicator only on the first load
-                        return lenoreGif(querySize);
+                        return multipleShimmerLoading(
+                            containerHeight: querySize.height * 0.06);
+                        // return lenoreGif(querySize);
                       } else if (wishlistProvider.wishlist == null ||
                           wishlistProvider.wishlist!.data.isEmpty) {
                         return Center(

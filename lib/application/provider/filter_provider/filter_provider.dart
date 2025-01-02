@@ -19,7 +19,7 @@ class FilterProvider with ChangeNotifier {
   List<int> get selectedCollectionIds => _selectedCollectionIds;
   List<int> get selectedGoldPurities => _selectedGoldPurities;
 
-  void updateCategoryId(int id) {
+  void updateCategoryId(int? id) {
     _categoryId = id;
     notifyListeners();
   }

@@ -1,6 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:lenore/application/provider/auth_provider/auth_provider.dart';
 import 'package:lenore/application/provider/delivery_fee_provider/delivery_fee_provider.dart';
 
@@ -14,9 +15,9 @@ import 'package:lenore/application/provider/home_provider/best_seller_provider/b
 import 'package:lenore/application/provider/new_aarival_provider/new_arrival_provider.dart';
 import 'package:lenore/application/provider/wishlist_provider/whishlist_provider.dart';
 import 'package:lenore/core/constant.dart';
-
 import 'package:lenore/presentation/screens/best_seller_new_arrival_listing_screen/best_seller_new_arrival_listing_screen.dart';
 import 'package:lenore/presentation/screens/collection_screen/collection_screen.dart';
+import 'package:lenore/presentation/screens/customise/customise.dart';
 import 'package:lenore/presentation/screens/gift_by%20category_screen/gift_by_category_screen.dart';
 import 'package:lenore/presentation/screens/gift_by_event_screen/gift_by_event_screen.dart';
 import 'package:lenore/presentation/screens/gift_by_voucher_detail_screen.dart/gift_by_voucher_detail_screen.dart';
@@ -26,9 +27,11 @@ import 'package:lenore/presentation/screens/home/widgets/custom_home_section_tit
 import 'package:lenore/presentation/screens/home/widgets/custom_home_top_bar.dart';
 import 'package:lenore/presentation/screens/home/widgets/custom_new_arrival_home.dart';
 import 'package:lenore/presentation/screens/product_detail_screen/product_detail_screen.dart';
+import 'package:lenore/presentation/screens/repair_screen/repair_screen.dart';
 
 import 'package:lenore/presentation/screens/sub_category_product_listing_screen/sub_category_product_listing_screen.dart';
 import 'package:lenore/presentation/screens/sub_category_screen/sub_category_screen.dart';
+import 'package:lenore/presentation/widgets/custom_profile_top_bar.dart';
 import 'package:lenore/presentation/widgets/custom_snack_bar.dart';
 import 'package:lenore/presentation/widgets/cutom_bottom_bar_top_bar.dart';
 import 'package:lenore/presentation/widgets/shimmer_widget.dart';
@@ -52,11 +55,13 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     print('hiiiiiiiiiiiiiiiiiiiiiiiiii');
-    // Fetch data as soon as the screen loads
+
+    //  Fetch data as soon as the screen loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<GiftByCategoryProvider>(context, listen: false)
           .giftByCategoryProviderMethod();
     });
+    Provider.of<DeliveryFeeProvider>(context, listen: false).fetchDeliveryFee();
     Provider.of<GiftByVoucherProvider>(context, listen: false)
         .fetchGiftByVoucherItems();
     Provider.of<GiftByEventProvider>(context, listen: false)
@@ -152,71 +157,218 @@ class _HomeScreenState extends State<HomeScreen> {
                                 return Padding(
                                   padding: EdgeInsets.symmetric(
                                       horizontal: querySize.width * 0.02),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(
-                                        querySize.height * 0.02),
-                                    child: Container(
-                                      width: double.infinity,
-                                      height: querySize.height * 0.24,
-                                      decoration: BoxDecoration(
-                                        image: DecorationImage(
-                                          image: NetworkImage(
-                                            homeBannerProvidervalue
-                                                .giftByVoucherItems
-                                                .data![index]
-                                                .image!,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      String? screen = homeBannerProvidervalue
+                                          .giftByVoucherItems
+                                          .data![index]
+                                          .screen;
+
+                                      if (screen == "best-seller" ||
+                                          screen == "new-arrival") {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                BestSellerNewArrivalListingScreen(
+                                              eventName: screen!,
+                                              productListingScreenName:
+                                                  homeBannerProvidervalue
+                                                          .giftByVoucherItems
+                                                          .data![index]
+                                                          .screenName ??
+                                                      '',
+                                            ),
                                           ),
-                                          fit: BoxFit.cover,
+                                        );
+                                      } else if (screen == "gift-by-event" ||
+                                          screen == "sub-category" ||
+                                          screen == "collections") {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                SubCategoryProductListingScreen(
+                                              eventId: int.parse(
+                                                  homeBannerProvidervalue
+                                                      .giftByVoucherItems
+                                                      .data![index]
+                                                      .screenId!),
+                                              eventName: homeBannerProvidervalue
+                                                  .giftByVoucherItems
+                                                  .data![index]
+                                                  .screen!,
+                                              productListingScreenName:
+                                                  homeBannerProvidervalue
+                                                          .giftByVoucherItems
+                                                          .data![index]
+                                                          .screenName ??
+                                                      '',
+                                            ),
+                                          ),
+                                        );
+                                      } else if (screen == "products") {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                ProductDetailScreen(
+                                              productId: int.parse(
+                                                  homeBannerProvidervalue
+                                                      .giftByVoucherItems
+                                                      .data![index]
+                                                      .screenId!),
+                                            ),
+                                          ),
+                                        );
+                                      } else if (screen == "customisation") {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                CustomisationScreen(
+                                              widgetName: customProfileTopBar(
+                                                querySize,
+                                                context,
+                                                "Customize",
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      } else if (screen == "repair") {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => RepairScreen(
+                                              widgetName: customProfileTopBar(
+                                                  querySize, context, "Repair"),
+                                            ),
+                                          ),
+                                        );
+                                      } else if (screen == "gift-voucher") {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                GiftByVoucherScreen(
+                                              giftByVoucherProvider: Provider
+                                                  .of<GiftByVoucherProvider>(
+                                                      context,
+                                                      listen: false),
+                                            ),
+                                          ),
+                                        );
+                                      } else {
+                                        // Handle unknown or null screen values
+                                        debugPrint("Unknown screen: $screen");
+                                      }
+                                    },
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(
+                                          querySize.height * 0.02),
+                                      child: Container(
+                                        width: double.infinity,
+                                        height: querySize.height * 0.24,
+                                        decoration: BoxDecoration(
+                                          image: DecorationImage(
+                                            image: NetworkImage(
+                                              homeBannerProvidervalue
+                                                  .giftByVoucherItems
+                                                  .data![index]
+                                                  .image!,
+                                            ),
+                                            fit: BoxFit.cover,
+                                          ),
                                         ),
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(
-                                            16.0), // Adjust padding as needed
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            SizedBox(
-                                              height: querySize.height * 0.07,
-                                            ),
-                                            Row(
-                                              children: [
-                                                SizedBox(
-                                                  width: querySize.width * 0.02,
-                                                ),
-                                                Flexible(
-                                                  child: Text(
-                                                    homeBannerProvidervalue
-                                                            .giftByVoucherItems
-                                                            .data![index]
-                                                            .titleOne ??
-                                                        "", // Replace with the desired text property
-                                                    style: TextStyle(
-                                                      fontFamily: 'ElMessiri',
-                                                      color: Colors.white,
-                                                      fontSize: 18,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      shadows: [
-                                                        Shadow(
-                                                          blurRadius: 5.0,
-                                                          color: Colors.black
-                                                              .withOpacity(0.7),
-                                                          offset:
-                                                              Offset(2.0, 2.0),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    maxLines:
-                                                        3, // Limits to 1 line and adds ellipsis if overflow
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(
+                                              16.0), // Adjust padding as needed
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              SizedBox(
+                                                height: querySize.height * 0.05,
+                                              ),
+                                              Row(
+                                                children: [
+                                                  SizedBox(
+                                                    width:
+                                                        querySize.width * 0.02,
                                                   ),
-                                                ),
-                                              ],
-                                            ),
-                                            // Add other content below the text if needed
-                                          ],
+                                                  Flexible(
+                                                    child: Text(
+                                                      homeBannerProvidervalue
+                                                              .giftByVoucherItems
+                                                              .data![index]
+                                                              .titleOne ??
+                                                          "", // Replace with the desired text property
+                                                      style: TextStyle(
+                                                        fontFamily: 'ElMessiri',
+                                                        color: Colors.white,
+                                                        fontSize: 18,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        shadows: [
+                                                          Shadow(
+                                                            blurRadius: 5.0,
+                                                            color: Colors.black
+                                                                .withOpacity(
+                                                                    0.7),
+                                                            offset: Offset(
+                                                                2.0, 2.0),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      maxLines:
+                                                          3, // Limits to 1 line and adds ellipsis if overflow
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              Row(
+                                                children: [
+                                                  SizedBox(
+                                                    width:
+                                                        querySize.width * 0.02,
+                                                  ),
+                                                  Flexible(
+                                                    child: Text(
+                                                      homeBannerProvidervalue
+                                                              .giftByVoucherItems
+                                                              .data![index]
+                                                              .description ??
+                                                          '', // Replace with the desired text property
+                                                      style: TextStyle(
+                                                        fontFamily: 'ElMessiri',
+                                                        color: Colors.white,
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        shadows: [
+                                                          Shadow(
+                                                            blurRadius: 5.0,
+                                                            color: Colors.black
+                                                                .withOpacity(
+                                                                    0.7),
+                                                            offset: Offset(
+                                                                2.0, 2.0),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      maxLines:
+                                                          3, // Limits to 1 line and adds ellipsis if overflow
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              // Add other content below the text if needed
+                                            ],
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -250,75 +402,6 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ],
                         );
-
-                        // return Column(
-                        //   children: [
-                        //     CarouselSlider.builder(
-                        //         itemCount: homeBannerProvidervalue
-                        //             .giftByVoucherItems.data!.length,
-                        //         itemBuilder: (context, index, realIndex) {
-                        //           return Padding(
-                        //             padding: EdgeInsets.symmetric(
-                        //                 horizontal: querySize.width * 0.02),
-                        //             child: ClipRRect(
-                        //               borderRadius: BorderRadius.circular(
-                        //                   querySize.height * 0.02),
-                        //               child: Image.network(
-                        //                 homeBannerProvidervalue
-                        //                     .giftByVoucherItems
-                        //                     .data![index]
-                        //                     .image!,
-                        //                 fit: BoxFit.cover,
-                        //                 // width: double
-                        //                 //     .infinity, // Ensures the image takes full width of its parent
-                        //                 // height: double
-                        //                 //     .infinity, // Ensures the image takes full height of its parent
-                        //               ),
-                        //             ),
-                        //           );
-
-                        //           // return Container(
-                        //           //   margin: EdgeInsets.only(
-                        //           //       right: querySize.width * 0.025),
-                        //           //   decoration: BoxDecoration(
-                        //           //     borderRadius: BorderRadius.circular(
-                        //           //         querySize.height * 0.01),
-                        //           //     image: DecorationImage(
-                        //           //       image: NetworkImage(
-                        //           //           homeBannerProvidervalue
-                        //           //               .giftByVoucherItems
-                        //           //               .data![index]
-                        //           //               .image!),
-                        //           //       fit: BoxFit.cover,
-                        //           //     ),
-                        //           //   ),
-                        //           // );
-                        //         },
-                        //         options: CarouselOptions(
-                        //             onPageChanged: (index, reason) {
-                        //               setState(() {
-                        //                 activeIndex = index;
-                        //               });
-                        //             },
-                        //             viewportFraction: 1,
-                        //             height: querySize.height * 0.24,
-                        //             autoPlay: true,
-                        //             autoPlayInterval:
-                        //                 const Duration(seconds: 5))),
-                        //     SizedBox(
-                        //       height: querySize.height * 0.01,
-                        //     ),
-                        //     AnimatedSmoothIndicator(
-                        //       activeIndex: activeIndex,
-                        //       count: homeBannerProvidervalue
-                        //           .giftByVoucherItems.data!.length,
-                        //       effect: SlideEffect(
-                        //           dotHeight: querySize.height * 0.008,
-                        //           dotWidth: querySize.width * 0.018,
-                        //           activeDotColor: appColor),
-                        //     )
-                        //   ],
-                        // );
                       }
                     },
                   ),

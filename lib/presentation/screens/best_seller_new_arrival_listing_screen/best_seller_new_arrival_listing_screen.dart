@@ -777,7 +777,17 @@ class _BestSellerNewArrivalListingScreenState
                     top: Radius.circular(querySize.width * 0.05),
                   ),
                 ),
-                builder: (context) => const FilterScreen(),
+                builder: (context) => FilterScreen(
+                  onResetFilters: () {
+                    Provider.of<BestsellerNewAarivalProductListProvider>(
+                            context,
+                            listen: false)
+                        .bestsellerNewAarivalProviderMethod(
+                            eventName: widget.eventName,
+                            pageNo: 1.toString(),
+                            isPagination: false);
+                  },
+                ),
               );
             },
             backgroundColor: const Color(0xFF00ACB3),

@@ -139,7 +139,7 @@ class CartScreen extends StatelessWidget {
                             Row(
                               children: [
                                 Text(
-                                  "Discount",
+                                  "Voucher Discount",
                                   style: TextStyle(
                                       fontWeight: FontWeight.w500,
                                       color: const Color(0xFF201A25),
@@ -148,7 +148,7 @@ class CartScreen extends StatelessWidget {
                                 ),
                                 const Spacer(),
                                 Text(
-                                  "00",
+                                  "QAR ${cartProvider.totalVoucherDiscount.toStringAsFixed(2)}",
                                   style: TextStyle(
                                       fontWeight: FontWeight.w400,
                                       color: const Color(0xFFC3C6C9),

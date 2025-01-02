@@ -12,8 +12,6 @@ class ProductCategoryWidget extends StatefulWidget {
 }
 
 class _ProductCategoryWidgetState extends State<ProductCategoryWidget> {
-  int? _selectedIndex;
-
   @override
   void initState() {
     super.initState();
@@ -21,29 +19,20 @@ class _ProductCategoryWidgetState extends State<ProductCategoryWidget> {
         .giftByCategoryProviderMethod();
   }
 
-  void _onCheckboxChanged(bool? value, int index, int categoryId) {
-    setState(() {
-      _selectedIndex = value == true ? index : null;
-      if (value == true) {
-        Provider.of<FilterProvider>(context, listen: false)
-            .updateCategoryId(categoryId);
-      }
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final Size querySize = MediaQuery.of(context).size;
 
     return Consumer2<GiftByCategoryProvider, FilterProvider>(
-        builder: (context, categoryValue, filterValue, child) {
+        builder: (context, categoryProvider, filterProvider, child) {
       double itemHeight = querySize.height * 0.05;
       double calculatedHeight =
-          itemHeight * categoryValue.cachedResponse!.data!.length;
+          itemHeight * (categoryProvider.cachedResponse?.data?.length ?? 0);
 
-      if (categoryValue.cachedResponse!.data!.isEmpty) {
-        return SizedBox();
+      if (categoryProvider.cachedResponse?.data?.isEmpty ?? true) {
+        return const SizedBox();
       }
+
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -62,20 +51,26 @@ class _ProductCategoryWidgetState extends State<ProductCategoryWidget> {
                 ? calculatedHeight
                 : querySize.height * 0.3,
             child: ListView.builder(
-              physics: NeverScrollableScrollPhysics(),
-              itemCount: categoryValue.cachedResponse!.data!.length,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: categoryProvider.cachedResponse!.data!.length,
               itemBuilder: (context, index) {
-                int categoryId = categoryValue.cachedResponse!.data![index].id!;
+                int categoryId =
+                    categoryProvider.cachedResponse!.data![index].id!;
                 return Row(
                   children: [
                     Transform.scale(
                       scale: querySize.height * 0.0014,
                       child: Checkbox(
                         visualDensity: VisualDensity.compact,
-                        value: _selectedIndex == index,
+                        value: filterProvider.categoryId == categoryId,
                         activeColor: Colors.black,
-                        onChanged: (value) =>
-                            _onCheckboxChanged(value, index, categoryId),
+                        onChanged: (value) {
+                          if (value == true) {
+                            filterProvider.updateCategoryId(categoryId);
+                          } else {
+                            filterProvider.updateCategoryId(null);
+                          }
+                        },
                         side: MaterialStateBorderSide.resolveWith(
                           (states) => BorderSide(
                             width: querySize.width * 0.003,
@@ -86,7 +81,7 @@ class _ProductCategoryWidgetState extends State<ProductCategoryWidget> {
                     ),
                     SizedBox(width: querySize.width * 0.03),
                     Text(
-                      categoryValue.cachedResponse!.data![index].name ?? '',
+                      categoryProvider.cachedResponse!.data![index].name ?? '',
                       style: TextStyle(
                         color: Colors.black,
                         fontWeight: FontWeight.w600,
@@ -113,11 +108,13 @@ class _ProductCategoryWidgetState extends State<ProductCategoryWidget> {
 // }
 
 // class _ProductCategoryWidgetState extends State<ProductCategoryWidget> {
+//   int? _selectedIndex;
+
 //   @override
 //   void initState() {
+//     super.initState();
 //     Provider.of<GiftByCategoryProvider>(context, listen: false)
 //         .giftByCategoryProviderMethod();
-//     super.initState();
 //   }
 
 //   void _onCheckboxChanged(bool? value, int index, int categoryId) {
@@ -130,29 +127,16 @@ class _ProductCategoryWidgetState extends State<ProductCategoryWidget> {
 //     });
 //   }
 
-//   final String title = "Product Type"; // Title defined directly in state
-//   int? _selectedIndex; // Track only a single selected checkbox
-
-//   // void _onCheckboxChanged(bool? value, int index, int categoryId) {
-//   //   setState(() {
-//   //     _selectedIndex = value == true ? index : null;
-//   //     if (value == true) {
-//   //       Provider.of<FilterProvider>(context, listen: false)
-//   //           .updateCategoryId(categoryId);
-//   //     }
-//   //   });
-//   // }
-
 //   @override
 //   Widget build(BuildContext context) {
 //     final Size querySize = MediaQuery.of(context).size;
 
-//     return Consumer<GiftByCategoryProvider>(
-//         builder: (context, categoryValue, child) {
-//       print(categoryValue.cachedResponse!.data!.length);
+//     return Consumer2<GiftByCategoryProvider, FilterProvider>(
+//         builder: (context, categoryValue, filterValue, child) {
 //       double itemHeight = querySize.height * 0.05;
 //       double calculatedHeight =
 //           itemHeight * categoryValue.cachedResponse!.data!.length;
+
 //       if (categoryValue.cachedResponse!.data!.isEmpty) {
 //         return SizedBox();
 //       }
@@ -160,7 +144,7 @@ class _ProductCategoryWidgetState extends State<ProductCategoryWidget> {
 //         crossAxisAlignment: CrossAxisAlignment.start,
 //         children: [
 //           Text(
-//             title,
+//             "Product Type",
 //             style: TextStyle(
 //               color: Colors.black,
 //               fontWeight: FontWeight.w600,
@@ -170,13 +154,12 @@ class _ProductCategoryWidgetState extends State<ProductCategoryWidget> {
 //           ),
 //           SizedBox(height: querySize.height * 0.01),
 //           SizedBox(
-//             height: /*querySize.height * 0.4,*/
-//                 calculatedHeight < querySize.height * 0.3
-//                     ? calculatedHeight
-//                     : querySize.height * 0.3,
+//             height: calculatedHeight < querySize.height * 0.3
+//                 ? calculatedHeight
+//                 : querySize.height * 0.3,
 //             child: ListView.builder(
 //               physics: NeverScrollableScrollPhysics(),
-//               itemCount: 7,
+//               itemCount: categoryValue.cachedResponse!.data!.length,
 //               itemBuilder: (context, index) {
 //                 int categoryId = categoryValue.cachedResponse!.data![index].id!;
 //                 return Row(

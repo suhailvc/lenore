@@ -28,6 +28,7 @@ import 'package:lenore/application/provider/new_aarival_provider/new_arrival_pro
 import 'package:lenore/application/provider/notification_provider/notification_provider.dart';
 import 'package:lenore/application/provider/order_detail_provider/order_detail_provider.dart';
 import 'package:lenore/application/provider/order_history_provider/order_history_provider.dart';
+import 'package:lenore/application/provider/order_status_provider/order_status_provider.dart';
 import 'package:lenore/application/provider/otp_provider/otp_provider.dart';
 import 'package:lenore/application/provider/gift_product_listing_provider/gift_product_listing_provider.dart';
 import 'package:lenore/application/provider/payment_provider/payment_provider.dart';
@@ -42,6 +43,7 @@ import 'package:lenore/application/provider/user_registration_provider/user_regi
 import 'package:lenore/application/provider/voucher_detail_provider/voucher_detail_provider.dart';
 import 'package:lenore/application/provider/wishlist_provider/whishlist_provider.dart';
 import 'package:lenore/domain/hive_model/hive_cart_model/hive_cart_model.dart';
+import 'package:lenore/domain/order_status_model/order_status_model.dart';
 
 import 'package:lenore/presentation/screens/splash/splash_screen.dart';
 
@@ -49,19 +51,46 @@ import 'package:myfatoorah_flutter/myfatoorah_flutter.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
+  // Ensure Flutter binding is initialized
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Hive
   await Hive.initFlutter();
   if (!Hive.isAdapterRegistered(HiveCartModelAdapter().typeId)) {
     Hive.registerAdapter(HiveCartModelAdapter());
   }
-  MFSDK.init(
+  await Hive.openBox<HiveCartModel>('cartBox');
+
+  // Initialize MFSDK with proper error handling
+  try {
+    debugPrint("Initializing MFSDK...");
+    await MFSDK.init(
       "rLtt6JWvbUHDDhsZnfpAhpYk4dxYDQkbcPTyGaKp2TYqQgG7FGZ5Th_WD53Oq8Ebz6A53njUoo1w3pjU1D4vs_ZMqFiz_j0urb_BH9Oq9VZoKFoJEDAbRZepGcQanImyYrry7Kt6MnMdgfG5jn4HngWoRdKduNNyP4kzcp3mRv7x00ahkm9LAK7ZRieg7k1PDAnBIOG3EyVSJ5kK4WLMvYr7sCwHbHcu4A5WwelxYK0GMJy37bNAarSJDFQsJ2ZvJjvMDmfWwDVFEVe_5tOomfVNt6bOg9mexbGjMrnHBnKnZR1vQbBtQieDlQepzTZMuQrSuKn-t5XZM7V6fCW7oP-uXGX-sMOajeX65JOf6XVpk29DP6ro8WTAflCDANC193yof8-f5_EYY-3hXhJj7RBXmizDpneEQDSaSz5sFk0sV5qPcARJ9zGG73vuGFyenjPPmtDtXtpx35A-BVcOSBYVIWe9kndG3nclfefjKEuZ3m4jL9Gg1h2JBvmXSMYiZtp9MR5I6pvbvylU_PP5xJFSjVTIz7IQSjcVGO41npnwIxRXNRxFOdIUHn0tjQ-7LwvEcTXyPsHXcMD8WtgBh-wxR8aKX7WPSsT1O8d8reb2aR7K3rkV3K82K_0OgawImEpwSvp9MNKynEAJQS6ZHe_J_l77652xwPNxMRTMASk1ZsJL",
       MFCountry.KUWAIT,
-      MFEnvironment.TEST);
-  await Hive.openBox<HiveCartModel>('cartBox');
-  // Routes.initializeRouter();
+      MFEnvironment.TEST,
+    );
+    debugPrint("MFSDK initialized successfully");
+  } catch (e) {
+    debugPrint("Error initializing MFSDK: $e");
+  }
+
   runApp(const MyApp());
 }
+// void main() async {
+//   WidgetsFlutterBinding.ensureInitialized();
+//   await Hive.initFlutter();
+//   if (!Hive.isAdapterRegistered(HiveCartModelAdapter().typeId)) {
+//     Hive.registerAdapter(HiveCartModelAdapter());
+//   }
+//   await Hive.openBox<HiveCartModel>('cartBox');
+//   MFSDK.init(
+//       "rLtt6JWvbUHDDhsZnfpAhpYk4dxYDQkbcPTyGaKp2TYqQgG7FGZ5Th_WD53Oq8Ebz6A53njUoo1w3pjU1D4vs_ZMqFiz_j0urb_BH9Oq9VZoKFoJEDAbRZepGcQanImyYrry7Kt6MnMdgfG5jn4HngWoRdKduNNyP4kzcp3mRv7x00ahkm9LAK7ZRieg7k1PDAnBIOG3EyVSJ5kK4WLMvYr7sCwHbHcu4A5WwelxYK0GMJy37bNAarSJDFQsJ2ZvJjvMDmfWwDVFEVe_5tOomfVNt6bOg9mexbGjMrnHBnKnZR1vQbBtQieDlQepzTZMuQrSuKn-t5XZM7V6fCW7oP-uXGX-sMOajeX65JOf6XVpk29DP6ro8WTAflCDANC193yof8-f5_EYY-3hXhJj7RBXmizDpneEQDSaSz5sFk0sV5qPcARJ9zGG73vuGFyenjPPmtDtXtpx35A-BVcOSBYVIWe9kndG3nclfefjKEuZ3m4jL9Gg1h2JBvmXSMYiZtp9MR5I6pvbvylU_PP5xJFSjVTIz7IQSjcVGO41npnwIxRXNRxFOdIUHn0tjQ-7LwvEcTXyPsHXcMD8WtgBh-wxR8aKX7WPSsT1O8d8reb2aR7K3rkV3K82K_0OgawImEpwSvp9MNKynEAJQS6ZHe_J_l77652xwPNxMRTMASk1ZsJL",
+//       MFCountry.KUWAIT,
+//       MFEnvironment.TEST);
+
+//   // Routes.initializeRouter();
+//   runApp(const MyApp());
+// }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -180,6 +209,9 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (context) => DeliveryFeeProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => OrderStatusProvider(),
         ),
       ],
       child: MaterialApp(

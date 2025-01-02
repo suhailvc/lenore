@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:lenore/application/provider/home_provider/gift_by_voucher_provider/gift_by_voucher_provider.dart';
+
 import 'package:lenore/application/provider/sub_category_provider/sub_category_provider.dart';
 import 'package:lenore/core/constant.dart';
-import 'package:lenore/domain/sub_category_model/sub_category_model.dart';
-import 'package:lenore/presentation/screens/sub_category_product_listing_screen/sub_category_product_listing_screen.dart';
 
 import 'package:lenore/presentation/screens/sub_category_screen/widget/sub_category_product_card.dart';
 import 'package:lenore/presentation/widgets/custom_top_bar.dart';
+import 'package:lenore/presentation/widgets/multiple_shimmer.dart';
+
 import 'package:provider/provider.dart';
 
 class SubCategoryScreen extends StatefulWidget {
@@ -34,6 +34,7 @@ class _SubCategoryScreenState extends State<SubCategoryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print("------------------------------------${widget.categoryName}");
     var querySize = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: Colors.white,
@@ -59,7 +60,9 @@ class _SubCategoryScreenState extends State<SubCategoryScreen> {
               Consumer<SubCategoryProvider>(
                 builder: (context, subCategoryvalue, child) {
                   if (subCategoryvalue.isLoading) {
-                    return lenoreGif(querySize);
+                    return multipleShimmerLoading(
+                        containerHeight: querySize.height * 0.04);
+                    //  return lenoreGif(querySize);
                   } else if (subCategoryvalue.error ==
                       "No data available for this category") {
                     return Container(

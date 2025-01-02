@@ -1,13 +1,43 @@
 import 'package:flutter/material.dart';
+import 'package:lenore/infrastructure/payment_api/my_fatoorah_api.dart';
 import 'package:lenore/infrastructure/payment_api/payment_api.dart';
 
 class PaymentProvider extends ChangeNotifier {
   bool _isLoading = false;
-  String? response;
+  int? response;
 
   bool get isLoading => _isLoading;
+  // New method to update order status using invoiceIdService
+  Future<Map<String, dynamic>> updateOrderStatus({
+    required String token,
+    required String orderId,
+    required String invoiceId,
+  }) async {
+    _setLoading(true);
 
-  Future<String> placeOrder({
+    try {
+      var response = await invoiceIdService(
+        orderId: orderId,
+        invoiceId: invoiceId,
+        token: token,
+      );
+
+      // Handle success/failure
+      if (response['status'] == 'success') {
+        print('Order status updated successfully');
+      } else {
+        print('Failed to update order status: ${response['message']}');
+      }
+      return response;
+    } catch (error) {
+      print('Error updating order status: $error');
+      return {'status': 'error', 'message': 'Something went wrong'};
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  Future<int?> placeOrder({
     required String token,
     required String addressId,
     required String paymentMethod,
@@ -32,10 +62,10 @@ class PaymentProvider extends ChangeNotifier {
         deliveryCharge: deliveryCharge,
         quantity: quantity,
       );
-      return response ?? 'error';
+      return response;
     } catch (error) {
       print('Error placing order: $error');
-      return 'error';
+      return null;
     } finally {
       _setLoading(false);
     }

@@ -3,6 +3,7 @@ import 'package:lenore/application/provider/auth_provider/auth_provider.dart';
 import 'package:lenore/core/constant.dart';
 import 'package:lenore/presentation/screens/account_screen/widgets/constant.dart';
 import 'package:lenore/presentation/screens/account_screen/widgets/customAccountListTile.dart';
+import 'package:lenore/presentation/screens/account_screen/widgets/privacy_policy_widget.dart';
 import 'package:lenore/presentation/screens/account_screen/widgets/whats_app.dart';
 import 'package:lenore/presentation/screens/customise/customise.dart';
 import 'package:lenore/presentation/screens/language_selection_screen/language_selection_screen.dart';
@@ -96,7 +97,7 @@ class AccountScreen extends StatelessWidget {
                   customHeightThree(querySize),
                   Container(
                     width: querySize.width * (345 / 375),
-                    height: querySize.height * (189 / 812),
+                    height: querySize.height * (135 / 812),
                     decoration: BoxDecoration(
                       color: accountContainerColor,
                       borderRadius:
@@ -129,55 +130,55 @@ class AccountScreen extends StatelessWidget {
                         SizedBox(
                           height: querySize.height * 0.015,
                         ),
-                        Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: querySize.width * 0.05),
-                          child: GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const LanguageSelectionScreen(),
-                                  ));
-                            },
-                            child: Row(
-                              children: [
-                                Image.asset(
-                                  'assets/images/account/language_icon.png',
-                                  width: querySize.width * (33 / 375),
-                                  height: querySize.height * (20 / 812),
-                                ),
-                                SizedBox(width: querySize.width * 0.05),
-                                Text(
-                                  'Language',
-                                  style: TextStyle(
-                                      color: textColor,
-                                      fontWeight: FontWeight.w400,
-                                      fontFamily: 'Segoe',
-                                      fontSize: querySize.width * (16 / 375)),
-                                ),
-                                const Spacer(),
-                                Text(
-                                    style: TextStyle(
-                                        color: textColor,
-                                        //  fontWeight: FontWeight.w400,
-                                        fontFamily: 'Segoe',
-                                        fontSize: querySize.width * (13 / 375)),
-                                    "English"),
-                              ],
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          height: querySize.height * 0.015,
-                        ),
-                        const Divider(
-                          color: Color(0xFFD3D0D0),
-                        ),
-                        SizedBox(
-                          height: querySize.height * 0.015,
-                        ),
+                        // Padding(
+                        //   padding: EdgeInsets.symmetric(
+                        //       horizontal: querySize.width * 0.05),
+                        //   child: GestureDetector(
+                        //     onTap: () {
+                        //       Navigator.push(
+                        //           context,
+                        //           MaterialPageRoute(
+                        //             builder: (context) =>
+                        //                 const LanguageSelectionScreen(),
+                        //           ));
+                        //     },
+                        //     child: Row(
+                        //       children: [
+                        //         Image.asset(
+                        //           'assets/images/account/language_icon.png',
+                        //           width: querySize.width * (33 / 375),
+                        //           height: querySize.height * (20 / 812),
+                        //         ),
+                        //         SizedBox(width: querySize.width * 0.05),
+                        //         Text(
+                        //           'Language',
+                        //           style: TextStyle(
+                        //               color: textColor,
+                        //               fontWeight: FontWeight.w400,
+                        //               fontFamily: 'Segoe',
+                        //               fontSize: querySize.width * (16 / 375)),
+                        //         ),
+                        //         const Spacer(),
+                        //         Text(
+                        //             style: TextStyle(
+                        //                 color: textColor,
+                        //                 //  fontWeight: FontWeight.w400,
+                        //                 fontFamily: 'Segoe',
+                        //                 fontSize: querySize.width * (13 / 375)),
+                        //             "English"),
+                        //       ],
+                        //     ),
+                        //   ),
+                        // ),
+                        // SizedBox(
+                        //   height: querySize.height * 0.015,
+                        // ),
+                        // const Divider(
+                        //   color: Color(0xFFD3D0D0),
+                        // ),
+                        // SizedBox(
+                        //   height: querySize.height * 0.015,
+                        // ),
                         GestureDetector(
                           onTap: () {
                             Navigator.push(
@@ -296,10 +297,18 @@ class AccountScreen extends StatelessWidget {
                         ),
                         GestureDetector(
                           onTap: () async {
-                            await openWhatsApp();
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const PrivacyPolicyScreen(),
+                                ));
+                            //await openWhatsApp();
                           },
-                          child: customAccountListTile(querySize,
-                              "assets/images/account/help.png", "Help"),
+                          child: customAccountListTile(
+                              querySize,
+                              "assets/images/account/help.png",
+                              "Privacy Policy"),
                         ),
                         SizedBox(
                           height: querySize.height * 0.015,

@@ -6,6 +6,7 @@ import 'package:lenore/application/provider/delivery_fee_provider/delivery_fee_p
 import 'package:lenore/application/provider/payment_provider/payment_provider.dart';
 import 'package:lenore/core/constant.dart';
 import 'package:lenore/domain/voucher_detail_model/voucher_detail_model.dart';
+import 'package:lenore/presentation/screens/my_fatoorah_screen/fatoorah_payment_screen.dart';
 import 'package:lenore/presentation/screens/payment_success_screen/payment_success_screen.dart';
 import 'package:lenore/presentation/widgets/custom_profile_top_bar.dart';
 import 'package:lenore/presentation/widgets/custom_snack_bar.dart';
@@ -426,7 +427,7 @@ class _VoucherBuyNowPaymentScreenState
                                             listen: false)
                                         .getToken() ??
                                     '';
-                                String result =
+                                int? result =
                                     await Provider.of<PaymentProvider>(context,
                                             listen: false)
                                         .placeOrder(
@@ -440,13 +441,24 @@ class _VoucherBuyNowPaymentScreenState
                                   deliveryCharge: deliveryFee,
                                   quantity: 1,
                                 );
-                                if (result == 'success') {
-                                  PersistentNavBarNavigator.pushNewScreen(
+                                if (result != null) {
+                                  Navigator.push(
                                     context,
-                                    screen: PaymentSuccessScreen(),
-                                    withNavBar:
-                                        false, // OPTIONAL VALUE. True by default.
+                                    MaterialPageRoute(
+                                      builder: (context) => CardPaymentScreen(
+                                        context: context,
+                                        token: token,
+                                        orderId: result,
+                                        totalAmount: totalAmount,
+                                      ),
+                                    ),
                                   );
+                                  // PersistentNavBarNavigator.pushNewScreen(
+                                  //   context,
+                                  //   screen: PaymentSuccessScreen(),
+                                  //   withNavBar:
+                                  //       false, // OPTIONAL VALUE. True by default.
+                                  // );
                                 }
                               },
                               style: ElevatedButton.styleFrom(

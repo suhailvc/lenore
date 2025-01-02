@@ -5,6 +5,7 @@ import 'package:lenore/application/provider/coupon_provider/coupon_provider.dart
 import 'package:lenore/application/provider/payment_provider/payment_provider.dart';
 import 'package:lenore/core/constant.dart';
 import 'package:lenore/domain/product_detail_model/product_detail_model.dart';
+import 'package:lenore/presentation/screens/my_fatoorah_screen/fatoorah_payment_screen.dart';
 import 'package:lenore/presentation/screens/payment_success_screen/payment_success_screen.dart';
 import 'package:lenore/presentation/widgets/custom_profile_top_bar.dart';
 import 'package:lenore/presentation/widgets/custom_snack_bar.dart';
@@ -30,7 +31,7 @@ class _BuyNowPaymentScreenState extends State<BuyNowPaymentScreen> {
   double discount = 0.0;
   bool isCouponApplied = false;
   String errorMessage = '';
-  double deliveryFee = 10.0;
+  //double deliveryFee = 10.0;
 
   @override
   void dispose() {
@@ -91,7 +92,8 @@ class _BuyNowPaymentScreenState extends State<BuyNowPaymentScreen> {
               return Consumer<CouponProvider>(
                 builder: (context, couponProvider, child) {
                   double subTotal = widget.product.data!.price!.toDouble();
-                  double totalAmount = subTotal - discount + deliveryFee;
+                  double totalAmount =
+                      (subTotal + double.parse(globalDeliveryFee)) - discount;
                   String couponCode = couponController.text.trim();
 
                   return Column(
@@ -271,28 +273,28 @@ class _BuyNowPaymentScreenState extends State<BuyNowPaymentScreen> {
                                 ),
                               ],
                             ),
-                            SizedBox(height: querySize.height * 0.01),
-                            Row(
-                              children: [
-                                Text(
-                                  "Voucher Discount",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      color: const Color(0xFF667080),
-                                      fontFamily: 'Segoe',
-                                      fontSize: querySize.height * 0.017),
-                                ),
-                                const Spacer(),
-                                Text(
-                                  "-${discount.toStringAsFixed(2)} QAR",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      color: const Color(0xFFC3C6C9),
-                                      fontFamily: 'Segoe',
-                                      fontSize: querySize.height * 0.017),
-                                ),
-                              ],
-                            ),
+                            // SizedBox(height: querySize.height * 0.01),
+                            // Row(
+                            //   children: [
+                            //     Text(
+                            //       "Voucher Discount",
+                            //       style: TextStyle(
+                            //           fontWeight: FontWeight.w600,
+                            //           color: const Color(0xFF667080),
+                            //           fontFamily: 'Segoe',
+                            //           fontSize: querySize.height * 0.017),
+                            //     ),
+                            //     const Spacer(),
+                            //     Text(
+                            //       "-${discount.toStringAsFixed(2)} QAR",
+                            //       style: TextStyle(
+                            //           fontWeight: FontWeight.w600,
+                            //           color: const Color(0xFFC3C6C9),
+                            //           fontFamily: 'Segoe',
+                            //           fontSize: querySize.height * 0.017),
+                            //     ),
+                            //   ],
+                            // ),
                             SizedBox(height: querySize.height * 0.01),
                             Row(
                               children: [
@@ -328,7 +330,7 @@ class _BuyNowPaymentScreenState extends State<BuyNowPaymentScreen> {
                                 ),
                                 const Spacer(),
                                 Text(
-                                  "10 QAR",
+                                  "$globalDeliveryFee QAR",
                                   style: TextStyle(
                                       fontWeight: FontWeight.w600,
                                       color: const Color(0xFFC3C6C9),
@@ -410,7 +412,7 @@ class _BuyNowPaymentScreenState extends State<BuyNowPaymentScreen> {
                                             listen: false)
                                         .getToken() ??
                                     '';
-                                String result =
+                                int? result =
                                     await Provider.of<PaymentProvider>(context,
                                             listen: false)
                                         .placeOrder(
@@ -421,16 +423,28 @@ class _BuyNowPaymentScreenState extends State<BuyNowPaymentScreen> {
                                   totalAmount: totalAmount,
                                   discount: discount,
                                   couponCode: couponCode,
-                                  deliveryCharge: deliveryFee,
+                                  deliveryCharge:
+                                      double.parse(globalDeliveryFee),
                                   quantity: 1,
                                 );
-                                if (result == 'success') {
-                                  PersistentNavBarNavigator.pushNewScreen(
+                                if (result != null) {
+                                  Navigator.push(
                                     context,
-                                    screen: PaymentSuccessScreen(),
-                                    withNavBar:
-                                        false, // OPTIONAL VALUE. True by default.
+                                    MaterialPageRoute(
+                                      builder: (context) => CardPaymentScreen(
+                                        context: context,
+                                        token: token,
+                                        orderId: result,
+                                        totalAmount: totalAmount,
+                                      ),
+                                    ),
                                   );
+                                  // PersistentNavBarNavigator.pushNewScreen(
+                                  //   context,
+                                  //   screen: PaymentSuccessScreen(),
+                                  //   withNavBar:
+                                  //       false, // OPTIONAL VALUE. True by default.
+                                  // );
                                 }
                               },
                               style: ElevatedButton.styleFrom(

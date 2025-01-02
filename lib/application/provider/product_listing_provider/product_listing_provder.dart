@@ -21,13 +21,14 @@ class ProductListProvider extends ChangeNotifier {
       var response = await productListingService(pageNo, eventName, id);
       if (response != null) {
         if (isPagination) {
-          newAllrivalList = response;
+          // newAllrivalList = response;
           // Append new data to the existing list
-          _productListItems.data!.addAll(response.data!);
+          newAllrivalList.data!.addAll(response.data!);
+          //  _productListItems.data!.addAll(response.data!);
         } else {
           // Replace the data for the first page or on refresh
           newAllrivalList = response;
-          _productListItems = response;
+          //_productListItems = response;
         }
       }
       WidgetsBinding.instance.addPostFrameCallback((_) {

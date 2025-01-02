@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 import 'package:lenore/application/provider/user_registration_provider/user_registration_provider.dart';
 import 'package:lenore/core/constant.dart';
 import 'package:lenore/domain/user_registration_model/user_registration_success_model.dart';
+import 'package:lenore/presentation/screens/login_screen/personal_details_screen/widgets/qid_image_picker_widget.dart';
 
 import 'package:lenore/presentation/screens/login_screen/personal_details_screen/widgets/user_input_field.dart';
 import 'package:lenore/presentation/screens/login_screen/widget/login_custom_button.dart';
@@ -108,7 +110,137 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                     if (showErrors && provider.errors?.qId != null)
                       errorText(provider.errors!.qId!.first),
                     SizedBox(height: querySize.height * 0.03),
-
+                    // Image Picker Section
+                    // Image Picker Section with Bottom Sheet
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Upload QID Documents",
+                          style: TextStyle(
+                            fontFamily: 'Jost',
+                            color: appColor,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                        SizedBox(height: querySize.height * 0.01),
+                        ElevatedButton(
+                          style: ButtonStyle(
+                              backgroundColor:
+                                  WidgetStatePropertyAll(appColor)),
+                          onPressed: () =>
+                              showImagePickerBottomSheet(provider, context),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.add,
+                                color: Colors.white,
+                              ),
+                              SizedBox(
+                                width: querySize.width * 0.02,
+                              ),
+                              const Text(
+                                "Upload",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: querySize.height * 0.01),
+                        Wrap(
+                          spacing: 8.0,
+                          runSpacing: 8.0,
+                          children: provider.documents.map((image) {
+                            int index = provider.documents.indexOf(image);
+                            return Stack(
+                              children: [
+                                Image.file(
+                                  image,
+                                  width: 100,
+                                  height: 100,
+                                  fit: BoxFit.cover,
+                                ),
+                                Positioned(
+                                  right: 0,
+                                  top: 0,
+                                  child: IconButton(
+                                    onPressed: () {
+                                      provider.removeDocument(index);
+                                    },
+                                    icon: Icon(Icons.close, color: Colors.red),
+                                  ),
+                                ),
+                              ],
+                            );
+                          }).toList(),
+                        ),
+                      ],
+                    ),
+                    if (showErrors && provider.documents.isEmpty)
+                      errorText("Image is required"),
+                    SizedBox(height: querySize.height * 0.03),
+                    // Column(
+                    //   crossAxisAlignment: CrossAxisAlignment.start,
+                    //   children: [
+                    //     Text(
+                    //       "Upload Documents",
+                    //       style: TextStyle(
+                    //         fontFamily: 'Jost',
+                    //         color: appColor,
+                    //         fontSize: 14,
+                    //         fontWeight: FontWeight.w400,
+                    //       ),
+                    //     ),
+                    //     SizedBox(height: querySize.height * 0.01),
+                    //     Row(
+                    //       children: [
+                    //         ElevatedButton.icon(
+                    //           onPressed: () =>
+                    //               provider.pickImage(ImageSource.camera),
+                    //           icon: Icon(Icons.camera),
+                    //           label: Text("Camera"),
+                    //         ),
+                    //         SizedBox(width: 10),
+                    //         ElevatedButton.icon(
+                    //           onPressed: () =>
+                    //               provider.pickImage(ImageSource.gallery),
+                    //           icon: Icon(Icons.photo),
+                    //           label: Text("Gallery"),
+                    //         ),
+                    //       ],
+                    //     ),
+                    //     SizedBox(height: querySize.height * 0.01),
+                    //     Wrap(
+                    //       spacing: 8.0,
+                    //       runSpacing: 8.0,
+                    //       children: provider.documents.map((image) {
+                    //         int index = provider.documents.indexOf(image);
+                    //         return Stack(
+                    //           children: [
+                    //             Image.file(
+                    //               image,
+                    //               width: 100,
+                    //               height: 100,
+                    //               fit: BoxFit.cover,
+                    //             ),
+                    //             Positioned(
+                    //               right: 0,
+                    //               top: 0,
+                    //               child: IconButton(
+                    //                 onPressed: () {
+                    //                   provider.removeDocument(index);
+                    //                 },
+                    //                 icon: Icon(Icons.close, color: Colors.red),
+                    //               ),
+                    //             ),
+                    //           ],
+                    //         );
+                    //       }).toList(),
+                    //     ),
+                    //   ],
+                    // ),
                     // Gender Dropdown
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -237,6 +369,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                             }
                             var response = await provider.userRegistration(
                               context: context,
+                              documents: provider.documents,
                               fName: fNameController.text.trim(),
                               sName: lNameController.text.trim(),
                               email: emailController.text.trim(),
@@ -250,6 +383,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                               lNameController.clear();
                               emailController.clear();
                               qIdController.clear();
+                              provider.documents.clear();
                               setState(() {
                                 selectedGender = null;
                                 termsAccepted = false;

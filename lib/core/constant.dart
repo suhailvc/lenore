@@ -92,4 +92,4 @@ Future<bool> hasBearerToken() async {
   return prefs.containsKey('bearerToken');
 }
 
-var voucherDiscoutPrice;
+String globalDeliveryFee = '0';
