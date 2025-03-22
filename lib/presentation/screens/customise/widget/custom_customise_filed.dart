@@ -18,7 +18,7 @@ Column customCustomiseField(
         style: TextStyle(
             fontFamily: 'Jost',
             color: textColor,
-            fontSize: 14,
+            fontSize: MediaQuery.of(context).size.width * 0.04,
             fontWeight: FontWeight.w400),
       ),
       SizedBox(

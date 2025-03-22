@@ -17,11 +17,12 @@ Future<dynamic> userRegistrationService({
   required String qId,
   required String gender,
   required bool term,
+  required String countryId,
   required String mobileNumber,
   required List<File> documents, // List of files for images
 }) async {
   final String url =
-      '$baseUrl/api/register?f_name=$fName&l_name=$sName&email=$email&q_id=$qId&gender=$gender&terms=$term&phone=$mobileNumber';
+      '$baseUrl/api/register?f_name=$fName&l_name=$sName&email=$email&q_id=$qId&gender=$gender&terms=$term&phone=$mobileNumber&country=$countryId';
 
   try {
     print('API called with URL: $url');

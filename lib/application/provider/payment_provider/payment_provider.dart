@@ -8,7 +8,7 @@ class PaymentProvider extends ChangeNotifier {
 
   bool get isLoading => _isLoading;
   // New method to update order status using invoiceIdService
-  Future<Map<String, dynamic>> updateOrderStatus({
+  Future<bool> updateOrderStatus({
     required String token,
     required String orderId,
     required String invoiceId,
@@ -23,15 +23,16 @@ class PaymentProvider extends ChangeNotifier {
       );
 
       // Handle success/failure
-      if (response['status'] == 'success') {
+      if (response['status'] == 'true') {
         print('Order status updated successfully');
+        return true;
       } else {
         print('Failed to update order status: ${response['message']}');
+        return false;
       }
-      return response;
     } catch (error) {
       print('Error updating order status: $error');
-      return {'status': 'error', 'message': 'Something went wrong'};
+      return false;
     } finally {
       _setLoading(false);
     }
@@ -47,21 +48,22 @@ class PaymentProvider extends ChangeNotifier {
     required String couponCode,
     required double deliveryCharge,
     required int quantity,
+    required double walletUsed,
   }) async {
     _setLoading(true);
 
     try {
       response = await paymentService(
-        token: token,
-        addressId: addressId,
-        paymentMethod: paymentMethod,
-        cart: cart,
-        totalAmount: totalAmount,
-        discount: discount,
-        couponCode: couponCode,
-        deliveryCharge: deliveryCharge,
-        quantity: quantity,
-      );
+          token: token,
+          addressId: addressId,
+          paymentMethod: paymentMethod,
+          cart: cart,
+          totalAmount: totalAmount,
+          discount: discount,
+          couponCode: couponCode,
+          deliveryCharge: deliveryCharge,
+          quantity: quantity,
+          walletUsed: walletUsed);
       return response;
     } catch (error) {
       print('Error placing order: $error');

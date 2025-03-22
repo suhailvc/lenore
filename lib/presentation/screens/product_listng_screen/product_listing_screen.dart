@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lenore/application/provider/auth_provider/auth_provider.dart';
+import 'package:lenore/application/provider/filter_provider/filter_provider.dart';
 import 'package:lenore/application/provider/home_provider/new_arrival_provider/new_arrival_provider.dart';
 import 'package:lenore/application/provider/gift_product_listing_provider/gift_product_listing_provider.dart';
 import 'package:lenore/application/provider/wishlist_provider/whishlist_provider.dart';
@@ -32,6 +33,7 @@ class _ProductListingScreenState extends State<ProductListingScreen> {
   @override
   void initState() {
     super.initState();
+    Provider.of<FilterProvider>(context, listen: false).resetFilters();
     // Load the first page when the screen is initialized
     Provider.of<GiftProductListingProvider>(context, listen: false)
         .productListProviderMethod(

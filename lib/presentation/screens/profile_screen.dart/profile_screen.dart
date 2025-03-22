@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lenore/application/provider/auth_provider/auth_provider.dart';
 import 'package:lenore/application/provider/profile_provider/profile_provider.dart';
+import 'package:lenore/application/provider/wallet_balance_provider/wallet_balance_provider.dart';
 import 'package:lenore/core/constant.dart';
 import 'package:lenore/infrastructure/email_verification_api.dart/email_verification_api.dart';
 import 'package:lenore/presentation/screens/profile_screen.dart/edit_profile_screen.dart';
@@ -23,6 +24,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     _fetchProfile();
+    _fetchWalletBalance();
     super.initState();
   }
 
@@ -37,6 +39,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (token != null) {
       Provider.of<ProfileProvider>(context, listen: false).fetchProfile(token);
     }
+  }
+
+  Future<void> _fetchWalletBalance() async {
+    // Fetch wallet balance when profile screen loads
+    Provider.of<WalletBalanceProvider>(context, listen: false)
+        .fetchWalletBalance(context);
   }
 
   @override
@@ -54,8 +62,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: Padding(
                     padding: EdgeInsets.symmetric(
                         horizontal: querySize.width * 0.02),
-                    child: Consumer<ProfileProvider>(
-                      builder: (context, profileValue, child) {
+                    child: Consumer2<ProfileProvider, WalletBalanceProvider>(
+                      builder: (context, profileValue, walletProvider, child) {
                         if (profileValue.showGif) {
                           return multipleShimmerLoading(
                               containerHeight: querySize.height * 0.06);
@@ -77,17 +85,67 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           profileValue.profile!.data.image!)
                                       : AssetImage(
                                           "assets/images/avatar.png",
-                                        ),
+                                        ) as ImageProvider,
                             ),
                             customSizedBox(querySize),
-                            Text(
-                              "My Profile",
-                              style: TextStyle(
+
+                            // Wallet Balance Widget - Added here
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                vertical: querySize.height * 0.01,
+                                horizontal: querySize.width * 0.04,
+                              ),
+                              decoration: BoxDecoration(
                                 color: const Color(0xFF00ACB3),
-                                fontSize: querySize.height * 0.022,
-                                fontFamily: 'Segoe',
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color:
+                                      const Color(0xFF00ACB3).withOpacity(0.3),
+                                  width: 1,
+                                ),
+                              ),
+                              child: Column(
+                                children: [
+                                  Text(
+                                    "Wallet Balance",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: querySize.height * 0.016,
+                                      fontFamily: 'Segoe',
+                                    ),
+                                  ),
+                                  SizedBox(height: querySize.height * 0.005),
+                                  walletProvider.isLoading
+                                      ? SizedBox(
+                                          height: querySize.height * 0.02,
+                                          width: querySize.width * 0.04,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            color: const Color(0xFF00ACB3),
+                                          ),
+                                        )
+                                      : Text(
+                                          "QAR ${walletProvider.walletBalance.toStringAsFixed(2)}",
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: querySize.height * 0.022,
+                                            fontWeight: FontWeight.bold,
+                                            fontFamily: 'Segoe',
+                                          ),
+                                        ),
+                                ],
                               ),
                             ),
+                            //    SizedBox(height: querySize.height * 0.02),
+
+                            // Text(
+                            //   "My Profile",
+                            //   style: TextStyle(
+                            //     color: const Color(0xFF00ACB3),
+                            //     fontSize: querySize.height * 0.022,
+                            //     fontFamily: 'Segoe',
+                            //   ),
+                            // ),
                             customSizedBox(querySize),
                             Padding(
                               padding: EdgeInsets.symmetric(
@@ -171,15 +229,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         )
                                     ],
                                   ),
-
-                                  // userDetailColumn(
-                                  //   context: context,
-                                  //   assetName:
-                                  //       "assets/images/profile/email_icon.png",
-                                  //   columnHeading: 'Email ID',
-                                  //   columnName:
-                                  //       profileValue.profile!.data.email,
-                                  // ),
                                   customSizedBox(querySize),
                                   userDetailColumn(
                                     context: context,
@@ -209,30 +258,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             : 'Female',
                                   ),
                                   customSizedBox(querySize),
-                                  ElevatedButton(
-                                    onPressed: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                EditProfileScreen(
-                                                    profileData: profileValue
-                                                        .profile!.data),
-                                          ));
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: const Color(0xFF00ACB3),
-                                      minimumSize: Size(
-                                        querySize.width * (137 / 375),
-                                        querySize.height * (42 / 812),
+                                  Center(
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  EditProfileScreen(
+                                                      profileData: profileValue
+                                                          .profile!.data),
+                                            ));
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor:
+                                            const Color(0xFF00ACB3),
+                                        minimumSize: Size(
+                                          querySize.width * (137 / 375),
+                                          querySize.height * (42 / 812),
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                        ),
                                       ),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8),
+                                      child: const Text(
+                                        'Edit Profile',
+                                        style: TextStyle(color: Colors.white),
                                       ),
-                                    ),
-                                    child: const Text(
-                                      'Edit Profile',
-                                      style: TextStyle(color: Colors.white),
                                     ),
                                   ),
                                   customSizedBox(querySize),
@@ -261,7 +314,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 }
-
 // class ProfileScreen extends StatefulWidget {
 //   const ProfileScreen({super.key});
 
@@ -276,11 +328,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
 //     super.initState();
 //   }
 
+//   String? _token;
 //   Future<void> _fetchProfile() async {
 //     final authProvider =
 //         await Provider.of<AuthProvider>(context, listen: false);
+//     _token = await authProvider.getToken();
 //     final token = await authProvider.getToken();
 
+//     print(token);
 //     if (token != null) {
 //       Provider.of<ProfileProvider>(context, listen: false).fetchProfile(token);
 //     }
@@ -289,6 +344,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 //   @override
 //   Widget build(BuildContext context) {
 //     var querySize = MediaQuery.of(context).size;
+
 //     return Scaffold(
 //       backgroundColor: Colors.white,
 //       body: SafeArea(
@@ -303,12 +359,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
 //                     child: Consumer<ProfileProvider>(
 //                       builder: (context, profileValue, child) {
 //                         if (profileValue.showGif) {
-//                           return lenoreGif(querySize);
+//                           return multipleShimmerLoading(
+//                               containerHeight: querySize.height * 0.06);
+//                           // return lenoreGif(querySize);
 //                         }
 //                         if (profileValue.profile == null) {
-//                           return SizedBox();
+//                           return askSignIn(querySize);
 //                         }
-//                         print(profileValue.profile!.data.image!);
+//                         print(profileValue.profile!.data.image);
+//                         print(profileValue.profile!.data.emailVerified);
 //                         return Column(
 //                           children: [
 //                             customHeightThree(querySize),
@@ -319,7 +378,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 //                                       ? NetworkImage(
 //                                           profileValue.profile!.data.image!)
 //                                       : AssetImage(
-//                                           'assets/images/profile/profile_picture_image.png',
+//                                           "assets/images/avatar.png",
 //                                         ),
 //                             ),
 //                             customSizedBox(querySize),
@@ -336,6 +395,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 //                               padding: EdgeInsets.symmetric(
 //                                   horizontal: querySize.width * 0.07),
 //                               child: Column(
+//                                 crossAxisAlignment: CrossAxisAlignment.start,
 //                                 children: [
 //                                   userDetailColumn(
 //                                     context: context,
@@ -352,19 +412,76 @@ class _ProfileScreenState extends State<ProfileScreen> {
 //                                         "assets/images/profile/second_name_icon.png",
 //                                     columnHeading: 'Last Name',
 //                                     columnName:
-//                                         profileValue.profile!.data.lName == null
-//                                             ? ""
-//                                             : profileValue.profile!.data.lName!,
+//                                         profileValue.profile!.data.lName ?? '',
 //                                   ),
 //                                   customSizedBox(querySize),
-//                                   userDetailColumn(
-//                                     context: context,
-//                                     assetName:
-//                                         "assets/images/profile/email_icon.png",
-//                                     columnHeading: 'Email ID',
-//                                     columnName:
-//                                         profileValue.profile!.data.email,
+//                                   Row(
+//                                     children: [
+//                                       emailColumn(
+//                                           context: context,
+//                                           assetName:
+//                                               "assets/images/profile/email_icon.png",
+//                                           columnName:
+//                                               profileValue.profile!.data.email),
+//                                       SizedBox(
+//                                         width: querySize.width * 0.01,
+//                                       ),
+//                                       if (profileValue
+//                                               .profile!.data.emailVerified ==
+//                                           0)
+//                                         Column(
+//                                           children: [
+//                                             SizedBox(
+//                                               height: querySize.height * 0.039,
+//                                             ),
+//                                             GestureDetector(
+//                                               onTap: () async {
+//                                                 await emailVerificationApi(
+//                                                     _token!);
+//                                                 emailVerifyPopUp(
+//                                                     context, querySize);
+//                                               },
+//                                               child: Text(
+//                                                 "Verify ?",
+//                                                 style: TextStyle(
+//                                                   color:
+//                                                       const Color(0xFF00ACB3),
+//                                                   fontSize:
+//                                                       querySize.height * 0.018,
+//                                                   fontFamily: 'Segoe',
+//                                                 ),
+//                                               ),
+//                                             ),
+//                                           ],
+//                                         )
+//                                       else
+//                                         Column(
+//                                           children: [
+//                                             SizedBox(
+//                                               height: querySize.height * 0.039,
+//                                             ),
+//                                             Text(
+//                                               "Verified",
+//                                               style: TextStyle(
+//                                                 color: const Color(0xFF00ACB3),
+//                                                 fontSize:
+//                                                     querySize.height * 0.017,
+//                                                 fontFamily: 'Segoe',
+//                                               ),
+//                                             ),
+//                                           ],
+//                                         )
+//                                     ],
 //                                   ),
+
+//                                   // userDetailColumn(
+//                                   //   context: context,
+//                                   //   assetName:
+//                                   //       "assets/images/profile/email_icon.png",
+//                                   //   columnHeading: 'Email ID',
+//                                   //   columnName:
+//                                   //       profileValue.profile!.data.email,
+//                                   // ),
 //                                   customSizedBox(querySize),
 //                                   userDetailColumn(
 //                                     context: context,
@@ -391,7 +508,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 //                                     columnName:
 //                                         profileValue.profile!.data.gender == '1'
 //                                             ? 'Male'
-//                                             : "female",
+//                                             : 'Female',
 //                                   ),
 //                                   customSizedBox(querySize),
 //                                   ElevatedButton(

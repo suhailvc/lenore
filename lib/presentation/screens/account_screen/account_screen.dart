@@ -97,7 +97,7 @@ class AccountScreen extends StatelessWidget {
                   customHeightThree(querySize),
                   Container(
                     width: querySize.width * (345 / 375),
-                    height: querySize.height * (135 / 812),
+                    height: querySize.height * 0.26,
                     decoration: BoxDecoration(
                       color: accountContainerColor,
                       borderRadius:
@@ -130,55 +130,59 @@ class AccountScreen extends StatelessWidget {
                         SizedBox(
                           height: querySize.height * 0.015,
                         ),
-                        // Padding(
-                        //   padding: EdgeInsets.symmetric(
-                        //       horizontal: querySize.width * 0.05),
-                        //   child: GestureDetector(
-                        //     onTap: () {
-                        //       Navigator.push(
-                        //           context,
-                        //           MaterialPageRoute(
-                        //             builder: (context) =>
-                        //                 const LanguageSelectionScreen(),
-                        //           ));
-                        //     },
-                        //     child: Row(
-                        //       children: [
-                        //         Image.asset(
-                        //           'assets/images/account/language_icon.png',
-                        //           width: querySize.width * (33 / 375),
-                        //           height: querySize.height * (20 / 812),
-                        //         ),
-                        //         SizedBox(width: querySize.width * 0.05),
-                        //         Text(
-                        //           'Language',
-                        //           style: TextStyle(
-                        //               color: textColor,
-                        //               fontWeight: FontWeight.w400,
-                        //               fontFamily: 'Segoe',
-                        //               fontSize: querySize.width * (16 / 375)),
-                        //         ),
-                        //         const Spacer(),
-                        //         Text(
-                        //             style: TextStyle(
-                        //                 color: textColor,
-                        //                 //  fontWeight: FontWeight.w400,
-                        //                 fontFamily: 'Segoe',
-                        //                 fontSize: querySize.width * (13 / 375)),
-                        //             "English"),
-                        //       ],
-                        //     ),
-                        //   ),
-                        // ),
-                        // SizedBox(
-                        //   height: querySize.height * 0.015,
-                        // ),
-                        // const Divider(
-                        //   color: Color(0xFFD3D0D0),
-                        // ),
-                        // SizedBox(
-                        //   height: querySize.height * 0.015,
-                        // ),
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: querySize.width * 0.05),
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const LanguageSelectionScreen(),
+                                  ));
+                            },
+                            child: Row(
+                              children: [
+                                Image.asset(
+                                  'assets/images/account/language_icon.png',
+                                  width: querySize.width * (33 / 375),
+                                  height: querySize.height * (20 / 812),
+                                ),
+                                SizedBox(width: querySize.width * 0.05),
+                                Text(
+                                  'Language',
+                                  style: TextStyle(
+                                      color: textColor,
+                                      fontWeight: FontWeight.w400,
+                                      fontFamily: 'Segoe',
+                                      fontSize: querySize.width * (16 / 375)),
+                                ),
+                                const Spacer(),
+                                Text(
+                                    style: TextStyle(
+                                        color: textColor,
+                                        //  fontWeight: FontWeight.w400,
+                                        fontFamily: 'Segoe',
+                                        fontSize: querySize.width * (13 / 375)),
+                                    Localizations.localeOf(context)
+                                                .languageCode ==
+                                            'en'
+                                        ? "English"
+                                        : "Arabic"),
+                              ],
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: querySize.height * 0.015,
+                        ),
+                        const Divider(
+                          color: Color(0xFFD3D0D0),
+                        ),
+                        SizedBox(
+                          height: querySize.height * 0.015,
+                        ),
                         GestureDetector(
                           onTap: () {
                             Navigator.push(

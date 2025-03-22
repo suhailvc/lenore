@@ -91,7 +91,7 @@ class HiveCartModel extends HiveObject {
   final double price;
 
   @HiveField(4)
-  final String size;
+  final String? size;
 
   @HiveField(5)
   final String image;
@@ -113,7 +113,7 @@ class HiveCartModel extends HiveObject {
     required this.productName,
     required this.description,
     required this.price,
-    required this.size,
+    this.size,
     required this.image,
     required this.stock,
     required this.type,
@@ -134,7 +134,7 @@ class HiveCartModel extends HiveObject {
       "product_id": productId,
       "quantity": quantity,
       "price": price,
-      "type": type,
+      "type": type, "size": size,
       "voucher_discount": voucherDiscount,
       "total_voucher_discount":
           totalVoucherDiscount, // Include the total voucher discount

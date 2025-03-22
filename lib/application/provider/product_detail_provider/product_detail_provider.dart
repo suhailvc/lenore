@@ -11,6 +11,11 @@ class ProductDetailProvider with ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get error => _error;
   ProductDetailModel? get productDetails => _productDetails;
+  void clearProductDetails() {
+    _productDetails = null;
+    _error = null;
+    notifyListeners();
+  }
 
   Future<ProductDetailModel?> fetchProductDetails({
     required int id,

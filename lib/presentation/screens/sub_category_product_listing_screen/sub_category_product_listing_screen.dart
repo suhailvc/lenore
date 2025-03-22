@@ -35,14 +35,25 @@ class _SubCategoryProductListingScreenState
   @override
   void initState() {
     print("eevvveeennnttttnnaammmmeee${widget.eventName}");
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<FilterProvider>(context, listen: false).resetFilters();
+      Provider.of<ProductListProvider>(context, listen: false)
+          .productListProviderMethod(
+              eventName: widget.eventName,
+              id: widget.eventId,
+              pageNo: pageNo.toString(),
+              isPagination: false); // False because it's the initial load
+      _fetchWishlist();
+    });
     // Load the first page when the screen is initialized
-    Provider.of<ProductListProvider>(context, listen: false)
-        .productListProviderMethod(
-            eventName: widget.eventName,
-            id: widget.eventId,
-            pageNo: pageNo.toString(),
-            isPagination: false); // False because it's the initial load
-    _fetchWishlist();
+    // Provider.of<FilterProvider>(context, listen: false).resetFilters();
+    // Provider.of<ProductListProvider>(context, listen: false)
+    //     .productListProviderMethod(
+    //         eventName: widget.eventName,
+    //         id: widget.eventId,
+    //         pageNo: pageNo.toString(),
+    //         isPagination: false); // False because it's the initial load
+    // _fetchWishlist();
     super.initState();
   }
 

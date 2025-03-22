@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lenore/application/provider/search_provider/search_provider.dart';
-import 'package:lenore/presentation/screens/persistant_bottom_nav_bar/persistant_bottom_nav_bar.dart';
+
 import 'package:lenore/presentation/screens/product_detail_screen/product_detail_screen.dart';
-import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
-import 'package:provider/provider.dart';
-import 'package:flutter/material.dart';
-import 'package:lenore/application/provider/search_provider/search_provider.dart';
-import 'package:lenore/presentation/screens/product_detail_screen/product_detail_screen.dart';
+
 import 'package:provider/provider.dart';
 
 class SearchScreen extends StatefulWidget {

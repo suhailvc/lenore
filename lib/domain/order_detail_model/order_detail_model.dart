@@ -34,6 +34,9 @@ class OrderData {
   final String? paymentMode;
   final int? amount;
   final String? discount;
+  final String? walletUsed;
+
+  final String? voucherDiscountAmount;
   final String? deliveryCharge;
   final List<ProductDetail>? productDetails;
 
@@ -45,6 +48,8 @@ class OrderData {
     this.paymentMode,
     this.amount,
     this.discount,
+    this.walletUsed,
+    this.voucherDiscountAmount,
     this.deliveryCharge,
     this.productDetails,
   });
@@ -59,6 +64,8 @@ class OrderData {
       amount: json['amount'] as int?,
       discount: json['discount'] as String?,
       deliveryCharge: json['delivery_charge'] as String?,
+      walletUsed: json['wallet_used'] as String?,
+      voucherDiscountAmount: json['voucher_discount_amount'] as String?,
       productDetails: (json['product_details'] as List<dynamic>?)
           ?.map((item) => ProductDetail.fromJson(item as Map<String, dynamic>))
           .toList(),
@@ -74,6 +81,8 @@ class OrderData {
       'payment_mode': paymentMode,
       'amount': amount,
       'discount': discount,
+      'voucher_discount_amount': voucherDiscountAmount,
+      'wallet_used': walletUsed,
       'delivery_charge': deliveryCharge,
       'product_details': productDetails?.map((item) => item.toJson()).toList(),
     };

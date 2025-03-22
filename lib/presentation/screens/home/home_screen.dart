@@ -38,6 +38,7 @@ import 'package:lenore/presentation/widgets/shimmer_widget.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:video_player/video_player.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -50,7 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int activeIndex = 0;
   int giftActiveIndex = 0;
   int collectionActiveIndex = 0;
-
+  Map<int, VideoPlayerController> videoControllers = {};
   @override
   void initState() {
     super.initState();
@@ -82,6 +83,29 @@ class _HomeScreenState extends State<HomeScreen> {
     Provider.of<HomeBannerProvider>(context, listen: false)
         .fetchHomeBannerItems();
     _fetchWishlist();
+  }
+
+  @override
+  void dispose() {
+    // Dispose all video controllers when widget is disposed
+    videoControllers.forEach((_, controller) {
+      controller.dispose();
+    });
+    super.dispose();
+  }
+
+  Future<VideoPlayerController> initializeVideoController(
+      String videoUrl, int index) async {
+    if (videoControllers.containsKey(index)) {
+      return videoControllers[index]!;
+    }
+
+    final controller = VideoPlayerController.network(videoUrl);
+    videoControllers[index] = controller;
+
+    await controller.initialize();
+    controller.setLooping(true);
+    return controller;
   }
 
   Future<void> _fetchWishlist() async {
@@ -154,15 +178,17 @@ class _HomeScreenState extends State<HomeScreen> {
                               itemCount: homeBannerProvidervalue
                                   .giftByVoucherItems.data!.length,
                               itemBuilder: (context, index, realIndex) {
+                                final item = homeBannerProvidervalue
+                                    .giftByVoucherItems.data![index];
+                                final hasVideo = item.video != null &&
+                                    item.video!.isNotEmpty;
+
                                 return Padding(
                                   padding: EdgeInsets.symmetric(
                                       horizontal: querySize.width * 0.02),
                                   child: GestureDetector(
                                     onTap: () {
-                                      String? screen = homeBannerProvidervalue
-                                          .giftByVoucherItems
-                                          .data![index]
-                                          .screen;
+                                      String? screen = item.screen;
 
                                       if (screen == "best-seller" ||
                                           screen == "new-arrival") {
@@ -173,11 +199,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 BestSellerNewArrivalListingScreen(
                                               eventName: screen!,
                                               productListingScreenName:
-                                                  homeBannerProvidervalue
-                                                          .giftByVoucherItems
-                                                          .data![index]
-                                                          .screenName ??
-                                                      '',
+                                                  item.screenName ?? '',
                                             ),
                                           ),
                                         );
@@ -189,21 +211,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                           MaterialPageRoute(
                                             builder: (context) =>
                                                 SubCategoryProductListingScreen(
-                                              eventId: int.parse(
-                                                  homeBannerProvidervalue
-                                                      .giftByVoucherItems
-                                                      .data![index]
-                                                      .screenId!),
-                                              eventName: homeBannerProvidervalue
-                                                  .giftByVoucherItems
-                                                  .data![index]
-                                                  .screen!,
+                                              eventId:
+                                                  int.parse(item.screenId!),
+                                              eventName: item.screen!,
                                               productListingScreenName:
-                                                  homeBannerProvidervalue
-                                                          .giftByVoucherItems
-                                                          .data![index]
-                                                          .screenName ??
-                                                      '',
+                                                  item.screenName ?? '',
                                             ),
                                           ),
                                         );
@@ -213,11 +225,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                           MaterialPageRoute(
                                             builder: (context) =>
                                                 ProductDetailScreen(
-                                              productId: int.parse(
-                                                  homeBannerProvidervalue
-                                                      .giftByVoucherItems
-                                                      .data![index]
-                                                      .screenId!),
+                                              productId:
+                                                  int.parse(item.screenId!),
                                             ),
                                           ),
                                         );
@@ -228,10 +237,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                             builder: (context) =>
                                                 CustomisationScreen(
                                               widgetName: customProfileTopBar(
-                                                querySize,
-                                                context,
-                                                "Customize",
-                                              ),
+                                                  querySize,
+                                                  context,
+                                                  "Customize"),
                                             ),
                                           ),
                                         );
@@ -269,106 +277,149 @@ class _HomeScreenState extends State<HomeScreen> {
                                       child: Container(
                                         width: double.infinity,
                                         height: querySize.height * 0.24,
-                                        decoration: BoxDecoration(
-                                          image: DecorationImage(
-                                            image: NetworkImage(
-                                              homeBannerProvidervalue
-                                                  .giftByVoucherItems
-                                                  .data![index]
-                                                  .image!,
+                                        child: Stack(
+                                          fit: StackFit.expand,
+                                          children: [
+                                            // Content: either video or image
+                                            hasVideo
+                                                ? FutureBuilder<
+                                                    VideoPlayerController>(
+                                                    future:
+                                                        initializeVideoController(
+                                                            item.video!, index),
+                                                    builder:
+                                                        (context, snapshot) {
+                                                      if (snapshot.connectionState ==
+                                                              ConnectionState
+                                                                  .done &&
+                                                          snapshot.hasData) {
+                                                        // Auto-play when this item becomes active
+                                                        if (activeIndex ==
+                                                                index &&
+                                                            !snapshot
+                                                                .data!
+                                                                .value
+                                                                .isPlaying) {
+                                                          snapshot.data!.play();
+                                                        } else if (activeIndex !=
+                                                                index &&
+                                                            snapshot.data!.value
+                                                                .isPlaying) {
+                                                          snapshot.data!
+                                                              .pause();
+                                                        }
+
+                                                        return AspectRatio(
+                                                          aspectRatio: snapshot
+                                                              .data!
+                                                              .value
+                                                              .aspectRatio,
+                                                          child: VideoPlayer(
+                                                              snapshot.data!),
+                                                        );
+                                                      } else {
+                                                        return Center(
+                                                            child:
+                                                                CircularProgressIndicator());
+                                                      }
+                                                    },
+                                                  )
+                                                : Container(
+                                                    decoration: BoxDecoration(
+                                                      image: DecorationImage(
+                                                        image: NetworkImage(
+                                                            item.image!),
+                                                        fit: BoxFit.cover,
+                                                      ),
+                                                    ),
+                                                  ),
+
+                                            // Text overlay
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.all(16.0),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  SizedBox(
+                                                      height: querySize.height *
+                                                          0.05),
+                                                  Row(
+                                                    children: [
+                                                      SizedBox(
+                                                          width:
+                                                              querySize.width *
+                                                                  0.02),
+                                                      Flexible(
+                                                        child: Text(
+                                                          item.titleOne ?? "",
+                                                          style: TextStyle(
+                                                            fontFamily:
+                                                                'ElMessiri',
+                                                            color: Colors.white,
+                                                            fontSize: 18,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            shadows: [
+                                                              Shadow(
+                                                                blurRadius: 5.0,
+                                                                color: Colors
+                                                                    .black
+                                                                    .withOpacity(
+                                                                        0.7),
+                                                                offset: Offset(
+                                                                    2.0, 2.0),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          maxLines: 3,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  Row(
+                                                    children: [
+                                                      SizedBox(
+                                                          width:
+                                                              querySize.width *
+                                                                  0.02),
+                                                      Flexible(
+                                                        child: Text(
+                                                          item.description ??
+                                                              '',
+                                                          style: TextStyle(
+                                                            fontFamily:
+                                                                'ElMessiri',
+                                                            color: Colors.white,
+                                                            fontSize: 16,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            shadows: [
+                                                              Shadow(
+                                                                blurRadius: 5.0,
+                                                                color: Colors
+                                                                    .black
+                                                                    .withOpacity(
+                                                                        0.7),
+                                                                offset: Offset(
+                                                                    2.0, 2.0),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          maxLines: 3,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
                                             ),
-                                            fit: BoxFit.cover,
-                                          ),
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(
-                                              16.0), // Adjust padding as needed
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              SizedBox(
-                                                height: querySize.height * 0.05,
-                                              ),
-                                              Row(
-                                                children: [
-                                                  SizedBox(
-                                                    width:
-                                                        querySize.width * 0.02,
-                                                  ),
-                                                  Flexible(
-                                                    child: Text(
-                                                      homeBannerProvidervalue
-                                                              .giftByVoucherItems
-                                                              .data![index]
-                                                              .titleOne ??
-                                                          "", // Replace with the desired text property
-                                                      style: TextStyle(
-                                                        fontFamily: 'ElMessiri',
-                                                        color: Colors.white,
-                                                        fontSize: 18,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        shadows: [
-                                                          Shadow(
-                                                            blurRadius: 5.0,
-                                                            color: Colors.black
-                                                                .withOpacity(
-                                                                    0.7),
-                                                            offset: Offset(
-                                                                2.0, 2.0),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                      maxLines:
-                                                          3, // Limits to 1 line and adds ellipsis if overflow
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              Row(
-                                                children: [
-                                                  SizedBox(
-                                                    width:
-                                                        querySize.width * 0.02,
-                                                  ),
-                                                  Flexible(
-                                                    child: Text(
-                                                      homeBannerProvidervalue
-                                                              .giftByVoucherItems
-                                                              .data![index]
-                                                              .description ??
-                                                          '', // Replace with the desired text property
-                                                      style: TextStyle(
-                                                        fontFamily: 'ElMessiri',
-                                                        color: Colors.white,
-                                                        fontSize: 16,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        shadows: [
-                                                          Shadow(
-                                                            blurRadius: 5.0,
-                                                            color: Colors.black
-                                                                .withOpacity(
-                                                                    0.7),
-                                                            offset: Offset(
-                                                                2.0, 2.0),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                      maxLines:
-                                                          3, // Limits to 1 line and adds ellipsis if overflow
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              // Add other content below the text if needed
-                                            ],
-                                          ),
+                                          ],
                                         ),
                                       ),
                                     ),
@@ -387,9 +438,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 autoPlayInterval: const Duration(seconds: 5),
                               ),
                             ),
-                            SizedBox(
-                              height: querySize.height * 0.01,
-                            ),
+                            SizedBox(height: querySize.height * 0.01),
                             AnimatedSmoothIndicator(
                               activeIndex: activeIndex,
                               count: homeBannerProvidervalue
@@ -402,6 +451,260 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ],
                         );
+                        // return Column(
+                        //   children: [
+                        //     CarouselSlider.builder(
+                        //       itemCount: homeBannerProvidervalue
+                        //           .giftByVoucherItems.data!.length,
+                        //       itemBuilder: (context, index, realIndex) {
+                        //         return Padding(
+                        //           padding: EdgeInsets.symmetric(
+                        //               horizontal: querySize.width * 0.02),
+                        //           child: GestureDetector(
+                        //             onTap: () {
+                        //               String? screen = homeBannerProvidervalue
+                        //                   .giftByVoucherItems
+                        //                   .data![index]
+                        //                   .screen;
+
+                        //               if (screen == "best-seller" ||
+                        //                   screen == "new-arrival") {
+                        //                 Navigator.push(
+                        //                   context,
+                        //                   MaterialPageRoute(
+                        //                     builder: (context) =>
+                        //                         BestSellerNewArrivalListingScreen(
+                        //                       eventName: screen!,
+                        //                       productListingScreenName:
+                        //                           homeBannerProvidervalue
+                        //                                   .giftByVoucherItems
+                        //                                   .data![index]
+                        //                                   .screenName ??
+                        //                               '',
+                        //                     ),
+                        //                   ),
+                        //                 );
+                        //               } else if (screen == "gift-by-event" ||
+                        //                   screen == "sub-category" ||
+                        //                   screen == "collections") {
+                        //                 Navigator.push(
+                        //                   context,
+                        //                   MaterialPageRoute(
+                        //                     builder: (context) =>
+                        //                         SubCategoryProductListingScreen(
+                        //                       eventId: int.parse(
+                        //                           homeBannerProvidervalue
+                        //                               .giftByVoucherItems
+                        //                               .data![index]
+                        //                               .screenId!),
+                        //                       eventName: homeBannerProvidervalue
+                        //                           .giftByVoucherItems
+                        //                           .data![index]
+                        //                           .screen!,
+                        //                       productListingScreenName:
+                        //                           homeBannerProvidervalue
+                        //                                   .giftByVoucherItems
+                        //                                   .data![index]
+                        //                                   .screenName ??
+                        //                               '',
+                        //                     ),
+                        //                   ),
+                        //                 );
+                        //               } else if (screen == "products") {
+                        //                 Navigator.push(
+                        //                   context,
+                        //                   MaterialPageRoute(
+                        //                     builder: (context) =>
+                        //                         ProductDetailScreen(
+                        //                       productId: int.parse(
+                        //                           homeBannerProvidervalue
+                        //                               .giftByVoucherItems
+                        //                               .data![index]
+                        //                               .screenId!),
+                        //                     ),
+                        //                   ),
+                        //                 );
+                        //               } else if (screen == "customisation") {
+                        //                 Navigator.push(
+                        //                   context,
+                        //                   MaterialPageRoute(
+                        //                     builder: (context) =>
+                        //                         CustomisationScreen(
+                        //                       widgetName: customProfileTopBar(
+                        //                         querySize,
+                        //                         context,
+                        //                         "Customize",
+                        //                       ),
+                        //                     ),
+                        //                   ),
+                        //                 );
+                        //               } else if (screen == "repair") {
+                        //                 Navigator.push(
+                        //                   context,
+                        //                   MaterialPageRoute(
+                        //                     builder: (context) => RepairScreen(
+                        //                       widgetName: customProfileTopBar(
+                        //                           querySize, context, "Repair"),
+                        //                     ),
+                        //                   ),
+                        //                 );
+                        //               } else if (screen == "gift-voucher") {
+                        //                 Navigator.push(
+                        //                   context,
+                        //                   MaterialPageRoute(
+                        //                     builder: (context) =>
+                        //                         GiftByVoucherScreen(
+                        //                       giftByVoucherProvider: Provider
+                        //                           .of<GiftByVoucherProvider>(
+                        //                               context,
+                        //                               listen: false),
+                        //                     ),
+                        //                   ),
+                        //                 );
+                        //               } else {
+                        //                 // Handle unknown or null screen values
+                        //                 debugPrint("Unknown screen: $screen");
+                        //               }
+                        //             },
+                        //             child: ClipRRect(
+                        //               borderRadius: BorderRadius.circular(
+                        //                   querySize.height * 0.02),
+                        //               child: Container(
+                        //                 width: double.infinity,
+                        //                 height: querySize.height * 0.24,
+                        //                 decoration: BoxDecoration(
+                        //                   image: DecorationImage(
+                        //                     image: NetworkImage(
+                        //                       homeBannerProvidervalue
+                        //                           .giftByVoucherItems
+                        //                           .data![index]
+                        //                           .image!,
+                        //                     ),
+                        //                     fit: BoxFit.cover,
+                        //                   ),
+                        //                 ),
+                        //                 child: Padding(
+                        //                   padding: const EdgeInsets.all(
+                        //                       16.0), // Adjust padding as needed
+                        //                   child: Column(
+                        //                     crossAxisAlignment:
+                        //                         CrossAxisAlignment.start,
+                        //                     children: [
+                        //                       SizedBox(
+                        //                         height: querySize.height * 0.05,
+                        //                       ),
+                        //                       Row(
+                        //                         children: [
+                        //                           SizedBox(
+                        //                             width:
+                        //                                 querySize.width * 0.02,
+                        //                           ),
+                        //                           Flexible(
+                        //                             child: Text(
+                        //                               homeBannerProvidervalue
+                        //                                       .giftByVoucherItems
+                        //                                       .data![index]
+                        //                                       .titleOne ??
+                        //                                   "", // Replace with the desired text property
+                        //                               style: TextStyle(
+                        //                                 fontFamily: 'ElMessiri',
+                        //                                 color: Colors.white,
+                        //                                 fontSize: 18,
+                        //                                 fontWeight:
+                        //                                     FontWeight.bold,
+                        //                                 shadows: [
+                        //                                   Shadow(
+                        //                                     blurRadius: 5.0,
+                        //                                     color: Colors.black
+                        //                                         .withOpacity(
+                        //                                             0.7),
+                        //                                     offset: Offset(
+                        //                                         2.0, 2.0),
+                        //                                   ),
+                        //                                 ],
+                        //                               ),
+                        //                               overflow:
+                        //                                   TextOverflow.ellipsis,
+                        //                               maxLines:
+                        //                                   3, // Limits to 1 line and adds ellipsis if overflow
+                        //                             ),
+                        //                           ),
+                        //                         ],
+                        //                       ),
+                        //                       Row(
+                        //                         children: [
+                        //                           SizedBox(
+                        //                             width:
+                        //                                 querySize.width * 0.02,
+                        //                           ),
+                        //                           Flexible(
+                        //                             child: Text(
+                        //                               homeBannerProvidervalue
+                        //                                       .giftByVoucherItems
+                        //                                       .data![index]
+                        //                                       .description ??
+                        //                                   '', // Replace with the desired text property
+                        //                               style: TextStyle(
+                        //                                 fontFamily: 'ElMessiri',
+                        //                                 color: Colors.white,
+                        //                                 fontSize: 16,
+                        //                                 fontWeight:
+                        //                                     FontWeight.bold,
+                        //                                 shadows: [
+                        //                                   Shadow(
+                        //                                     blurRadius: 5.0,
+                        //                                     color: Colors.black
+                        //                                         .withOpacity(
+                        //                                             0.7),
+                        //                                     offset: Offset(
+                        //                                         2.0, 2.0),
+                        //                                   ),
+                        //                                 ],
+                        //                               ),
+                        //                               overflow:
+                        //                                   TextOverflow.ellipsis,
+                        //                               maxLines:
+                        //                                   3, // Limits to 1 line and adds ellipsis if overflow
+                        //                             ),
+                        //                           ),
+                        //                         ],
+                        //                       ),
+                        //                       // Add other content below the text if needed
+                        //                     ],
+                        //                   ),
+                        //                 ),
+                        //               ),
+                        //             ),
+                        //           ),
+                        //         );
+                        //       },
+                        //       options: CarouselOptions(
+                        //         onPageChanged: (index, reason) {
+                        //           setState(() {
+                        //             activeIndex = index;
+                        //           });
+                        //         },
+                        //         viewportFraction: 1,
+                        //         height: querySize.height * 0.24,
+                        //         autoPlay: true,
+                        //         autoPlayInterval: const Duration(seconds: 5),
+                        //       ),
+                        //     ),
+                        //     SizedBox(
+                        //       height: querySize.height * 0.01,
+                        //     ),
+                        //     AnimatedSmoothIndicator(
+                        //       activeIndex: activeIndex,
+                        //       count: homeBannerProvidervalue
+                        //           .giftByVoucherItems.data!.length,
+                        //       effect: SlideEffect(
+                        //         dotHeight: querySize.height * 0.008,
+                        //         dotWidth: querySize.width * 0.018,
+                        //         activeDotColor: appColor,
+                        //       ),
+                        //     ),
+                        //   ],
+                        // );
                       }
                     },
                   ),
@@ -1930,7 +2233,7 @@ class _HomeScreenState extends State<HomeScreen> {
           shrinkWrap: true,
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 4, // Number of columns
-            crossAxisSpacing: 10.0,
+            crossAxisSpacing: 1.0,
             mainAxisSpacing: 16.0,
             childAspectRatio: 1.1,
           ),

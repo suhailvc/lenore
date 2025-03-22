@@ -222,53 +222,74 @@ class _WishListScreenState extends State<WishListScreen> {
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
-                                      Spacer(),
-                                      GestureDetector(
-                                        onTap: () async {
-                                          final authProvider =
-                                              Provider.of<AuthProvider>(context,
-                                                  listen: false);
-                                          final token =
-                                              await authProvider.getToken();
-                                          wishlistProvider.toggleWishlist(
-                                              token!, item.id);
-                                          var productDetail = await Provider.of<
-                                                      ProductDetailProvider>(
-                                                  context,
-                                                  listen: false)
-                                              .fetchProductDetails(id: item.id);
-                                          final cartItem = HiveCartModel(
-                                            type: '1',
-                                            productId: productDetail!.data!.id!,
-                                            productName:
-                                                productDetail.data!.name ?? '',
-                                            description:
-                                                productDetail.data!.sku ?? '',
-                                            price: productDetail.data!.price!
-                                                .toDouble(),
-                                            size: 'Default Size',
-                                            image: (productDetail
-                                                            .data!.images !=
-                                                        null &&
-                                                    productDetail.data!.images!
-                                                        .isNotEmpty)
-                                                ? productDetail.data!.images!
-                                                    .first // Use the first image if available
-                                                : 'assets/images/placeholder.png', // Default placeholder image
-                                            stock:
-                                                productDetail.data!.stock ?? 0,
-                                            quantity: 1,
-                                          );
-                                          Provider.of<CartProvider>(context,
-                                                  listen: false)
-                                              .addToCart(cartItem);
-                                        },
-                                        child: Image.asset(
-                                          'assets/images/bag.png',
-                                          width: querySize.width * 0.088,
-                                          height: querySize.height * 0.028,
-                                        ),
-                                      ),
+                                      // Spacer(),
+                                      // GestureDetector(
+                                      //   onTap: () async {
+                                      //     final authProvider =
+                                      //         Provider.of<AuthProvider>(context,
+                                      //             listen: false);
+                                      //     final token =
+                                      //         await authProvider.getToken();
+
+                                      //     var productDetail = await Provider.of<
+                                      //                 ProductDetailProvider>(
+                                      //             context,
+                                      //             listen: false)
+                                      //         .fetchProductDetails(id: item.id);
+                                      //     if (Provider.of<ProductDetailProvider>(
+                                      //                 context,
+                                      //                 listen: false)
+                                      //             .productDetails!
+                                      //             .data!
+                                      //             .stock! >
+                                      //         0) {
+                                      //       wishlistProvider.toggleWishlist(
+                                      //           token!, item.id);
+                                      //       final cartItem = HiveCartModel(
+                                      //         type: '1',
+                                      //         productId:
+                                      //             productDetail!.data!.id!,
+                                      //         productName:
+                                      //             productDetail.data!.name ??
+                                      //                 '',
+                                      //         description:
+                                      //             productDetail.data!.sku ?? '',
+                                      //         price: productDetail.data!.price!
+                                      //             .toDouble(),
+                                      //         size: 'Default Size',
+                                      //         image: (productDetail
+                                      //                         .data!.images !=
+                                      //                     null &&
+                                      //                 productDetail.data!
+                                      //                     .images!.isNotEmpty)
+                                      //             ? productDetail.data!.images!
+                                      //                 .first // Use the first image if available
+                                      //             : 'assets/images/placeholder.png', // Default placeholder image
+                                      //         stock:
+                                      //             productDetail.data!.stock ??
+                                      //                 0,
+                                      //         quantity: 1,
+                                      //       );
+                                      //       Provider.of<CartProvider>(context,
+                                      //               listen: false)
+                                      //           .addToCart(cartItem);
+                                      //     } else {
+                                      //       ScaffoldMessenger.of(context)
+                                      //           .showSnackBar(
+                                      //         SnackBar(
+                                      //             backgroundColor:
+                                      //                 const Color(0xFF008186),
+                                      //             content:
+                                      //                 Text("Out Of Stock")),
+                                      //       );
+                                      //     }
+                                      //   },
+                                      //   child: Image.asset(
+                                      //     'assets/images/bag.png',
+                                      //     width: querySize.width * 0.088,
+                                      //     height: querySize.height * 0.028,
+                                      //   ),
+                                      // ),
                                     ],
                                   ),
                                 ],

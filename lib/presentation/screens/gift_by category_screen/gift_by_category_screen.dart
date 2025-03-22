@@ -202,9 +202,21 @@ class _GiftByCategoryScreenState extends State<GiftByCategoryScreen> {
                                       left: 0,
                                       right: 0,
                                       child: Text(
-                                        giftByCategoryValue.cachedResponse!
-                                                .data![index].name ??
-                                            'No Name',
+                                        Localizations.localeOf(context)
+                                                    .languageCode ==
+                                                'en'
+                                            ? giftByCategoryValue
+                                                .cachedResponse!
+                                                .data![index]
+                                                .name!
+                                            : giftByCategoryValue
+                                                    .cachedResponse!
+                                                    .data![index]
+                                                    .namear ??
+                                                giftByCategoryValue
+                                                    .cachedResponse!
+                                                    .data![index]
+                                                    .name!,
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
                                           fontSize:

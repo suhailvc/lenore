@@ -13,7 +13,10 @@ class GoldPurityFilter extends StatefulWidget {
 class _GoldPurityFilterState extends State<GoldPurityFilter> {
   @override
   void initState() {
-    Provider.of<GoldPurityProvider>(context, listen: false).loadGoldPurity();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<GoldPurityProvider>(context, listen: false).loadGoldPurity();
+    });
+    // Provider.of<GoldPurityProvider>(context, listen: false).loadGoldPurity();
     super.initState();
   }
 
@@ -52,6 +55,8 @@ class _GoldPurityFilterState extends State<GoldPurityFilter> {
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: goldPurityProvider.goldPurityData!.data.length,
                 itemBuilder: (context, index) {
+                  int goldId =
+                      goldPurityProvider.goldPurityData!.data[index].id;
                   int goldPurity = int.parse(
                       goldPurityProvider.goldPurityData!.data[index].purity);
 
@@ -62,18 +67,18 @@ class _GoldPurityFilterState extends State<GoldPurityFilter> {
                         child: Checkbox(
                           visualDensity: VisualDensity.compact,
                           value: filterProvider.selectedGoldPurities
-                              .contains(goldPurity),
+                              .contains(goldId),
                           activeColor: Colors.black,
                           onChanged: (value) {
                             if (value == true) {
                               filterProvider.updateGoldPurities([
                                 ...filterProvider.selectedGoldPurities,
-                                goldPurity
+                                goldId
                               ]);
                             } else {
                               filterProvider.updateGoldPurities(
                                 filterProvider.selectedGoldPurities
-                                    .where((id) => id != goldPurity)
+                                    .where((id) => id != goldId)
                                     .toList(),
                               );
                             }

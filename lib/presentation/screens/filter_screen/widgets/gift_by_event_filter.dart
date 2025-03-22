@@ -14,8 +14,12 @@ class GiftByEventFilter extends StatefulWidget {
 class _GiftByEventFilterState extends State<GiftByEventFilter> {
   @override
   void initState() {
-    Provider.of<GiftByEventProvider>(context, listen: false)
-        .giftByEventProviderMethod();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<GiftByEventProvider>(context, listen: false)
+          .giftByEventProviderMethod();
+    });
+    // Provider.of<GiftByEventProvider>(context, listen: false)
+    //     .giftByEventProviderMethod();
     super.initState();
   }
 

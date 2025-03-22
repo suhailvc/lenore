@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "923759502233",
+    "project_id": "lenore-92b3c",
+    "storage_bucket": "lenore-92b3c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:923759502233:android:f0c0a9ce4509ad013ba908",
+        "android_client_info": {
+          "package_name": "qa.lenore"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCkM1lNnvS4yONuBzYJG0T1fOB-tGIydiw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

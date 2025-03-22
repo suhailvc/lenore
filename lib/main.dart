@@ -1,5 +1,9 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:lenore/application/localization/localization.dart';
 import 'package:lenore/application/provider/add_to_wishlist_provider/add_to_wishlist_provider.dart';
 import 'package:lenore/application/provider/auth_provider/auth_provider.dart';
 import 'package:lenore/application/provider/bestseller_new_aarival_product_list_provider/bestseller_new_aarival_product_list_provider.dart';
@@ -21,11 +25,13 @@ import 'package:lenore/application/provider/home_provider/gift_by_category/gift_
 import 'package:lenore/application/provider/home_provider/gift_by_event_provider/gift_by_event_provider.dart';
 import 'package:lenore/application/provider/home_provider/gift_by_voucher_provider/gift_by_voucher_provider.dart';
 import 'package:lenore/application/provider/home_provider/home_banner_provider/home_banner_provider.dart';
+import 'package:lenore/application/provider/locale_provider/locale_provider.dart';
 
 import 'package:lenore/application/provider/login_provider/login_provider.dart';
 import 'package:lenore/application/provider/mobile_number_provider/mobile_number_provider.dart';
 import 'package:lenore/application/provider/new_aarival_provider/new_arrival_provider.dart';
 import 'package:lenore/application/provider/notification_provider/notification_provider.dart';
+import 'package:lenore/application/provider/off_days_provider/off_days_provider.dart';
 import 'package:lenore/application/provider/order_detail_provider/order_detail_provider.dart';
 import 'package:lenore/application/provider/order_history_provider/order_history_provider.dart';
 import 'package:lenore/application/provider/order_status_provider/order_status_provider.dart';
@@ -41,56 +47,90 @@ import 'package:lenore/application/provider/sub_category_provider/sub_category_p
 
 import 'package:lenore/application/provider/user_registration_provider/user_registration_provider.dart';
 import 'package:lenore/application/provider/voucher_detail_provider/voucher_detail_provider.dart';
+import 'package:lenore/application/provider/wallet_balance_provider/wallet_balance_provider.dart';
 import 'package:lenore/application/provider/wishlist_provider/whishlist_provider.dart';
+import 'package:lenore/core/constant.dart';
 import 'package:lenore/domain/hive_model/hive_cart_model/hive_cart_model.dart';
-import 'package:lenore/domain/order_status_model/order_status_model.dart';
+import 'package:lenore/firebase_options.dart';
 
 import 'package:lenore/presentation/screens/splash/splash_screen.dart';
-
+import 'package:lenore/push_notification.dart';
 import 'package:myfatoorah_flutter/myfatoorah_flutter.dart';
+
 import 'package:provider/provider.dart';
 
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter/foundation.dart'
+    show defaultTargetPlatform, kDebugMode, kIsWeb;
+
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+AndroidNotificationChannel? channel;
 void main() async {
   // Ensure Flutter binding is initialized
   WidgetsFlutterBinding.ensureInitialized();
-
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   // Initialize Hive
   await Hive.initFlutter();
   if (!Hive.isAdapterRegistered(HiveCartModelAdapter().typeId)) {
     Hive.registerAdapter(HiveCartModelAdapter());
   }
   await Hive.openBox<HiveCartModel>('cartBox');
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  // await FirebaseMessaging.instance.subscribeToTopic('grofresh');
+  if (defaultTargetPlatform == TargetPlatform.android) {
+    FirebaseMessaging.instance.requestPermission();
 
-  // Initialize MFSDK with proper error handling
-  try {
-    debugPrint("Initializing MFSDK...");
-    await MFSDK.init(
-      "rLtt6JWvbUHDDhsZnfpAhpYk4dxYDQkbcPTyGaKp2TYqQgG7FGZ5Th_WD53Oq8Ebz6A53njUoo1w3pjU1D4vs_ZMqFiz_j0urb_BH9Oq9VZoKFoJEDAbRZepGcQanImyYrry7Kt6MnMdgfG5jn4HngWoRdKduNNyP4kzcp3mRv7x00ahkm9LAK7ZRieg7k1PDAnBIOG3EyVSJ5kK4WLMvYr7sCwHbHcu4A5WwelxYK0GMJy37bNAarSJDFQsJ2ZvJjvMDmfWwDVFEVe_5tOomfVNt6bOg9mexbGjMrnHBnKnZR1vQbBtQieDlQepzTZMuQrSuKn-t5XZM7V6fCW7oP-uXGX-sMOajeX65JOf6XVpk29DP6ro8WTAflCDANC193yof8-f5_EYY-3hXhJj7RBXmizDpneEQDSaSz5sFk0sV5qPcARJ9zGG73vuGFyenjPPmtDtXtpx35A-BVcOSBYVIWe9kndG3nclfefjKEuZ3m4jL9Gg1h2JBvmXSMYiZtp9MR5I6pvbvylU_PP5xJFSjVTIz7IQSjcVGO41npnwIxRXNRxFOdIUHn0tjQ-7LwvEcTXyPsHXcMD8WtgBh-wxR8aKX7WPSsT1O8d8reb2aR7K3rkV3K82K_0OgawImEpwSvp9MNKynEAJQS6ZHe_J_l77652xwPNxMRTMASk1ZsJL",
-      MFCountry.KUWAIT,
-      MFEnvironment.TEST,
-    );
-    debugPrint("MFSDK initialized successfully");
-  } catch (e) {
-    debugPrint("Error initializing MFSDK: $e");
+    /// firebase crashlytics
   }
+  final fcmToken = await FirebaseMessaging.instance.getToken();
+  print('-------fcm token-----  $fcmToken');
+  fcm_token = fcmToken;
+  int? orderID;
+  try {
+    if (!kIsWeb) {
+      channel = const AndroidNotificationChannel(
+        'high_importance_channel',
+        'High Importance Notifications',
+        importance: Importance.high,
+        enableLights: true,
+        enableVibration: true,
+        playSound: true,
+        showBadge: true,
+        description: 'Important notifications from the app', // Add description
+      );
+    }
+    final RemoteMessage? remoteMessage =
+        await FirebaseMessaging.instance.getInitialMessage();
+    if (remoteMessage != null) {
+      orderID = remoteMessage.notification!.titleLocKey != null
+          ? int.parse(remoteMessage.notification!.titleLocKey!)
+          : null;
+    }
+    await NotificationHelper.initialize(flutterLocalNotificationsPlugin);
+    FirebaseMessaging.onBackgroundMessage(myBackgroundMessageHandler);
+  } catch (e) {
+    if (kDebugMode) {
+      print('error---> ${e.toString()}');
+    }
+  }
+  // Initialize MFSDK with proper error handling
+  // try {
+  //   debugPrint("Initializing MFSDK...");
+  //   await MFSDK.init(
+  //     "rLtt6JWvbUHDDhsZnfpAhpYk4dxYDQkbcPTyGaKp2TYqQgG7FGZ5Th_WD53Oq8Ebz6A53njUoo1w3pjU1D4vs_ZMqFiz_j0urb_BH9Oq9VZoKFoJEDAbRZepGcQanImyYrry7Kt6MnMdgfG5jn4HngWoRdKduNNyP4kzcp3mRv7x00ahkm9LAK7ZRieg7k1PDAnBIOG3EyVSJ5kK4WLMvYr7sCwHbHcu4A5WwelxYK0GMJy37bNAarSJDFQsJ2ZvJjvMDmfWwDVFEVe_5tOomfVNt6bOg9mexbGjMrnHBnKnZR1vQbBtQieDlQepzTZMuQrSuKn-t5XZM7V6fCW7oP-uXGX-sMOajeX65JOf6XVpk29DP6ro8WTAflCDANC193yof8-f5_EYY-3hXhJj7RBXmizDpneEQDSaSz5sFk0sV5qPcARJ9zGG73vuGFyenjPPmtDtXtpx35A-BVcOSBYVIWe9kndG3nclfefjKEuZ3m4jL9Gg1h2JBvmXSMYiZtp9MR5I6pvbvylU_PP5xJFSjVTIz7IQSjcVGO41npnwIxRXNRxFOdIUHn0tjQ-7LwvEcTXyPsHXcMD8WtgBh-wxR8aKX7WPSsT1O8d8reb2aR7K3rkV3K82K_0OgawImEpwSvp9MNKynEAJQS6ZHe_J_l77652xwPNxMRTMASk1ZsJL",
+  //     MFCountry.KUWAIT,
+  //     MFEnvironment.TEST,
+  //   );
+  //   debugPrint("MFSDK initialized successfully");
+  // } catch (e) {
+  //   debugPrint("Error initializing MFSDK: $e");
+  // }
 
   runApp(const MyApp());
 }
-// void main() async {
-//   WidgetsFlutterBinding.ensureInitialized();
-//   await Hive.initFlutter();
-//   if (!Hive.isAdapterRegistered(HiveCartModelAdapter().typeId)) {
-//     Hive.registerAdapter(HiveCartModelAdapter());
-//   }
-//   await Hive.openBox<HiveCartModel>('cartBox');
-//   MFSDK.init(
-//       "rLtt6JWvbUHDDhsZnfpAhpYk4dxYDQkbcPTyGaKp2TYqQgG7FGZ5Th_WD53Oq8Ebz6A53njUoo1w3pjU1D4vs_ZMqFiz_j0urb_BH9Oq9VZoKFoJEDAbRZepGcQanImyYrry7Kt6MnMdgfG5jn4HngWoRdKduNNyP4kzcp3mRv7x00ahkm9LAK7ZRieg7k1PDAnBIOG3EyVSJ5kK4WLMvYr7sCwHbHcu4A5WwelxYK0GMJy37bNAarSJDFQsJ2ZvJjvMDmfWwDVFEVe_5tOomfVNt6bOg9mexbGjMrnHBnKnZR1vQbBtQieDlQepzTZMuQrSuKn-t5XZM7V6fCW7oP-uXGX-sMOajeX65JOf6XVpk29DP6ro8WTAflCDANC193yof8-f5_EYY-3hXhJj7RBXmizDpneEQDSaSz5sFk0sV5qPcARJ9zGG73vuGFyenjPPmtDtXtpx35A-BVcOSBYVIWe9kndG3nclfefjKEuZ3m4jL9Gg1h2JBvmXSMYiZtp9MR5I6pvbvylU_PP5xJFSjVTIz7IQSjcVGO41npnwIxRXNRxFOdIUHn0tjQ-7LwvEcTXyPsHXcMD8WtgBh-wxR8aKX7WPSsT1O8d8reb2aR7K3rkV3K82K_0OgawImEpwSvp9MNKynEAJQS6ZHe_J_l77652xwPNxMRTMASk1ZsJL",
-//       MFCountry.KUWAIT,
-//       MFEnvironment.TEST);
-
-//   // Routes.initializeRouter();
-//   runApp(const MyApp());
-// }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -213,31 +253,39 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (context) => OrderStatusProvider(),
         ),
-      ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Flutter Demo',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-          useMaterial3: true,
+        ChangeNotifierProvider(
+          create: (context) => LocaleProvider(),
         ),
-        // routerConfig: Routes.router,
-
-        // routerDelegate: Routes.router.routerDelegate,
-        //routeInformationParser: Routes.router.routeInformationParser,
-        //  home: const PersistantBottomNavBarScreen(),
-        //  home: LandingScreen(),
-        //home: AccountScreen(),
-        // home: const SplashScreen(),
-        //home: const BottomNaveBar(),
-        //home: const CollectionScreen(),
-        // home: const MobileNumberInputScreen(),
-        // home: PersistantBottomNavBarScreen(),
-        home: const SplashScreen(),
-        // home: const ShimmerLoading(
-        //     itemCount: itemCount, containerHeight: containerHeight),
-        // home: EditProfileScreen(),
-      ),
+        ChangeNotifierProvider(
+          create: (context) => OffDaysProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => WalletBalanceProvider(),
+        ),
+      ],
+      child:
+          Consumer<LocaleProvider>(builder: (context, localeProvider, child) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'Flutter Demo',
+          locale: localeProvider.locale,
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [
+            Locale('en'), // English
+            Locale('ar'), // Arabic
+          ],
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+            useMaterial3: true,
+          ),
+          home: const SplashScreen(),
+        );
+      }),
     );
   }
 }

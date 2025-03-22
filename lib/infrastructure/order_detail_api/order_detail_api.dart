@@ -5,6 +5,7 @@ import 'package:lenore/domain/order_detail_model/order_detail_model.dart';
 
 Future<OrderDetailModel?> fetchOrderDetailService(
     String token, String orderId) async {
+  print("order id : $orderId");
   final url = Uri.parse('${baseUrl}/api/order-details?order_id=${orderId}');
 
   try {

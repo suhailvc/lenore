@@ -376,7 +376,7 @@ class CartScreen extends StatelessWidget {
                   GestureDetector(
                     onTap: () {
                       cartProvider.incrementItemQuantity(
-                          cartProvider.items.indexOf(item));
+                          cartProvider.items.indexOf(item), context);
                     },
                     child: Container(
                       decoration: const BoxDecoration(

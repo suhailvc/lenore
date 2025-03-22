@@ -11,6 +11,8 @@ import 'package:lenore/core/constant.dart';
 import 'package:lenore/domain/hive_model/hive_cart_model/hive_cart_model.dart';
 import 'package:lenore/domain/product_detail_model/product_detail_model.dart';
 import 'package:lenore/presentation/screens/buy_now_check_out_screen/buy_now_check_out_screen.dart';
+import 'package:lenore/presentation/screens/check_out_screen/check_out_screen.dart';
+import 'package:lenore/presentation/widgets/custom_snack_bar.dart';
 
 import 'package:lenore/presentation/widgets/custom_top_bar.dart';
 import 'package:lenore/presentation/widgets/multiple_shimmer.dart';
@@ -30,15 +32,81 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   int detailActiveIndex = 0;
+  ProductSize? selectedSize; // Only track the selected size
+  @override
+  void didUpdateWidget(ProductDetailScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // If the productId has changed (e.g., when returning from a similar product)
+    if (oldWidget.productId != widget.productId) {
+      _resetAndFetchProduct();
+    }
+  }
+
+// Add this method to your _ProductDetailScreenState class
+  void _resetAndFetchProduct() {
+    // Reset state
+    setState(() {
+      detailActiveIndex = 0;
+      selectedSize = null;
+    });
+
+    // Clear previous data and fetch new product details
+    Provider.of<ProductDetailProvider>(context, listen: false)
+        .clearProductDetails();
+    Provider.of<ProductDetailProvider>(context, listen: false)
+        .fetchProductDetails(id: widget.productId)
+        .then((_) {
+      // After fetching product details, select the first size by default if available
+      final productDetails =
+          Provider.of<ProductDetailProvider>(context, listen: false)
+              .productDetails;
+      if (productDetails?.data?.sizes != null &&
+          productDetails!.data!.sizes!.isNotEmpty) {
+        setState(() {
+          selectedSize = productDetails.data!.sizes!.first;
+        });
+      }
+    });
+    _fetchWishlistStatus();
+  }
+
   @override
   void initState() {
-    print('---------------------------------${widget.productId}');
-    // Initialize TabController in initState and use vsync: this
-    _tabController = TabController(length: 2, vsync: this);
-    Provider.of<ProductDetailProvider>(context, listen: false)
-        .fetchProductDetails(id: widget.productId);
-    _fetchWishlistStatus();
     super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _resetAndFetchProduct();
+    });
+  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   _tabController = TabController(length: 2, vsync: this);
+  //   WidgetsBinding.instance.addPostFrameCallback((_) {
+  //     Provider.of<ProductDetailProvider>(context, listen: false)
+  //         .clearProductDetails(); // Clear previous data
+  //     Provider.of<ProductDetailProvider>(context, listen: false)
+  //         .fetchProductDetails(id: widget.productId)
+  //         .then((_) {
+  //       // After fetching product details, select the first size by default if available
+  //       final productDetails =
+  //           Provider.of<ProductDetailProvider>(context, listen: false)
+  //               .productDetails;
+  //       if (productDetails?.data?.sizes != null &&
+  //           productDetails!.data!.sizes!.isNotEmpty) {
+  //         setState(() {
+  //           selectedSize = productDetails.data!.sizes!.first;
+  //         });
+  //       }
+  //     });
+  //     _fetchWishlistStatus();
+  //   });
+  // }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   Future<void> _fetchWishlistStatus() async {
@@ -53,13 +121,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
   }
 
   @override
-  void dispose() {
-    // Dispose of the TabController when the widget is disposed
-    _tabController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     print('---------------------------------${widget.productId}');
     var querySize = MediaQuery.of(context).size;
@@ -70,7 +131,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
           if (productDetailProvidervalue.isLoading) {
             return multipleShimmerLoading(
                 containerHeight: querySize.height * 0.06);
-            // return lenoreGif(querySize);
           }
           if (productDetailProvidervalue.productDetails == null) {
             return Container(
@@ -126,181 +186,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                                           right: querySize.height * 0.02,
                                           child: Row(
                                             children: [
-                                              // CircleAvatar(
-                                              //   radius: querySize.width * 0.033,
-                                              //   backgroundColor: Colors.white,
-                                              //   child: Image.asset(
-                                              //     'assets/images/product_detail_image/share.png',
-                                              //     width: querySize.width * 0.04,
-                                              //     height:
-                                              //         querySize.height * 0.017,
-                                              //   ),
-                                              // ),
-                                              // SizedBox(
-                                              //     width:
-                                              //         querySize.width * 0.02),
-                                              // Consumer2<GetWishListProvider,
-                                              //     AddToWishlistProvider>(
-                                              //   builder: (context,
-                                              //       getWishListProvider,
-                                              //       addToWishlistProvider,
-                                              //       child) {
-                                              //     final productId =
-                                              //         productDetailProvidervalue
-                                              //             .productDetails!
-                                              //             .data!
-                                              //             .id!;
-                                              //     final isInWishlist =
-                                              //         addToWishlistProvider
-                                              //             .isProductInWishlist(
-                                              //                 productId);
-
-                                              //     return GestureDetector(
-                                              //       onTap: () async {
-                                              //         String token =
-                                              //             await Provider.of<
-                                              //                             AuthProvider>(
-                                              //                         context,
-                                              //                         listen:
-                                              //                             false)
-                                              //                     .getToken() ??
-                                              //                 '';
-                                              //         if (token.isEmpty) {
-                                              //           customSnackBar(context,
-                                              //               "Please Sign In");
-                                              //         } else {
-                                              //           // Add or remove from wishlist based on current state
-                                              //           if (isInWishlist) {
-                                              //             await addToWishlistProvider
-                                              //                 .addToWishListProvider(
-                                              //                     productId,
-                                              //                     '0',
-                                              //                     token);
-                                              //           } else {
-                                              //             await addToWishlistProvider
-                                              //                 .addToWishListProvider(
-                                              //                     productId,
-                                              //                     '1',
-                                              //                     token);
-                                              //           }
-                                              //         }
-                                              //       },
-                                              //       child: CircleAvatar(
-                                              //         radius: querySize.width *
-                                              //             0.033,
-                                              //         backgroundColor:
-                                              //             isInWishlist
-                                              //                 ? Colors.red
-                                              //                 : Colors.white,
-                                              //         child: Image.asset(
-                                              //           isInWishlist
-                                              //               ? 'assets/images/app icon.png'
-                                              //               : 'assets/images/home/favourite.png',
-                                              //           width: querySize.width *
-                                              //               0.075,
-                                              //           height:
-                                              //               querySize.height *
-                                              //                   0.037,
-                                              //         ),
-                                              //       ),
-                                              //     );
-                                              //   },
-                                              // )
-
-                                              // Consumer<GetWishListProvider>(...............................................
-                                              //     builder: (context,
-                                              //         getWishListvalue, child) {
-                                              //   return Consumer<
-                                              //           AddToWishlistProvider>(
-                                              //       builder: (context,
-                                              //           wishlistValue, child) {
-                                              //     return GestureDetector(
-                                              //       onTap: () async {
-                                              //         String token =
-                                              //             await Provider.of<
-                                              //                             AuthProvider>(
-                                              //                         context,
-                                              //                         listen:
-                                              //                             false)
-                                              //                     .getToken() ??
-                                              //                 '';
-                                              //         if (token == '') {
-                                              //           return customSnackBar(
-                                              //               context,
-                                              //               "Please SignIn");
-                                              //         } else if (getWishListvalue
-                                              //                 .isProductInWishlist(
-                                              //                     productDetailProvidervalue
-                                              //                         .productDetails!
-                                              //                         .data!
-                                              //                         .id!) ==
-                                              //             false)
-                                              //           wishlistValue
-                                              //               .addToWishListProvider(
-                                              //                   productDetailProvidervalue
-                                              //                       .productDetails!
-                                              //                       .data!
-                                              //                       .id!,
-                                              //                   '1',
-                                              //                   token);
-                                              //         else if (getWishListvalue
-                                              //                 .isProductInWishlist(
-                                              //                     productDetailProvidervalue
-                                              //                         .productDetails!
-                                              //                         .data!
-                                              //                         .id!) ==
-                                              //             true)
-                                              //           wishlistValue
-                                              //               .addToWishListProvider(
-                                              //                   productDetailProvidervalue
-                                              //                       .productDetails!
-                                              //                       .data!
-                                              //                       .id!,
-                                              //                   '0',
-                                              //                   token);
-                                              //         print('touched');
-                                              //       },
-                                              //       child: CircleAvatar(
-                                              //         radius: querySize.width *
-                                              //             0.033,
-                                              //         backgroundColor:
-                                              //             Colors.white,
-                                              //         child: getWishListvalue
-                                              //                     .isProductInWishlist(
-                                              //                         productDetailProvidervalue
-                                              //                             .productDetails!
-                                              //                             .data!
-                                              //                             .id!) ==
-                                              //                 false
-                                              //             ? Image.asset(
-                                              //                 'assets/images/home/favourite.png',
-                                              //                 width: querySize
-                                              //                         .width *
-                                              //                     0.075,
-                                              //                 height: querySize
-                                              //                         .height *
-                                              //                     0.037,
-                                              //               )
-                                              //             : Image.asset(
-                                              //                 'assets/images/app icon.png',
-                                              //                 width: querySize
-                                              //                         .width *
-                                              //                     0.075,
-                                              //                 height: querySize
-                                              //                         .height *
-                                              //                     0.037,
-                                              //               ),
-                                              //       ),
-                                              //     );
-                                              //   });
-                                              // }),
                                               Consumer<WishlistProvider>(
                                                 builder: (context,
                                                     wishlistProvider, child) {
-                                                  // if (wishlistProvider
-                                                  //     .isLoading) {
-                                                  //   return CircularProgressIndicator();
-                                                  // }
                                                   if (wishlistProvider
                                                           .errorMessage !=
                                                       null) {
@@ -410,57 +298,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                                 ),
                               ],
                             )
-
-                            // Container(
-                            //   width: querySize.width * 0.94,
-                            //   height: querySize.width * 0.9,
-                            //   decoration: BoxDecoration(
-                            //     boxShadow: [
-                            //       BoxShadow(
-                            //         color: Colors.black.withOpacity(0.3),
-                            //         offset: const Offset(0, 4),
-                            //         blurRadius: querySize.width * 0.008,
-                            //         spreadRadius: 0,
-                            //       ),
-                            //     ],
-                            //     color: const Color(0xFFE7E7E7),
-                            //     borderRadius:
-                            //         BorderRadius.circular(querySize.width * 0.02),
-                            //     image: const DecorationImage(
-                            //       image:
-                            //           AssetImage("assets/images/wishlist_one.png"),
-                            //       fit: BoxFit.cover,
-                            //     ),
-                            //   ),
-                            //   child: Row(
-                            //     mainAxisAlignment: MainAxisAlignment.end,
-                            //     crossAxisAlignment: CrossAxisAlignment.start,
-                            //     children: [
-                            //       Padding(
-                            //         padding: EdgeInsets.only(
-                            //             top: querySize.height * 0.008,
-                            //             right: querySize.height * 0.012),
-                            //         child: Row(
-                            //           children: [
-                            // Image.asset(
-                            //   'assets/images/product_detail_image/share.png',
-                            //   width: querySize.width * 0.04,
-                            //   height: querySize.height * 0.017,
-                            // ),
-                            // SizedBox(
-                            //   width: querySize.width * 0.03,
-                            // ),
-                            // Image.asset(
-                            //   'assets/images/home/favourite.png',
-                            //   width: querySize.width * 0.075,
-                            //   height: querySize.height * 0.037,
-                            // ),
-                            //           ],
-                            //         ),
-                            //       ),
-                            //     ],
-                            //   ),
-                            // ),
                           ],
                         ),
                       ),
@@ -472,8 +309,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                           children: [
                             Row(
                               children: [
+                                // Text(
+                                //   'QAR ${(selectedSize?.addPrice ?? productDetailProvidervalue.productDetails!.data!.price)! + (selectedSize?.addMakingPrice != null ? selectedSize!.addMakingPrice : productDetailProvidervalue.productDetails!.data!.makingPrice)!}',
+                                //   style: TextStyle(
+                                //       fontFamily: 'ElMessirisemibold',
+                                //       fontSize: querySize.height * 0.025,
+                                //       fontWeight: FontWeight.w600),
+                                // ),
                                 Text(
-                                  'QAR ${productDetailProvidervalue.productDetails!.data!.price}',
+                                  'QAR ${selectedSize?.addPrice ?? productDetailProvidervalue.productDetails!.data!.price}',
                                   style: TextStyle(
                                       fontFamily: 'ElMessirisemibold',
                                       fontSize: querySize.height * 0.025,
@@ -514,17 +358,140 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                                 )
                               ],
                             ),
+
+                            // Size dropdown - Only show if sizes are available
+                            // if (productDetailProvidervalue
+                            //             .productDetails!.data!.sizes !=
+                            //         null &&
+                            //     productDetailProvidervalue
+                            //         .productDetails!.data!.sizes!.isNotEmpty)
+                            //   Padding(
+                            //     padding: EdgeInsets.symmetric(
+                            //         vertical: querySize.height * 0.01),
+                            //     child: Row(
+                            //       children: [
+                            //         Text(
+                            //           'Size:',
+                            //           style: TextStyle(
+                            //             fontFamily: 'Segoe',
+                            //             fontSize: querySize.width * 0.04,
+                            //             color: const Color(0xFF5E5E5E),
+                            //           ),
+                            //         ),
+                            //         SizedBox(width: querySize.width * 0.02),
+                            //         Container(
+                            //           padding: EdgeInsets.symmetric(
+                            //               horizontal: querySize.width * 0.02),
+                            //           decoration: BoxDecoration(
+                            //             border: Border.all(
+                            //                 color: const Color(0xFF008186)),
+                            //             borderRadius: BorderRadius.circular(
+                            //                 querySize.width * 0.01),
+                            //           ),
+                            //           child: DropdownButton<ProductSize>(
+                            //             underline: SizedBox(),
+                            //             value: selectedSize,
+                            //             hint: Text('Select Size'),
+                            //             items: productDetailProvidervalue
+                            //                 .productDetails!.data!.sizes!
+                            //                 .map((size) =>
+                            //                     DropdownMenuItem<ProductSize>(
+                            //                       value: size,
+                            //                       child: Text('${size.addKey}'),
+                            //                     ))
+                            //                 .toList(),
+                            //             onChanged: (ProductSize? newSize) {
+                            //               setState(() {
+                            //                 selectedSize = newSize;
+                            //               });
+                            //             },
+                            //           ),
+                            //         ),
+                            //       ],
+                            //     ),
+                            //   ),
+
                             SizedBox(
                               height: querySize.height * 0.01,
                             ),
-                            Text(
-                              productDetailProvidervalue
-                                  .productDetails!.data!.name!,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  color: const Color(0xFF008186),
-                                  fontFamily: 'Segoe',
-                                  fontSize: querySize.width * 0.047),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  productDetailProvidervalue
+                                      .productDetails!.data!.name!,
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      color: const Color(0xFF008186),
+                                      fontFamily: 'Segoe',
+                                      fontSize: querySize.width * 0.047),
+                                ),
+                                if (productDetailProvidervalue
+                                            .productDetails!.data!.sizes !=
+                                        null &&
+                                    productDetailProvidervalue.productDetails!
+                                        .data!.sizes!.isNotEmpty)
+                                  Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: querySize.height * 0.01),
+                                    child: Row(
+                                      children: [
+                                        Text(
+                                          'Size:',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              color: Colors.black,
+                                              fontFamily: 'Segoe',
+                                              fontSize: querySize.width * 0.04),
+                                        ),
+                                        SizedBox(width: querySize.width * 0.02),
+                                        Container(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal:
+                                                  querySize.width * 0.01,
+                                              vertical:
+                                                  querySize.height * 0.003),
+                                          height: querySize.height * 0.035,
+                                          width: querySize.width *
+                                              0.20, // Added fixed width
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                                color: const Color(0xFF008186)),
+                                            borderRadius: BorderRadius.circular(
+                                                querySize.width * 0.01),
+                                          ),
+                                          child: DropdownButton<ProductSize>(
+                                            isDense: true,
+                                            isExpanded:
+                                                true, // Makes dropdown fit the container width
+                                            underline: SizedBox(),
+                                            icon: Icon(Icons.arrow_drop_down,
+                                                size: 19),
+                                            value: selectedSize,
+                                            hint: Text('Size',
+                                                style: TextStyle(fontSize: 11)),
+                                            items: productDetailProvidervalue
+                                                .productDetails!.data!.sizes!
+                                                .map((size) => DropdownMenuItem<
+                                                        ProductSize>(
+                                                      value: size,
+                                                      child: Text(
+                                                          '${size.addKey}',
+                                                          style: TextStyle(
+                                                              fontSize: 15)),
+                                                    ))
+                                                .toList(),
+                                            onChanged: (ProductSize? newSize) {
+                                              setState(() {
+                                                selectedSize = newSize;
+                                              });
+                                            },
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                              ],
                             ),
                             TabBar(
                               labelColor: appColor,
@@ -736,7 +703,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                                                         .name !=
                                                     'Diamond'
                                                 ? "${productDetailProvidervalue.productDetails!.data!.type ?? "N/A"}KT"
-                                                : "${productDetailProvidervalue.productDetails!.data!.goldWeight ?? "N/A"} gm",
+                                                : "${selectedSize?.addWeight ?? productDetailProvidervalue.productDetails!.data!.goldWeight ?? "N/A"} gm",
                                             style: TextStyle(
                                                 fontWeight: FontWeight.w600,
                                                 fontSize:
@@ -826,7 +793,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                                                         .category!
                                                         .name !=
                                                     'Diamond'
-                                                ? "${productDetailProvidervalue.productDetails!.data!.goldWeight ?? "N/A"} gm"
+                                                ? "${selectedSize?.addWeight ?? productDetailProvidervalue.productDetails!.data!.goldWeight ?? "N/A"} gm"
                                                 : productDetailProvidervalue
                                                     .productDetails!
                                                     .data!
@@ -856,7 +823,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                                       productDetailProvidervalue.productDetails!
                                                   .data!.category!.name !=
                                               'Diamond'
-                                          ? Column(
+                                          ? // Update the part in ProductDetailScreen that displays making charge
+                                          Column(
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
                                               children: [
@@ -871,7 +839,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                                                       fontFamily: 'Segoe'),
                                                 ),
                                                 Text(
-                                                  "${productDetailProvidervalue.productDetails!.data!.makingPrice ?? "N/A"} Qr",
+                                                  "${selectedSize?.addMakingPrice != null ? selectedSize!.addMakingPrice : productDetailProvidervalue.productDetails!.data!.makingPrice ?? "N/A"} Qr",
                                                   style: TextStyle(
                                                       fontWeight:
                                                           FontWeight.w600,
@@ -884,33 +852,50 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                                                 )
                                               ],
                                             )
+                                          // ? Column(
+                                          //     crossAxisAlignment:
+                                          //         CrossAxisAlignment.start,
+                                          //     children: [
+                                          //       Text(
+                                          //         "Making Charge",
+                                          //         style: TextStyle(
+                                          //             fontSize:
+                                          //                 querySize.width *
+                                          //                     0.0344,
+                                          //             color: const Color(
+                                          //                 0xFF5E5E5E),
+                                          //             fontFamily: 'Segoe'),
+                                          //       ),
+                                          //       Text(
+                                          //         "${productDetailProvidervalue.productDetails!.data!.makingPrice ?? "N/A"} Qr",
+                                          //         style: TextStyle(
+                                          //             fontWeight:
+                                          //                 FontWeight.w600,
+                                          //             fontSize:
+                                          //                 querySize.width *
+                                          //                     0.0344,
+                                          //             color: const Color(
+                                          //                 0xFF000000),
+                                          //             fontFamily: 'Segoe'),
+                                          //       )
+                                          //     ],
+                                          //   )
                                           : SizedBox(),
                                     ],
                                   ),
                                   customSizedBox(querySize),
-                                  // Text(
-                                  //   'Price Breakup',
-                                  //   style: TextStyle(
-                                  //     decoration: TextDecoration.underline,
-                                  //     fontSize: querySize.width * 0.0344,
-                                  //     color: const Color(0xFF000000),
-                                  //     fontWeight: FontWeight.w600,
-                                  //     fontFamily: 'Segoe',
-                                  //   ),
-                                  // ),
                                   customSizedBox(querySize),
                                   productDetailProvidervalue.productDetails!
                                               .data!.category!.name ==
                                           'Diamond'
                                       ? Row(
-                                          //   mainAxisAlignment: MainAxisAlignment.start,
                                           children: [
                                             Column(
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
                                               children: [
                                                 Text(
-                                                  "Dimaond Weight",
+                                                  "Diamond Weight",
                                                   style: TextStyle(
                                                       fontSize:
                                                           querySize.width *
@@ -1046,22 +1031,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                                         textDecoration: TextDecoration
                                             .underline, // Underline links
                                       ),
-                                      // fontSize: querySize.width * 0.03,
-                                      // fontFamily: 'Segoe',
-                                      // color: Colors.black,
-                                      // fontWeight: FontWeight.w500,
                                     },
                                   ),
-                                  // Text(
-                                  //   productDetailProvidervalue.productDetails!
-                                  //           .data!.longDescription ??
-                                  //       "N/A",
-                                  //   style: TextStyle(
-                                  //       fontSize: querySize.width * 0.03,
-                                  //       fontFamily: 'Segoe',
-                                  //       color: Colors.black,
-                                  //       fontWeight: FontWeight.w500),
-                                  // ),
                                 ],
                               ),
                             ),
@@ -1084,7 +1055,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                             ),
                             customSizedBox(querySize),
                             SizedBox(
-                              // color: Colors.blueGrey,
                               height: 230.7 / 812.0 * querySize.height,
                               child: ListView.builder(
                                 physics: const ScrollPhysics(
@@ -1102,17 +1072,40 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                                           GestureDetector(
                                             onTap: () {
                                               Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        ProductDetailScreen(
-                                                            productId: productDetailProvidervalue
-                                                                .productDetails!
-                                                                .relatedProducts![
-                                                                    index]
-                                                                .id!),
-                                                  ));
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      ChangeNotifierProvider(
+                                                    create: (context) =>
+                                                        ProductDetailProvider(),
+                                                    child: ProductDetailScreen(
+                                                      productId:
+                                                          productDetailProvidervalue
+                                                              .productDetails!
+                                                              .relatedProducts![
+                                                                  index]
+                                                              .id!,
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
                                             },
+                                            // onTap: () {
+                                            //   Navigator.push(
+                                            //     context,
+                                            //     MaterialPageRoute(
+                                            //       builder: (context) =>
+                                            //           ProductDetailScreen(
+                                            //         productId:
+                                            //             productDetailProvidervalue
+                                            //                 .productDetails!
+                                            //                 .relatedProducts![
+                                            //                     index]
+                                            //                 .id!,
+                                            //       ),
+                                            //     ),
+                                            //   );
+                                            // },
                                             child: Container(
                                               margin: EdgeInsets.only(
                                                   right:
@@ -1204,7 +1197,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                                               fontFamily: 'Segoebold',
                                               fontWeight: FontWeight.w600,
                                               fontSize: querySize.width * 0.026,
-                                              //color: const Color(0xFF525252),
                                             ),
                                           ),
                                         ],
@@ -1258,46 +1250,37 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
         children: [
           ElevatedButton(
             onPressed: () {
-              final cartItem = HiveCartModel(
-                type: '1',
-                productId: product.data!.id!,
-                productName: product.data!.name ?? '',
-                description: product.data!.sku ?? '',
-                price: product.data!.price?.toDouble() ?? 0.0,
-                size: 'Default Size',
-                image: (product.data!.images != null &&
-                        product.data!.images!.isNotEmpty)
-                    ? product
-                        .data!.images!.first // Use the first image if available
-                    : 'assets/images/placeholder.png', // Default placeholder image
-                stock: product.data!.stock ?? 0,
-                quantity: 1,
-              );
+              // Only add to cart if not already there
+              if (!Provider.of<CartProvider>(context, listen: false)
+                  .isProductInCart(product.data!.id!)) {
+                final cartItem = HiveCartModel(
+                  type: '1',
+                  productId: product.data!.id!,
+                  productName: product.data!.name ?? '',
+                  description: product.data!.sku ?? '',
+                  price: selectedSize?.addPrice ??
+                      product.data!.price?.toDouble() ??
+                      0.0,
+                  size: selectedSize?.addKey?.toString(),
+                  image: (product.data!.images != null &&
+                          product.data!.images!.isNotEmpty)
+                      ? product.data!.images!.first
+                      : 'assets/images/placeholder.png',
+                  stock: product.data!.stock ?? 0,
+                  quantity: 1,
+                );
 
-              Provider.of<CartProvider>(context, listen: false)
-                  .addToCart(cartItem);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                    content: Text("${product.data!.name ?? ''} added to cart")),
-              );
-              // final cartItem = CartModel(
-              //   productId: product.data!.id!,
-              //   image: (product.data!.images != null &&
-              //           product.data!.images!.isNotEmpty)
-              //       ? product
-              //           .data!.images!.first // Use the first image if available
-              //       : 'assets/images/placeholder.png', // Provide a default placeholder image
-              //   stock: product.data!.stock ?? 0,
-              //   productName: product.data!.name ?? '',
-              //   description: product.data!.sku ?? '',
-              //   price: product.data!.price!.toDouble(),
-              //   size: 'Default Size',
-              // );
-
-              // Provider.of<CartProvider>(context, listen: false)
-              //     .addToCart(cartItem);
-              // customSnackBar(
-              //     context, "${product.data!.name ?? ''} added to cart");
+                Provider.of<CartProvider>(context, listen: false)
+                    .addToCart(cartItem);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                      backgroundColor: const Color(0xFF008186),
+                      content: Text(
+                        "${product.data!.name ?? ''} added to cart",
+                        style: TextStyle(color: Colors.white),
+                      )),
+                );
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF008186),
@@ -1309,21 +1292,113 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            child: const Text(
-              'Add to cart',
+            child: Text(
+              Provider.of<CartProvider>(context)
+                      .isProductInCart(product.data!.id!)
+                  ? 'Already added'
+                  : 'Add to cart',
               style: TextStyle(color: Colors.white),
             ),
-          ),
+          ), // ElevatedButton(
+          //   onPressed: () {
+          //     final cartItem = HiveCartModel(
+          //       type: '1',
+          //       productId: product.data!.id!,
+          //       productName: product.data!.name ?? '',
+          //       description: product.data!.sku ?? '',
+          //       price: selectedSize?.addPrice ??
+          //           product.data!.price?.toDouble() ??
+          //           0.0,
+          //       size: selectedSize?.addKey?.toString(),
+          //       image: (product.data!.images != null &&
+          //               product.data!.images!.isNotEmpty)
+          //           ? product.data!.images!.first
+          //           : 'assets/images/placeholder.png',
+          //       stock: product.data!.stock ?? 0,
+          //       quantity: 1,
+          //     );
+
+          //     Provider.of<CartProvider>(context, listen: false)
+          //         .addToCart(cartItem);
+          //     ScaffoldMessenger.of(context).showSnackBar(
+          //       SnackBar(
+          //           backgroundColor: const Color(0xFF008186),
+          //           content: Text(
+          //             "${product.data!.name ?? ''} added to cart",
+          //             style: TextStyle(color: Colors.white),
+          //           )),
+          //     );
+          //   },
+          //   style: ElevatedButton.styleFrom(
+          //     backgroundColor: const Color(0xFF008186),
+          //     minimumSize: Size(
+          //       MediaQuery.of(context).size.width * (137 / 375),
+          //       MediaQuery.of(context).size.height * (42 / 812),
+          //     ),
+          //     shape: RoundedRectangleBorder(
+          //       borderRadius: BorderRadius.circular(8),
+          //     ),
+          //   ),
+          //   child: const Text(
+          //     'Add to cart',
+          //     style: TextStyle(color: Colors.white),
+          //   ),
+          // ),
           ElevatedButton(
             onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => BuyNowCheckOutScreen(
-                      productId: product.data!.id!,
-                      quantity: 1,
-                    ),
-                  ));
+              if (!Provider.of<AuthProvider>(context, listen: false).hasToken) {
+                return customSnackBar(context, "Please Login");
+              }
+              final cartItem = HiveCartModel(
+                type: '1',
+                productId: product.data!.id!,
+                productName: product.data!.name ?? '',
+                description: product.data!.sku ?? '',
+                price: selectedSize?.addPrice ??
+                    product.data!.price?.toDouble() ??
+                    0.0,
+                size: selectedSize?.addKey?.toString(),
+                image: (product.data!.images != null &&
+                        product.data!.images!.isNotEmpty)
+                    ? product.data!.images!.first
+                    : 'assets/images/placeholder.png',
+                stock: product.data!.stock ?? 0,
+                quantity: 1,
+              );
+              if (Provider.of<CartProvider>(context, listen: false)
+                  .isProductInCart(product.data!.id!)) {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CheckOutScreen(
+
+                          //  size: selectedSize?.addKey,
+                          //price: selectedSize?.addPrice,
+                          ),
+                    ));
+              } else {
+                Provider.of<CartProvider>(context, listen: false)
+                    .addToCart(cartItem);
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CheckOutScreen(
+
+                          //  size: selectedSize?.addKey,
+                          //price: selectedSize?.addPrice,
+                          ),
+                    ));
+              }
+              // Navigator.push(
+              //     context,
+              //     MaterialPageRoute(
+              //       builder: (context) => BuyNowCheckOutScreen(
+              //         productId: product.data!.id!,
+              //         quantity: 1,
+              //         //  size: selectedSize?.addKey,
+              //         //price: selectedSize?.addPrice,
+              //       ),
+              //     ));
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF008186),
@@ -1344,77 +1419,4 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
       ),
     );
   }
-
-  // Container addToCartAndBuyNowButton(
-  //     Size querySize, BuildContext context, ProductDetailModel product) {
-  //   return Container(
-  //     decoration: BoxDecoration(
-  //       color: Colors.white,
-  //       boxShadow: [
-  //         BoxShadow(
-  //           color: Colors.black.withOpacity(0.2),
-  //           //spreadRadius: 0,
-  //           blurRadius: 4,
-  //           offset: const Offset(0, -5),
-  //         ),
-  //       ],
-  //       borderRadius: BorderRadius.circular(10),
-  //     ),
-  //     padding: EdgeInsets.all(querySize.width * 0.04),
-  //     child: Row(
-  //       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-  //       children: [
-  //         ElevatedButton(
-  //           onPressed: () {
-  //             final cartItem = CartModel(
-  //               image: product.data!.images![1],
-  //               stock: product.data!.stock ?? 0,
-  //               productName: product.data!.name ?? '',
-  //               description: product.data!.sku ?? '',
-  //               price: product.data!.price!.toDouble(),
-  //               size: 'Default Size',
-  //             );
-  //             Provider.of<CartProvider>(context, listen: false)
-  //                 .addToCart(cartItem);
-  //             ScaffoldMessenger.of(context).showSnackBar(
-  //               SnackBar(
-  //                   content: Text("${product.data!.name ?? ''} added to cart")),
-  //             );
-  //           },
-  //           style: ElevatedButton.styleFrom(
-  //             backgroundColor: const Color(0xFF008186),
-  //             minimumSize: Size(
-  //               MediaQuery.of(context).size.width * (137 / 375),
-  //               MediaQuery.of(context).size.height * (42 / 812),
-  //             ),
-  //             shape: RoundedRectangleBorder(
-  //               borderRadius: BorderRadius.circular(8),
-  //             ),
-  //           ),
-  //           child: const Text(
-  //             'Add to cart',
-  //             style: TextStyle(color: Colors.white),
-  //           ),
-  //         ),
-  //         ElevatedButton(
-  //           onPressed: () {},
-  //           style: ElevatedButton.styleFrom(
-  //             backgroundColor: const Color(0xFF008186),
-  //             minimumSize: Size(
-  //               MediaQuery.of(context).size.width * (137 / 375),
-  //               MediaQuery.of(context).size.height * (42 / 812),
-  //             ),
-  //             shape: RoundedRectangleBorder(
-  //               borderRadius: BorderRadius.circular(8),
-  //             ),
-  //           ),
-  //           child: const Text(
-  //             'Buy Now',
-  //             style: TextStyle(color: Colors.white),
-  //           ),
-  //         )
-  //       ],
-  //     ),
-  //   );
-  // }
 }

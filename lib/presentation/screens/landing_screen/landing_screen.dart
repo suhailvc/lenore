@@ -20,7 +20,8 @@ class _LandingScreenState extends State<LandingScreen> {
   void initState() {
     super.initState();
     videoPlayerController =
-        VideoPlayerController.asset('assets/images/landing_screen_video.mp4');
+        VideoPlayerController.asset("assets/images/story.mp4");
+    // VideoPlayerController.asset('assets/images/landing_screen_video.mp4');
     WidgetsBinding.instance.addPostFrameCallback((_) {
       var querySize = MediaQuery.of(context).size;
       setState(() {

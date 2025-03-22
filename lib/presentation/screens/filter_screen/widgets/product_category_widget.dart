@@ -15,8 +15,12 @@ class _ProductCategoryWidgetState extends State<ProductCategoryWidget> {
   @override
   void initState() {
     super.initState();
-    Provider.of<GiftByCategoryProvider>(context, listen: false)
-        .giftByCategoryProviderMethod();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<GiftByCategoryProvider>(context, listen: false)
+          .giftByCategoryProviderMethod();
+    });
+    // Provider.of<GiftByCategoryProvider>(context, listen: false)
+    //     .giftByCategoryProviderMethod();
   }
 
   @override

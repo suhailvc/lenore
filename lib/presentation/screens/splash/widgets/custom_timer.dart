@@ -42,7 +42,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 // }
 
 wait(context) async {
-  await Future.delayed(const Duration(milliseconds: 3700));
+  await Future.delayed(const Duration(milliseconds: 5800));
   //GoRouter.of(context).pushReplacement(NamedRoutes().mobileNumber.path);
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String? token = prefs.getString('bearerToken');

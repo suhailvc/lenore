@@ -30,7 +30,7 @@ class GiftByEventModel {
 class Data {
   int? id;
   String? eventCategory;
-  Null? eventCategoryar;
+  String? eventCategoryar;
   String? image;
 
   Data({this.id, this.eventCategory, this.eventCategoryar, this.image});

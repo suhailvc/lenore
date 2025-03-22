@@ -2,19 +2,26 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:lenore/core/constant.dart';
 
-Future<int?> paymentService({
-  required String token,
-  required String addressId,
-  required String paymentMethod,
-  required List<Map<String, dynamic>> cart,
-  required double totalAmount,
-  required double discount,
-  required String couponCode,
-  required double deliveryCharge,
-  required int quantity,
-}) async {
+Future<int?> paymentService(
+    {required String token,
+    required String addressId,
+    required String paymentMethod,
+    required List<Map<String, dynamic>> cart,
+    required double totalAmount,
+    required double discount,
+    required String couponCode,
+    required double deliveryCharge,
+    required int quantity,
+    required double walletUsed}) async {
   String url = '${baseUrl}/api/place-order';
-
+  print('discount: $discount');
+  print('couponcode : $couponCode');
+  print('delivery charge: $deliveryCharge');
+  print('Address ID: $addressId');
+  print('Payment Method: $paymentMethod');
+  print('Total Amount: $totalAmount');
+  print('Quantity: $quantity');
+  print('Cart: $cart');
   // Create the MultipartRequest
   var request = http.MultipartRequest('POST', Uri.parse(url));
 
@@ -32,6 +39,7 @@ Future<int?> paymentService({
   request.fields['coupon_code'] = couponCode;
   request.fields['delivery_charge'] = deliveryCharge.toString();
   request.fields['quantity'] = quantity.toString();
+  request.fields['wallet_used'] = walletUsed.toString();
 
   // Convert cart items to JSON and add as a field
   request.fields['cart'] = jsonEncode(cart);

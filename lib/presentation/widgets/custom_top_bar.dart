@@ -24,6 +24,12 @@ Row customTopBar(Size querySize, BuildContext context) {
       Expanded(
         child: GestureDetector(
           onTap: () {
+            // Navigator.push(
+            //   context,
+            //   MaterialPageRoute(
+            //     builder: (context) => SearchScreen(),
+            //   ),
+            // );
             PersistentNavBarNavigator.pushNewScreen(
               context,
               screen: SearchScreen(),

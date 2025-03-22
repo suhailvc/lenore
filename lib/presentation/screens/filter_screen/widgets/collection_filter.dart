@@ -13,8 +13,12 @@ class CollectionFilter extends StatefulWidget {
 class _CollectionFilterState extends State<CollectionFilter> {
   @override
   void initState() {
-    Provider.of<CollectionProvider>(context, listen: false)
-        .collectionProviderMethod();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<CollectionProvider>(context, listen: false)
+          .collectionProviderMethod();
+    });
+    // Provider.of<CollectionProvider>(context, listen: false)
+    //     .collectionProviderMethod();
     super.initState();
   }
 

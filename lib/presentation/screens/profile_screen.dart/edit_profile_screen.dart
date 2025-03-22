@@ -543,6 +543,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         if (buttonText == 'Save') {
           final token = await Provider.of<AuthProvider>(context, listen: false)
               .getToken();
+          print("token $token");
           final success =
               await Provider.of<EditProfileProvider>(context, listen: false)
                   .editProfileRequest(

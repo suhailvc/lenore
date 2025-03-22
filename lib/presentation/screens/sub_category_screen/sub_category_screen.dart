@@ -26,9 +26,14 @@ class SubCategoryScreen extends StatefulWidget {
 class _SubCategoryScreenState extends State<SubCategoryScreen> {
   @override
   void initState() {
-    Provider.of<SubCategoryProvider>(context, listen: false)
-        .fetchSubCategoriesItems(
-            categoryName: widget.categoryName, id: widget.id.toString());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<SubCategoryProvider>(context, listen: false)
+          .fetchSubCategoriesItems(
+              categoryName: widget.categoryName, id: widget.id.toString());
+    });
+    // Provider.of<SubCategoryProvider>(context, listen: false)
+    //     .fetchSubCategoriesItems(
+    //         categoryName: widget.categoryName, id: widget.id.toString());
     super.initState();
   }
 

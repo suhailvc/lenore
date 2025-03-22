@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lenore/application/provider/auth_provider/auth_provider.dart';
 import 'package:lenore/application/provider/cart_provider/cart_provider.dart';
 import 'package:lenore/application/provider/check_out_provider/check_box_provider.dart';
+import 'package:lenore/application/provider/off_days_provider/off_days_provider.dart';
 import 'package:lenore/core/constant.dart';
 import 'package:lenore/domain/check_out_model/check_out_model.dart';
 import 'package:lenore/presentation/screens/check_out_screen/widget/customCheckOutField.dart';
@@ -22,6 +23,17 @@ class CheckOutScreen extends StatefulWidget {
 }
 
 class _CheckOutScreenState extends State<CheckOutScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Fetch off days using provider
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<OffDaysProvider>(context, listen: false).fetchOffDays();
+    });
+  }
+
+  String? dateError;
+  String? selfDateError;
   var myNameController = TextEditingController();
   var myMobileNumberController = TextEditingController();
   var mySelfTo = TextEditingController();
@@ -46,8 +58,12 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
   String? numberError;
   String? giftMyNameError;
   String? giftMyNumberError;
+  String? gifteeNameError;
+  String? gifteeNumberError;
   String? selfMyNameError;
   String? selfMyNumberError;
+  bool customDateSelected = false;
+  bool selfCustomDateSelected = false;
   void validateFields() {
     setState(() {
       selfMyNameError =
@@ -67,12 +83,19 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
               myMobileNumberController.text.length != 8
           ? 'Please enter your mobile number'
           : null;
+      gifteeNameError = giftteeNameController.text.isEmpty
+          ? 'Please enter giftee your name'
+          : null;
+      gifteeNumberError = giftteemobileNumberController.text.length != 8
+          ? 'Please enter your mobile number'
+          : null;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     final cartProvider = Provider.of<CartProvider>(context);
+    final offDaysProvider = Provider.of<OffDaysProvider>(context);
     var querySize = MediaQuery.of(context).size;
 
     return Scaffold(
@@ -186,7 +209,8 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                                   myNameController,
                                   myMobileNumberController,
                                   mySelfTo,
-                                  mySelfMessage),
+                                  mySelfMessage,
+                                  offDaysProvider),
                             if (checkBox.sendAsGift)
                               sendAsGiftSection(
                                   querySize,
@@ -198,7 +222,8 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                                   giftteeNameController,
                                   giftteemobileNumberController,
                                   giftteeTo,
-                                  giftteeMessage),
+                                  giftteeMessage,
+                                  offDaysProvider),
                           ],
                         );
                       })
@@ -273,7 +298,11 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
     TextEditingController giftteeMobileNumber,
     TextEditingController toContoller,
     TextEditingController message,
+    OffDaysProvider offDaysProvider,
   ) {
+    bool isTodayOffDay() => offDaysProvider.isOffDay(DateTime.now());
+    bool isTomorrowOffDay() =>
+        offDaysProvider.isOffDay(DateTime.now().add(Duration(days: 1)));
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -301,7 +330,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
             'Enter Your Number',
             'Mobile Number',
             myMobileNumber,
-            errorMessage: giftMyNumberError),
+            errorMessage: gifteeNumberError),
         customOneSizedBox(querySize),
         customSizedBox(querySize),
         Text(
@@ -318,14 +347,16 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
             "assets/images/profile/first_name_icon.png",
             'Enter Giftee Name',
             'Giftee Name',
-            giftteeName),
+            giftteeName,
+            errorMessage: gifteeNameError),
         customOneSizedBox(querySize),
         customCheckOutField(
             context,
             "assets/images/profile/qatar_flag_icon.png",
             'Enter Giftee Number',
             'Giftee Mobile Number',
-            giftteeMobileNumber),
+            giftteeMobileNumber,
+            errorMessage: gifteeNumberError),
         SizedBox(
           height: querySize.width * 0.01,
         ),
@@ -411,110 +442,301 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
         SizedBox(
           height: querySize.height * 0.01,
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  todaySelected = !todaySelected;
-                  tommorrowSelected = false;
-                });
-                if (todaySelected == true) {
-                  selectedDay = 'today';
-                  selectedDate =
-                      DateFormat('yyyy-MM-dd').format(DateTime.now());
-                }
-                print(todaySelected);
-              },
-              child: Container(
-                width: querySize.width * 0.28,
-                height: querySize.height * 0.045,
-                decoration: BoxDecoration(
-                  color: todaySelected ? Colors.blue : appColor,
-                  borderRadius: BorderRadius.circular(querySize.width * 0.02),
-                ),
-                child: Center(
-                  child: Text(
-                    'Today',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                      fontFamily: 'Segoe',
-                      fontSize: querySize.height * 0.017,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  todaySelected = false;
-                  tommorrowSelected = !tommorrowSelected;
-                });
-                if (todaySelected == true) {
-                  selectedDay = 'tommorrow';
-                  selectedDate = DateFormat('yyyy-MM-dd')
-                      .format(DateTime.now().add(Duration(days: 1)));
-                }
-              },
-              child: Container(
-                width: querySize.width * 0.28,
-                height: querySize.height * 0.045,
-                decoration: BoxDecoration(
-                  color: tommorrowSelected ? Colors.blue : appColor,
-                  borderRadius: BorderRadius.circular(querySize.width * 0.02),
-                ),
-                child: Center(
-                  child: Text(
-                    'Tommorrow',
-                    style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                        fontFamily: 'Segoe',
-                        fontSize: querySize.height * 0.017),
-                  ),
-                ),
-              ),
-            ),
-            GestureDetector(
-                onTap: () async {
-                  setState(() {
-                    todaySelected = false;
-                    tommorrowSelected = false;
-                  });
-                  DateTime? pickedDate = await showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now().add(const Duration(days: 1)),
-                    firstDate: DateTime.now().add(const Duration(days: 1)),
-                    lastDate: DateTime(2100),
-                  );
 
-                  if (pickedDate != null) {
-                    selectedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
-                  }
-                },
-                child: Container(
-                  width: querySize.width * 0.28,
-                  height: querySize.height * 0.045,
-                  decoration: BoxDecoration(
-                    color: appColor,
-                    borderRadius: BorderRadius.circular(querySize.width * 0.02),
-                  ),
-                  child: Center(
-                    child: Text(
-                      'Pick a date',
-                      style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                          fontFamily: 'Segoe',
-                          fontSize: querySize.height * 0.017),
+        // Show loading indicator if still loading off days
+        offDaysProvider.isLoading
+            ? Center(child: CircularProgressIndicator())
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Today button - disabled if it's an off day
+                  GestureDetector(
+                    onTap: isTodayOffDay()
+                        ? null
+                        : () {
+                            setState(() {
+                              todaySelected = !todaySelected;
+                              tommorrowSelected = false;
+                              customDateSelected = false;
+                              dateError = null;
+                            });
+                            if (todaySelected == true) {
+                              selectedDay = 'today';
+                              selectedDate = DateFormat('yyyy-MM-dd')
+                                  .format(DateTime.now());
+                            } else {
+                              selectedDay = null;
+                              selectedDate = null;
+                            }
+                          },
+                    child: Container(
+                      width: querySize.width * 0.28,
+                      height: querySize.height * 0.045,
+                      decoration: BoxDecoration(
+                        color: isTodayOffDay()
+                            ? Colors.grey
+                            : (todaySelected ? Colors.blue : appColor),
+                        borderRadius:
+                            BorderRadius.circular(querySize.width * 0.02),
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Today',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                            fontFamily: 'Segoe',
+                            fontSize: querySize.height * 0.017,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                )),
-          ],
+
+                  // Tomorrow button - disabled if it's an off day
+                  GestureDetector(
+                    onTap: isTomorrowOffDay()
+                        ? null
+                        : () {
+                            setState(() {
+                              todaySelected = false;
+                              customDateSelected = false;
+                              tommorrowSelected = !tommorrowSelected;
+                              dateError = null;
+                            });
+                            if (tommorrowSelected == true) {
+                              selectedDay = 'tomorrow';
+                              selectedDate = DateFormat('yyyy-MM-dd').format(
+                                  DateTime.now().add(Duration(days: 1)));
+                            } else {
+                              selectedDay = null;
+                              selectedDate = null;
+                            }
+                          },
+                    child: Container(
+                      width: querySize.width * 0.28,
+                      height: querySize.height * 0.045,
+                      decoration: BoxDecoration(
+                        color: isTomorrowOffDay()
+                            ? Colors.grey
+                            : (tommorrowSelected ? Colors.blue : appColor),
+                        borderRadius:
+                            BorderRadius.circular(querySize.width * 0.02),
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Tomorrow',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                              fontFamily: 'Segoe',
+                              fontSize: querySize.height * 0.017),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  // Pick a date button
+                  GestureDetector(
+                    onTap: () async {
+                      setState(() {
+                        todaySelected = false;
+                        tommorrowSelected = false;
+                      });
+                      DateTime? pickedDate = await showDatePicker(
+                        context: context,
+                        initialDate:
+                            DateTime.now().add(const Duration(days: 1)),
+                        firstDate: DateTime.now().add(const Duration(days: 1)),
+                        lastDate: DateTime(2100),
+                        selectableDayPredicate: (DateTime day) {
+                          // Return false for off days to make them unselectable
+                          return !offDaysProvider.isOffDay(day);
+                        },
+                      );
+
+                      if (pickedDate != null) {
+                        selectedDate =
+                            DateFormat('yyyy-MM-dd').format(pickedDate);
+                        //  selectedDay = 'custom';
+                        dateError = null;
+                        customDateSelected = true;
+                      }
+                    },
+                    child: Container(
+                      width: querySize.width * 0.28,
+                      height: querySize.height * 0.045,
+                      decoration: BoxDecoration(
+                        color: customDateSelected ? Colors.blue : appColor,
+                        borderRadius:
+                            BorderRadius.circular(querySize.width * 0.02),
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Pick a date',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                              fontFamily: 'Segoe',
+                              fontSize: querySize.height * 0.017),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+        if (dateError != null)
+          Padding(
+            padding: EdgeInsets.only(top: 8.0),
+            child: Text(
+              dateError!,
+              style: TextStyle(
+                color: Colors.red,
+                fontSize: querySize.height * 0.015,
+                fontFamily: 'Segoe',
+              ),
+            ),
+          ),
+        // Add explanation about off days
+        SizedBox(
+          height: querySize.height * 0.01,
         ),
+        Text(
+          'Note: Grayed out dates are off days and cannot be selected',
+          style: TextStyle(
+              fontWeight: FontWeight.w500,
+              color: const Color(0xFFAAAEAE),
+              fontFamily: 'Segoe',
+              fontSize: querySize.height * 0.015),
+        ),
+
+        // Rest of the code remains the same
+        // SizedBox(
+        //   height: querySize.height * 0.018,
+        // ),
+        // Text(
+        //   'Note: Our team will contact the giftee for their location',
+        //   style: TextStyle(
+        //       fontWeight: FontWeight.w500,
+        //       color: const Color(0xFFAAAEAE),
+        //       fontFamily: 'Segoe',
+        //       fontSize: querySize.height * 0.015),
+        // ),
+        // Text(
+        //   'Pick a date',
+        //   style: TextStyle(
+        //       fontWeight: FontWeight.w600,
+        //       color: const Color(0xFF667080),
+        //       fontFamily: 'Segoe',
+        //       fontSize: querySize.height * 0.017),
+        // ),
+        // SizedBox(
+        //   height: querySize.height * 0.01,
+        // ),
+        // Row(
+        //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        //   children: [
+        //     GestureDetector(
+        //       onTap: () {
+        //         setState(() {
+        //           todaySelected = !todaySelected;
+        //           tommorrowSelected = false;
+        //         });
+        //         if (todaySelected == true) {
+        //           selectedDay = 'today';
+        //           selectedDate =
+        //               DateFormat('yyyy-MM-dd').format(DateTime.now());
+        //         }
+        //         print(todaySelected);
+        //       },
+        //       child: Container(
+        //         width: querySize.width * 0.28,
+        //         height: querySize.height * 0.045,
+        //         decoration: BoxDecoration(
+        //           color: todaySelected ? Colors.blue : appColor,
+        //           borderRadius: BorderRadius.circular(querySize.width * 0.02),
+        //         ),
+        //         child: Center(
+        //           child: Text(
+        //             'Today',
+        //             style: TextStyle(
+        //               fontWeight: FontWeight.w600,
+        //               color: Colors.white,
+        //               fontFamily: 'Segoe',
+        //               fontSize: querySize.height * 0.017,
+        //             ),
+        //           ),
+        //         ),
+        //       ),
+        //     ),
+        //     GestureDetector(
+        //       onTap: () {
+        //         setState(() {
+        //           todaySelected = false;
+        //           tommorrowSelected = !tommorrowSelected;
+        //         });
+        //         if (todaySelected == true) {
+        //           selectedDay = 'tommorrow';
+        //           selectedDate = DateFormat('yyyy-MM-dd')
+        //               .format(DateTime.now().add(Duration(days: 1)));
+        //         }
+        //       },
+        //       child: Container(
+        //         width: querySize.width * 0.28,
+        //         height: querySize.height * 0.045,
+        //         decoration: BoxDecoration(
+        //           color: tommorrowSelected ? Colors.blue : appColor,
+        //           borderRadius: BorderRadius.circular(querySize.width * 0.02),
+        //         ),
+        //         child: Center(
+        //           child: Text(
+        //             'Tommorrow',
+        //             style: TextStyle(
+        //                 fontWeight: FontWeight.w600,
+        //                 color: Colors.white,
+        //                 fontFamily: 'Segoe',
+        //                 fontSize: querySize.height * 0.017),
+        //           ),
+        //         ),
+        //       ),
+        //     ),
+        //     GestureDetector(
+        //         onTap: () async {
+        //           setState(() {
+        //             todaySelected = false;
+        //             tommorrowSelected = false;
+        //           });
+        //           DateTime? pickedDate = await showDatePicker(
+        //             context: context,
+        //             initialDate: DateTime.now().add(const Duration(days: 1)),
+        //             firstDate: DateTime.now().add(const Duration(days: 1)),
+        //             lastDate: DateTime(2100),
+        //           );
+
+        //           if (pickedDate != null) {
+        //             selectedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
+        //           }
+        //         },
+        //         child: Container(
+        //           width: querySize.width * 0.28,
+        //           height: querySize.height * 0.045,
+        //           decoration: BoxDecoration(
+        //             color: appColor,
+        //             borderRadius: BorderRadius.circular(querySize.width * 0.02),
+        //           ),
+        //           child: Center(
+        //             child: Text(
+        //               'Pick a date',
+        //               style: TextStyle(
+        //                   fontWeight: FontWeight.w600,
+        //                   color: Colors.white,
+        //                   fontFamily: 'Segoe',
+        //                   fontSize: querySize.height * 0.017),
+        //             ),
+        //           ),
+        //         )),
+        //   ],
+        // ),
         SizedBox(
           height: querySize.height * 0.018,
         ),
@@ -560,7 +782,17 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
               onTap: () async {
                 String token = (await AuthProvider().getToken())!;
                 giftValidateFields();
-                if (giftMyNameError == null && giftMyNumberError == null) {
+                // Check if date is selected
+                if (selectedDate == null) {
+                  setState(() {
+                    dateError = 'Please select a date';
+                  });
+                  return;
+                }
+                if (giftMyNameError == null &&
+                    giftMyNumberError == null &&
+                    gifteeNameError == null &&
+                    gifteeNumberError == null) {
                   var response = await Provider.of<CheckOutProvider>(context,
                           listen: false)
                       .saveAddress(
@@ -626,7 +858,11 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
     TextEditingController myMobileNumber,
     TextEditingController toContoller,
     TextEditingController message,
+    OffDaysProvider offDaysProvider,
   ) {
+    bool isTodayOffDay() => offDaysProvider.isOffDay(DateTime.now());
+    bool isTomorrowOffDay() =>
+        offDaysProvider.isOffDay(DateTime.now().add(Duration(days: 1)));
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -709,111 +945,282 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
         SizedBox(
           height: querySize.height * 0.01,
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  selfTodaySelected = !selfTodaySelected;
-                  selfTommorrowSelected = false;
-                });
-                if (todaySelected == true) {
-                  selfSelectedDay = 'today';
-                  selfSelectedDate =
-                      DateFormat('yyyy-MM-dd').format(DateTime.now());
-                }
-                print(todaySelected);
-              },
-              child: Container(
-                width: querySize.width * 0.28,
-                height: querySize.height * 0.045,
-                decoration: BoxDecoration(
-                  color: selfTodaySelected ? Colors.blue : appColor,
-                  borderRadius: BorderRadius.circular(querySize.width * 0.02),
-                ),
-                child: Center(
-                  child: Text(
-                    'Today',
-                    style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                        fontFamily: 'Segoe',
-                        fontSize: querySize.height * 0.017),
-                  ),
-                ),
-              ),
-            ),
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  selfTodaySelected = false;
-                  selfTommorrowSelected = !tommorrowSelected;
-                });
-                if (todaySelected == true) {
-                  selfSelectedDay = 'tomorrow';
-                  selfSelectedDate = DateFormat('yyyy-MM-dd')
-                      .format(DateTime.now().add(Duration(days: 1)));
-                }
-              },
-              child: Container(
-                width: querySize.width * 0.28,
-                height: querySize.height * 0.045,
-                decoration: BoxDecoration(
-                  color: selfTommorrowSelected ? Colors.blue : appColor,
-                  borderRadius: BorderRadius.circular(querySize.width * 0.02),
-                ),
-                child: Center(
-                  child: Text(
-                    'Tomorrow',
-                    style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                        fontFamily: 'Segoe',
-                        fontSize: querySize.height * 0.017),
-                  ),
-                ),
-              ),
-            ),
-            GestureDetector(
-              onTap: () async {
-                setState(() {
-                  selfTodaySelected = false;
-                  selfTommorrowSelected = false;
-                });
-                DateTime? pickedDate = await showDatePicker(
-                  context: context,
-                  initialDate: DateTime.now().add(const Duration(days: 1)),
-                  firstDate: DateTime.now().add(const Duration(days: 1)),
-                  lastDate: DateTime(2100),
-                );
 
-                if (pickedDate != null) {
-                  selfSelectedDate =
-                      DateFormat('yyyy-MM-dd').format(pickedDate);
-                }
-              },
-              child: Container(
-                width: querySize.width * 0.28,
-                height: querySize.height * 0.045,
-                decoration: BoxDecoration(
-                  color: appColor,
-                  borderRadius: BorderRadius.circular(querySize.width * 0.02),
-                ),
-                child: Center(
-                  child: Text(
-                    'Pick a date',
-                    style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                        fontFamily: 'Segoe',
-                        fontSize: querySize.height * 0.017),
+        // Show loading indicator if still loading off days
+        offDaysProvider.isLoading
+            ? Center(child: CircularProgressIndicator())
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Today button - disabled if it's an off day
+                  GestureDetector(
+                    onTap: isTodayOffDay()
+                        ? null
+                        : () {
+                            setState(() {
+                              selfTodaySelected = !selfTodaySelected;
+                              selfTommorrowSelected = false;
+                              selfDateError = null;
+                              selfCustomDateSelected = false;
+                            });
+                            if (selfTodaySelected == true) {
+                              selfSelectedDay = 'today';
+                              selfSelectedDate = DateFormat('yyyy-MM-dd')
+                                  .format(DateTime.now());
+                            }
+                          },
+                    child: Container(
+                      width: querySize.width * 0.28,
+                      height: querySize.height * 0.045,
+                      decoration: BoxDecoration(
+                        color: isTodayOffDay()
+                            ? Colors.grey
+                            : (selfTodaySelected ? Colors.blue : appColor),
+                        borderRadius:
+                            BorderRadius.circular(querySize.width * 0.02),
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Today',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                              fontFamily: 'Segoe',
+                              fontSize: querySize.height * 0.017),
+                        ),
+                      ),
+                    ),
                   ),
-                ),
+
+                  // Tomorrow button - disabled if it's an off day
+                  GestureDetector(
+                    onTap: isTomorrowOffDay()
+                        ? null
+                        : () {
+                            setState(() {
+                              selfTodaySelected = false;
+                              selfTommorrowSelected = !selfTommorrowSelected;
+                              selfDateError = null;
+                              selfCustomDateSelected = false;
+                            });
+                            if (selfTommorrowSelected == true) {
+                              selfSelectedDay = 'tomorrow';
+                              selfSelectedDate = DateFormat('yyyy-MM-dd')
+                                  .format(
+                                      DateTime.now().add(Duration(days: 1)));
+                            }
+                          },
+                    child: Container(
+                      width: querySize.width * 0.28,
+                      height: querySize.height * 0.045,
+                      decoration: BoxDecoration(
+                        color: isTomorrowOffDay()
+                            ? Colors.grey
+                            : (selfTommorrowSelected ? Colors.blue : appColor),
+                        borderRadius:
+                            BorderRadius.circular(querySize.width * 0.02),
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Tomorrow',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                              fontFamily: 'Segoe',
+                              fontSize: querySize.height * 0.017),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  // Pick a date button
+                  GestureDetector(
+                    onTap: () async {
+                      setState(() {
+                        selfTodaySelected = false;
+                        selfTommorrowSelected = false;
+                      });
+                      DateTime? pickedDate = await showDatePicker(
+                        context: context,
+                        initialDate:
+                            DateTime.now().add(const Duration(days: 1)),
+                        firstDate: DateTime.now().add(const Duration(days: 1)),
+                        lastDate: DateTime(2100),
+                        selectableDayPredicate: (DateTime day) {
+                          // Return false for off days to make them unselectable
+                          return !offDaysProvider.isOffDay(day);
+                        },
+                      );
+
+                      if (pickedDate != null) {
+                        selfSelectedDate =
+                            DateFormat('yyyy-MM-dd').format(pickedDate);
+                        selfDateError = null;
+                        selfCustomDateSelected = true;
+                      }
+                    },
+                    child: Container(
+                      width: querySize.width * 0.28,
+                      height: querySize.height * 0.045,
+                      decoration: BoxDecoration(
+                        color: appColor,
+                        borderRadius:
+                            BorderRadius.circular(querySize.width * 0.02),
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Pick a date',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                              fontFamily: 'Segoe',
+                              fontSize: querySize.height * 0.017),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+        if (selfDateError != null)
+          Padding(
+            padding: EdgeInsets.only(top: 8.0),
+            child: Text(
+              selfDateError!,
+              style: TextStyle(
+                color: Colors.red,
+                fontSize: querySize.height * 0.015,
+                fontFamily: 'Segoe',
               ),
             ),
-          ],
+          ),
+        // Add explanation about off days
+        SizedBox(
+          height: querySize.height * 0.01,
         ),
+        Text(
+          'Note: Grayed out dates are off days and cannot be selected',
+          style: TextStyle(
+              fontWeight: FontWeight.w500,
+              color: const Color(0xFFAAAEAE),
+              fontFamily: 'Segoe',
+              fontSize: querySize.height * 0.015),
+        ),
+        // Text(
+        //   'Pick a date',
+        //   style: TextStyle(
+        //       fontWeight: FontWeight.w600,
+        //       color: const Color(0xFF667080),
+        //       fontFamily: 'Segoe',
+        //       fontSize: querySize.height * 0.017),
+        // ),
+        // SizedBox(
+        //   height: querySize.height * 0.01,
+        // ),
+        // Row(
+        //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        //   children: [
+        //     GestureDetector(
+        //       onTap: () {
+        //         setState(() {
+        //           selfTodaySelected = !selfTodaySelected;
+        //           selfTommorrowSelected = false;
+        //         });
+        //         if (todaySelected == true) {
+        //           selfSelectedDay = 'today';
+        //           selfSelectedDate =
+        //               DateFormat('yyyy-MM-dd').format(DateTime.now());
+        //         }
+        //         print(todaySelected);
+        //       },
+        //       child: Container(
+        //         width: querySize.width * 0.28,
+        //         height: querySize.height * 0.045,
+        //         decoration: BoxDecoration(
+        //           color: selfTodaySelected ? Colors.blue : appColor,
+        //           borderRadius: BorderRadius.circular(querySize.width * 0.02),
+        //         ),
+        //         child: Center(
+        //           child: Text(
+        //             'Today',
+        //             style: TextStyle(
+        //                 fontWeight: FontWeight.w600,
+        //                 color: Colors.white,
+        //                 fontFamily: 'Segoe',
+        //                 fontSize: querySize.height * 0.017),
+        //           ),
+        //         ),
+        //       ),
+        //     ),
+        //     GestureDetector(
+        //       onTap: () {
+        //         setState(() {
+        //           selfTodaySelected = false;
+        //           selfTommorrowSelected = !tommorrowSelected;
+        //         });
+        //         if (todaySelected == true) {
+        //           selfSelectedDay = 'tomorrow';
+        //           selfSelectedDate = DateFormat('yyyy-MM-dd')
+        //               .format(DateTime.now().add(Duration(days: 1)));
+        //         }
+        //       },
+        //       child: Container(
+        //         width: querySize.width * 0.28,
+        //         height: querySize.height * 0.045,
+        //         decoration: BoxDecoration(
+        //           color: selfTommorrowSelected ? Colors.blue : appColor,
+        //           borderRadius: BorderRadius.circular(querySize.width * 0.02),
+        //         ),
+        //         child: Center(
+        //           child: Text(
+        //             'Tomorrow',
+        //             style: TextStyle(
+        //                 fontWeight: FontWeight.w600,
+        //                 color: Colors.white,
+        //                 fontFamily: 'Segoe',
+        //                 fontSize: querySize.height * 0.017),
+        //           ),
+        //         ),
+        //       ),
+        //     ),
+        //     GestureDetector(
+        //       onTap: () async {
+        //         setState(() {
+        //           selfTodaySelected = false;
+        //           selfTommorrowSelected = false;
+        //         });
+        //         DateTime? pickedDate = await showDatePicker(
+        //           context: context,
+        //           initialDate: DateTime.now().add(const Duration(days: 1)),
+        //           firstDate: DateTime.now().add(const Duration(days: 1)),
+        //           lastDate: DateTime(2100),
+        //         );
+
+        //         if (pickedDate != null) {
+        //           selfSelectedDate =
+        //               DateFormat('yyyy-MM-dd').format(pickedDate);
+        //         }
+        //       },
+        //       child: Container(
+        //         width: querySize.width * 0.28,
+        //         height: querySize.height * 0.045,
+        //         decoration: BoxDecoration(
+        //           color: appColor,
+        //           borderRadius: BorderRadius.circular(querySize.width * 0.02),
+        //         ),
+        //         child: Center(
+        //           child: Text(
+        //             'Pick a date',
+        //             style: TextStyle(
+        //                 fontWeight: FontWeight.w600,
+        //                 color: Colors.white,
+        //                 fontFamily: 'Segoe',
+        //                 fontSize: querySize.height * 0.017),
+        //           ),
+        //         ),
+        //       ),
+        //     ),
+        //   ],
+        // ),
         customSizedBox(querySize),
         Row(
           children: [
@@ -846,6 +1253,12 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
               onTap: () async {
                 String token = (await AuthProvider().getToken())!;
                 validateFields();
+                if (selfSelectedDate == null) {
+                  setState(() {
+                    selfDateError = 'Please select a date';
+                  });
+                  return;
+                }
                 if (selfMyNameError == null && selfMyNumberError == null) {
                   var response = await Provider.of<CheckOutProvider>(context,
                           listen: false)
@@ -859,7 +1272,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                                   giftteemobileNumberController.text.trim(),
                               to: toContoller.text.trim(),
                               message: message.text.trim(),
-                              date: selectedDate.toString(),
+                              date: selfSelectedDate.toString(),
                               makeAnonymous: '0',
                               deliveryType: selectedDay),
                           token);

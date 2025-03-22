@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:lenore/application/provider/auth_provider/auth_provider.dart';
 import 'package:lenore/application/provider/cart_provider/cart_provider.dart';
 import 'package:lenore/application/provider/voucher_detail_provider/voucher_detail_provider.dart';
 import 'package:lenore/core/constant.dart';
 import 'package:lenore/domain/hive_model/hive_cart_model/hive_cart_model.dart';
 import 'package:lenore/domain/voucher_detail_model/voucher_detail_model.dart';
 import 'package:lenore/presentation/screens/buy_now_check_out_screen/buy_now_check_out_screen.dart';
+import 'package:lenore/presentation/screens/check_out_screen/check_out_screen.dart';
 import 'package:lenore/presentation/screens/voucher_buy_now_checkout_screen.dart/voucher_buy_now_checkout_screen.dart';
+import 'package:lenore/presentation/widgets/custom_snack_bar.dart';
 
 import 'package:lenore/presentation/widgets/custom_top_bar.dart';
 import 'package:lenore/presentation/widgets/multiple_shimmer.dart';
@@ -24,8 +27,12 @@ class GiftByVoucherDetailScreen extends StatefulWidget {
 class _GiftByVoucherDetailScreenState extends State<GiftByVoucherDetailScreen> {
   @override
   void initState() {
-    Provider.of<VocherDetailProvider>(context, listen: false)
-        .fetchVoucherDetail(widget.id);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<VocherDetailProvider>(context, listen: false)
+          .fetchVoucherDetail(widget.id);
+    });
+    // Provider.of<VocherDetailProvider>(context, listen: false)
+    //     .fetchVoucherDetail(widget.id);
 
     super.initState();
   }
@@ -330,25 +337,33 @@ Container addToCartAndBuyNowButton(
       children: [
         ElevatedButton(
           onPressed: () {
-            final cartItem = HiveCartModel(
-              voucherDiscount: voucher.data![0].discount ?? 0.0,
-              type: '2',
-              productId: voucher.data![0].id!,
-              productName: voucher.data![0].name ?? '',
-              description: '',
-              price: voucher.data![0].amount!.toDouble(),
-              // double.tryParse(voucher.data![0].priceAfterDiscount!) ?? 0.0,
-              size: 'Default Size',
-              image: voucher.data![0].image!, // Default placeholder image
-              stock: 10000,
-              quantity: 1,
-            );
+            if (!Provider.of<CartProvider>(context, listen: false)
+                .isProductInCart(voucher.data![0].id!)) {
+              final cartItem = HiveCartModel(
+                voucherDiscount: voucher.data![0].discount ?? 0.0,
+                type: '2',
+                productId: voucher.data![0].id!,
+                productName: voucher.data![0].name ?? '',
+                description: '',
+                price: voucher.data![0].amount!.toDouble(),
+                // double.tryParse(voucher.data![0].priceAfterDiscount!) ?? 0.0,
+                size: 'Default Size',
+                image: voucher.data![0].image!, // Default placeholder image
+                stock: 10000,
+                quantity: 1,
+              );
 
-            Provider.of<CartProvider>(context, listen: false)
-                .addToCart(cartItem);
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("voucher added to cart")),
-            );
+              Provider.of<CartProvider>(context, listen: false)
+                  .addToCart(cartItem);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                    backgroundColor: const Color(0xFF008186),
+                    content: Text(
+                      "voucher added to cart",
+                      style: TextStyle(color: Colors.white),
+                    )),
+              );
+            }
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF008186),
@@ -360,21 +375,57 @@ Container addToCartAndBuyNowButton(
               borderRadius: BorderRadius.circular(8),
             ),
           ),
-          child: const Text(
-            'Add to cart',
+          child: Text(
+            Provider.of<CartProvider>(context, listen: false)
+                    .isProductInCart(voucher.data![0].id!)
+                ? 'Already added'
+                : 'Add to cart',
             style: TextStyle(color: Colors.white),
           ),
         ),
         ElevatedButton(
           onPressed: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => VoucherBuyNowCheckoutScreen(
-                    productId: voucher.data![0].id!,
-                    quantity: 2,
-                  ),
-                ));
+            if (!Provider.of<AuthProvider>(context, listen: false).hasToken) {
+              return customSnackBar(context, "Please Login");
+            }
+            if (Provider.of<CartProvider>(context, listen: false)
+                .isProductInCart(voucher.data![0].id!)) {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CheckOutScreen(),
+                  ));
+            } else {
+              final cartItem = HiveCartModel(
+                voucherDiscount: voucher.data![0].discount ?? 0.0,
+                type: '2',
+                productId: voucher.data![0].id!,
+                productName: voucher.data![0].name ?? '',
+                description: '',
+                price: voucher.data![0].amount!.toDouble(),
+                // double.tryParse(voucher.data![0].priceAfterDiscount!) ?? 0.0,
+                size: 'Default Size',
+                image: voucher.data![0].image!, // Default placeholder image
+                stock: 10000,
+                quantity: 1,
+              );
+
+              Provider.of<CartProvider>(context, listen: false)
+                  .addToCart(cartItem);
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CheckOutScreen(),
+                  ));
+            }
+            // Navigator.push(
+            //     context,
+            //     MaterialPageRoute(
+            //       builder: (context) => VoucherBuyNowCheckoutScreen(
+            //         productId: voucher.data![0].id!,
+            //         quantity: 2,
+            //       ),
+            //     ));
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF008186),

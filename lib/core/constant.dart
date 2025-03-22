@@ -93,3 +93,4 @@ Future<bool> hasBearerToken() async {
 }
 
 String globalDeliveryFee = '0';
+String? fcm_token;

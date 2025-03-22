@@ -21,7 +21,7 @@ class HiveCartModelAdapter extends TypeAdapter<HiveCartModel> {
       productName: fields[1] as String,
       description: fields[2] as String,
       price: fields[3] as double,
-      size: fields[4] as String,
+      size: fields[4] as String?,
       image: fields[5] as String,
       stock: fields[6] as int,
       type: fields[8] as String,

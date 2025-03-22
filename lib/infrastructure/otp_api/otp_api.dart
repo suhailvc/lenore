@@ -14,7 +14,7 @@ class OtpApiService {
   Future<dynamic> verifyOtp(
       String mobileNumber, String otp, BuildContext context) async {
     final String url =
-        '$baseUrl/api/confirm-otp?phone=${mobileNumber}&otp=$otp';
+        '$baseUrl/api/confirm-otp?phone=${mobileNumber}&otp=$otp&fcm_token=$fcm_token';
     // final String url = '$baseUrl/api/confirm-otp?phone=$mobileNumber&otp=1234';
     try {
       print(

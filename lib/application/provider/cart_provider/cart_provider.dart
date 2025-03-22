@@ -21,6 +21,10 @@ class CartProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  bool isProductInCart(int productId) {
+    return _items.any((item) => item.productId == productId);
+  }
+
   void addToCart(HiveCartModel product) {
     final existingIndex =
         _items.indexWhere((item) => item.productId == product.productId);
@@ -35,10 +39,19 @@ class CartProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void incrementItemQuantity(int index) {
+  void incrementItemQuantity(int index, BuildContext context) {
     if (_items[index].quantity < _items[index].stock) {
       _items[index].incrementQuantity();
       notifyListeners();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            backgroundColor: Colors.red,
+            content: Text(
+              "Out of stock",
+              style: TextStyle(color: Colors.white),
+            )),
+      );
     }
   }
 

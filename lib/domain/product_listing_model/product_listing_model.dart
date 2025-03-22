@@ -51,17 +51,28 @@ class Data {
   String? name;
   String? namear;
   String? thumbImage;
-  int? price;
+  double? price;
 
   Data({this.id, this.name, this.namear, this.thumbImage, this.price});
-
   Data.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     name = json['name'];
     namear = json['namear'];
     thumbImage = json['thumb_image'];
-    price = json['price'];
+    // Handle both int and double price values
+    if (json['price'] != null) {
+      price = json['price'] is int
+          ? (json['price'] as int).toDouble()
+          : json['price'];
+    }
   }
+  // Data.fromJson(Map<String, dynamic> json) {
+  //   id = json['id'];
+  //   name = json['name'];
+  //   namear = json['namear'];
+  //   thumbImage = json['thumb_image'];
+  //   price = json['price'];
+  // }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();

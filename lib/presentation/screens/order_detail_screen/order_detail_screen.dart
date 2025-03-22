@@ -243,6 +243,54 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                             Row(
                               children: [
                                 Text(
+                                  "Wallet",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      color: const Color(0xFF252525),
+                                      fontFamily: 'Segoe',
+                                      fontSize: querySize.height * 0.017),
+                                ),
+                                Spacer(),
+                                Text(
+                                  "${orderDetailValue.orderDetail!.data!.walletUsed} QAR",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      color: const Color(0xFF252525),
+                                      fontFamily: 'Segoe',
+                                      fontSize: querySize.height * 0.017),
+                                )
+                              ],
+                            ),
+                            SizedBox(
+                              height: querySize.height * 0.01,
+                            ),
+                            Row(
+                              children: [
+                                Text(
+                                  "Voucher Discount",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      color: const Color(0xFF252525),
+                                      fontFamily: 'Segoe',
+                                      fontSize: querySize.height * 0.017),
+                                ),
+                                Spacer(),
+                                Text(
+                                  "${orderDetailValue.orderDetail!.data!.voucherDiscountAmount} QAR",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      color: const Color(0xFF252525),
+                                      fontFamily: 'Segoe',
+                                      fontSize: querySize.height * 0.017),
+                                )
+                              ],
+                            ),
+                            SizedBox(
+                              height: querySize.height * 0.01,
+                            ),
+                            Row(
+                              children: [
+                                Text(
                                   "Discount",
                                   style: TextStyle(
                                       fontWeight: FontWeight.w600,
