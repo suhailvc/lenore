@@ -78,7 +78,7 @@ void main() async {
     Hive.registerAdapter(HiveCartModelAdapter());
   }
   await Hive.openBox<HiveCartModel>('cartBox');
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  // await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   // await FirebaseMessaging.instance.subscribeToTopic('grofresh');
   if (defaultTargetPlatform == TargetPlatform.android) {
     FirebaseMessaging.instance.requestPermission();

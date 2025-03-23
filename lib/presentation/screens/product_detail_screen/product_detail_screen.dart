@@ -10,7 +10,6 @@ import 'package:lenore/core/constant.dart';
 
 import 'package:lenore/domain/hive_model/hive_cart_model/hive_cart_model.dart';
 import 'package:lenore/domain/product_detail_model/product_detail_model.dart';
-import 'package:lenore/presentation/screens/buy_now_check_out_screen/buy_now_check_out_screen.dart';
 import 'package:lenore/presentation/screens/check_out_screen/check_out_screen.dart';
 import 'package:lenore/presentation/widgets/custom_snack_bar.dart';
 

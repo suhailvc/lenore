@@ -51,7 +51,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyCkM1lNnvS4yONuBzYJG0T1fOB-tGIydiw',
-    appId: '1:923759502233:android:f0c0a9ce4509ad013ba908',
+    appId: '1:923759502233:android:7b9cd96d96aeb09b3ba908',
     messagingSenderId: '923759502233',
     projectId: 'lenore-92b3c',
     storageBucket: 'lenore-92b3c.firebasestorage.app',
@@ -59,10 +59,10 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyAKNbyPjQzhLNKmmIO4ExBJOgFnNwOpddw',
-    appId: '1:923759502233:ios:a98e7640251dbac23ba908',
+    appId: '1:923759502233:ios:bee46f663bc033ee3ba908',
     messagingSenderId: '923759502233',
     projectId: 'lenore-92b3c',
     storageBucket: 'lenore-92b3c.firebasestorage.app',
-    iosBundleId: 'com.example.lenore',
+    iosBundleId: 'com.LenoreJewellery.iOS',
   );
 }
